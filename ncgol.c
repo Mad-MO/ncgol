@@ -91,8 +91,6 @@ static void draw_grid(void)
     uint8_t x, y;
     char str[16];
 
-    // Clear display
-    //wclear(w_grid);
     cells_alive = 0;
 
     // Draw grid to canvas
@@ -116,17 +114,17 @@ static void draw_grid(void)
     wattron(w_status, COLOR_PAIR(2));
     mvwprintw(w_status, 0, 0, "Cycles =");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 9, "%d", cycle_counter);
+    mvwprintw(w_status, 0, 9, "%7d", cycle_counter);
 
     wattron(w_status, COLOR_PAIR(2));
     mvwprintw(w_status, 0, 20, "Cells =");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 28, "%d", cells_alive);
+    mvwprintw(w_status, 0, 28, "%5d", cells_alive);
 
     wattron(w_status, COLOR_PAIR(2));
     mvwprintw(w_status, 0, 40, "Speed =");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 48, "%d", speed);
+    mvwprintw(w_status, 0, 48, "%2d", speed);
 
     wattroff(w_status, COLOR_PAIR(3));
     wrefresh(w_status);
