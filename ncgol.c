@@ -205,12 +205,18 @@ int main(void)
     draw_grid();
     wrefresh(w_grid);
 
-    // Handle exit
+    // Handle input
     int z = wgetch(w_grid);
     if(z == 27)
     {
       endwin();
       exit(0);
+    }
+    else if((z == KEY_RIGHT) || (z == KEY_LEFT))
+    {
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
     }
   }
 
