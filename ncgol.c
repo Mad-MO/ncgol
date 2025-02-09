@@ -8,12 +8,11 @@
 
 // Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
 
-
-
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 
 
 // Define SW name and Version
@@ -23,18 +22,20 @@
 #define SW_STR  SW_NAME " " SW_VERS " " AUTHOR
 
 // Define the size of the grid
-#define GRID_WIDTH    100
-#define GRID_HEIGHT   100
+#define GRID_WIDTH_MAX  1000 // Ultrawidescreen 250 -> 1000
+#define GRID_HEIGHT_MAX  400 // Ultrawidescreen 100 ->  400
 
 // Create the grid to represent the cells
-static uint8_t grid[GRID_WIDTH][GRID_HEIGHT];
-static uint8_t new_grid[GRID_WIDTH][GRID_HEIGHT];
+static uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
+static uint8_t new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t speed;
 int cells_alive = 0;
 int cycle_counter = 0;
 #define END_DET_CNT 60
 static uint8_t end_det[END_DET_CNT];
 static uint8_t end_det_pos;
+static uint16_t grid_width;
+static uint16_t grid_height;
 
 WINDOW *w_grid_box;
 WINDOW *w_grid;
@@ -57,7 +58,6 @@ static ModeType mode;
 
 
 
-
 // Function to initialize the grid
 void init_grid(void)
 {
@@ -65,24 +65,24 @@ void init_grid(void)
 
     if(mode == ModeTypeRandom)
     {
-        uint8_t x, y;
-        for(x=0; x<GRID_WIDTH; x++)
-            for(y=0; y<GRID_HEIGHT; y++)
+        uint16_t x, y;
+        for(x=0; x<grid_width; x++)
+            for(y=0; y<grid_height; y++)
                 grid[x][y] = (random() & 1);
     }
     else if(mode == ModeTypeBlinker)
     {
-        grid[1+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
     }
     else if(mode == ModeTypeGlider)
     {
-        grid[0+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
-        grid[2+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
-        grid[2+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+        grid[0+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[2+(grid_width/2)][2+(grid_height/2)] = 1;
     }
     else if(mode == ModeTypeGliderGun)
     {
@@ -105,31 +105,31 @@ void init_grid(void)
     }
     else if(mode == ModeTypePentomino)
     {
-        grid[0+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
-        grid[2+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
+        grid[0+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[2+(grid_width/2)][0+(grid_height/2)] = 1;
     }
     else if(mode == ModeTypeDiehard)
     {
-        grid[0+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
-        grid[5+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
-        grid[6+(GRID_WIDTH/2)][3+(GRID_HEIGHT/2)] = 1;
-        grid[6+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
-        grid[7+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
+        grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][5+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][5+(grid_height/2)] = 1;
+        grid[6+(grid_width/2)][3+(grid_height/2)] = 1;
+        grid[6+(grid_width/2)][5+(grid_height/2)] = 1;
+        grid[7+(grid_width/2)][5+(grid_height/2)] = 1;
     }
     else if(mode == ModeTypeAcorn)
     {
-        grid[0+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
-        grid[1+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
-        grid[3+(GRID_WIDTH/2)][3+(GRID_HEIGHT/2)] = 1;
-        grid[4+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
-        grid[5+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
-        grid[6+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][3+(grid_height/2)] = 1;
+        grid[4+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[6+(grid_width/2)][4+(grid_height/2)] = 1;
     }
 
     cycle_counter = 0;
@@ -140,10 +140,10 @@ void init_grid(void)
 // Function to update the grid based on the game of life rules
 void update_grid(void)
 {
-    uint8_t x, y;
-    for(x=0; x<GRID_WIDTH; x++)
+    uint16_t x, y;
+    for(x=0; x<grid_width; x++)
     {
-        for(y=0; y<GRID_HEIGHT; y++)
+        for(y=0; y<grid_height; y++)
         {
             uint8_t neighbors = 0;
             for(int8_t dx=-1; dx<=1; dx++)
@@ -154,8 +154,8 @@ void update_grid(void)
                     {
                         continue;
                     }
-                    uint8_t nx = (GRID_WIDTH + x + dx) % GRID_WIDTH;
-                    uint8_t ny = (GRID_HEIGHT + y + dy) % GRID_HEIGHT;
+                    uint16_t nx = (grid_width + x + dx) % grid_width;
+                    uint16_t ny = (grid_height + y + dy) % grid_height;
                     neighbors += grid[nx][ny];
                 }
             }
@@ -179,15 +179,15 @@ void update_grid(void)
 // Function to draw the grid on the canvas
 static void draw_grid(void)
 {
-    uint8_t x, y;
+    uint16_t x, y;
     char str[16];
 
     cells_alive = 0;
 
     // Draw grid to canvas
-    for(x=0; x<GRID_WIDTH; x++)
+    for(x=0; x<grid_width; x++)
     {
-        for(y=0; y<GRID_HEIGHT; y++)
+        for(y=0; y<grid_height; y++)
         {
             if(grid[x][y])
             {
@@ -206,40 +206,32 @@ static void draw_grid(void)
     }
     wattroff(w_status, COLOR_PAIR(1));
 
-    // Handle mode info
-    wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 40, "Mode:          ");
-    wattron(w_status, COLOR_PAIR(3));
-    if     (mode == ModeTypeRandom)
-        mvwaddstr(w_status, 0, 45, "Random");
-    else if(mode == ModeTypeBlinker)
-        mvwaddstr(w_status, 0, 45, "Blinker");
-    else if(mode == ModeTypeGlider)
-        mvwaddstr(w_status, 0, 45, "Glider");
-    else if(mode == ModeTypeGliderGun)
-        mvwaddstr(w_status, 0, 45, "Glider gun");
-    else if(mode == ModeTypePentomino)
-        mvwaddstr(w_status, 0, 45, "Pentomino");
-    else if(mode == ModeTypeDiehard)
-        mvwaddstr(w_status, 0, 45, "Diehard");
-    else if(mode == ModeTypeAcorn)
-        mvwaddstr(w_status, 0, 45, "Acorn");
-
     // Handle status line
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 0, "Cycles:       ");
-    wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 7, "%d", cycle_counter);
+    //                              1000x400_       123456_      400000_      10_     Glider gun
+    mvwaddstr(w_status, 0, 0, "Grid:         Cycles:       Cells:       Speed:   Mode:          ");
 
-    wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 16, "Cells:      ");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 22, "%d", cells_alive);
+    mvwprintw(w_status, 0,  5, "%dx%d", grid_width, grid_height);
+    mvwprintw(w_status, 0, 21, "%d", cycle_counter);
+    mvwprintw(w_status, 0, 34, "%d", cells_alive);
+    mvwprintw(w_status, 0, 47, "%d", speed);
 
-    wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 30, "Speed:  ");
-    wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 36, "%d", speed);
+    // Handle mode info
+    if     (mode == ModeTypeRandom)
+        mvwaddstr(w_status, 0, 55, "Random");
+    else if(mode == ModeTypeBlinker)
+        mvwaddstr(w_status, 0, 55, "Blinker");
+    else if(mode == ModeTypeGlider)
+        mvwaddstr(w_status, 0, 55, "Glider");
+    else if(mode == ModeTypeGliderGun)
+        mvwaddstr(w_status, 0, 55, "Glider gun");
+    else if(mode == ModeTypePentomino)
+        mvwaddstr(w_status, 0, 55, "Pentomino");
+    else if(mode == ModeTypeDiehard)
+        mvwaddstr(w_status, 0, 55, "Diehard");
+    else if(mode == ModeTypeAcorn)
+        mvwaddstr(w_status, 0, 55, "Acorn");
 
     wattroff(w_status, COLOR_PAIR(0));
     wrefresh(w_status);
@@ -356,6 +348,10 @@ int main(void)
   keypad(w_grid, TRUE); // Enable special keys
 
   // Init
+  grid_width  = getmaxx(w_grid) / 2;
+  grid_height = getmaxy(w_grid);
+  if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
+  if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
   mode  = ModeTypeRandom;
   speed = 4;
 
