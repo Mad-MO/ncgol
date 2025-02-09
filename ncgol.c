@@ -101,15 +101,15 @@ static void draw_grid(void)
             if(grid[x][y])
             {
               wattron(w_grid, COLOR_PAIR(4));
-              mvwaddch(w_grid, y, x, ' ');
               cells_alive++;
             }
             else
             {
               wattron(w_grid, COLOR_PAIR(5));
-              mvwaddch(w_grid, y, x, ' ');
             }
-        }
+            mvwaddch(w_grid, y, x*2+0, ' ');
+            mvwaddch(w_grid, y, x*2+1, ' ');
+      }
     }
     wattroff(w_status, COLOR_PAIR(1));
 
