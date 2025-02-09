@@ -100,15 +100,18 @@ static void draw_grid(void)
         {
             if(grid[x][y])
             {
-              mvwaddch(w_grid, y, x, '#');
+              wattron(w_grid, COLOR_PAIR(4));
+              mvwaddch(w_grid, y, x, ' ');
               cells_alive++;
             }
             else
             {
+              wattron(w_grid, COLOR_PAIR(5));
               mvwaddch(w_grid, y, x, ' ');
             }
         }
     }
+    wattroff(w_status, COLOR_PAIR(1));
 
     // Handle status line
     wattron(w_status, COLOR_PAIR(2));
@@ -126,7 +129,7 @@ static void draw_grid(void)
     wattron(w_status, COLOR_PAIR(3));
     mvwprintw(w_status, 0, 46, "%2d", speed);
 
-    wattroff(w_status, COLOR_PAIR(3));
+    wattroff(w_status, COLOR_PAIR(0));
     wrefresh(w_status);
 }
 
@@ -164,27 +167,36 @@ int main(void)
   initscr(); // Determine terminal type
   cbreak();  // Disable buffering
   noecho();  // Disable echo to the screen
+  curs_set(0); // Hide the cursor
   clear();   // Clear the screen
 
   // Prepare coloring
   start_color();
-  init_pair(1, COLOR_WHITE, COLOR_BLACK);
-  init_pair(2, COLOR_WHITE, COLOR_RED);
-  init_pair(3, COLOR_WHITE, COLOR_BLUE);
+  init_pair(1, COLOR_WHITE, COLOR_BLACK);  // Standard
+  init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Label
+  init_pair(3, COLOR_YELLOW, COLOR_BLACK); // Value
+  init_pair(4, COLOR_RED,   COLOR_RED);    // Live cell
+  init_pair(5, COLOR_BLACK, COLOR_BLACK);  // Dead cell
+  init_pair(6, COLOR_CYAN, COLOR_BLACK);   // Title
   ESCDELAY = 1; // Set the delay for escape sequences
 
   // Create status window
   w_status_box = newwin(3, COLS, LINES-3, 0);
   box(w_status_box, 0, 0); // Draw a box around the screen
+  wattron(w_status_box, COLOR_PAIR(6));
+  mvwaddstr(w_status_box, 0, 3, " Status ");
+  wattroff(w_status_box, COLOR_PAIR(0));
   wrefresh(w_status_box);
   w_status = newwin(1, COLS-2, LINES-2, 1);
   wrefresh(w_status);
-  //nodelay(status, TRUE); // Non-blocking input
   keypad(w_status, TRUE); // Enable special keys
 
   // Create grid window
   w_grid_box = newwin(LINES-3, COLS, 0, 0);
   box(w_grid_box, 0, 0); // Draw a box around the screen
+  wattron(w_grid_box, COLOR_PAIR(6));
+  mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
+  wattroff(w_grid_box, COLOR_PAIR(0));
   wrefresh(w_grid_box);
   w_grid = newwin(LINES-5, COLS-2, 1, 1);
   wrefresh(w_grid);
