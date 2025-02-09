@@ -1,4 +1,10 @@
 
+# File:    Makefile
+# Author:  Martin Ochs
+# License: MIT
+
+
+
 run: ncgol
 	./ncgol
 

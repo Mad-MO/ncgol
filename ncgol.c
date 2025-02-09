@@ -1,5 +1,12 @@
 
-// https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+// File:    ncgol.c
+// Author:  Martin Ochs
+// License: MIT
+// Brief:   A very basic python implementation for Conway's "Game of Life"
+//          using ncurses for the GUI. The simulation can be controlled by
+//          the arrow keys and the buttons for different initial states.
+// Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+
 
 #include <curses.h>
 #include <stdlib.h>
@@ -235,7 +242,13 @@ int main(void)
       endwin();
       exit(0);
     }
-    else if((z == KEY_RIGHT) || (z == KEY_LEFT))
+    else if(z == KEY_RIGHT)
+    {
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(z == KEY_LEFT)
     {
       init_grid();
       draw_grid();
