@@ -26,7 +26,7 @@
 #define GRID_WIDTH    100
 #define GRID_HEIGHT   100
 
-// Define the size of the grid
+// Create the grid to represent the cells
 static uint8_t grid[GRID_WIDTH][GRID_HEIGHT];
 static uint8_t new_grid[GRID_WIDTH][GRID_HEIGHT];
 static uint8_t speed;
@@ -204,25 +204,6 @@ static void draw_grid(void)
     }
     wattroff(w_status, COLOR_PAIR(1));
 
-    // Handle status line
-    wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 0, "Cycles:       ");
-    wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 7, "%d", cycle_counter);
-
-    wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 16, "Cells:      ");
-    wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 22, "%d", cells_alive);
-
-    wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 30, "Speed:  ");
-    wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 36, "%d", speed);
-
-    wattroff(w_status, COLOR_PAIR(0));
-    wrefresh(w_status);
-
     // Handle mode info
     wattron(w_status, COLOR_PAIR(2));
     mvwprintw(w_status, 0, 40, "Mode:          ");
@@ -241,6 +222,25 @@ static void draw_grid(void)
         mvwaddstr(w_status, 0, 45, "Diehard");
     else if(mode == ModeTypeAcorn)
         mvwaddstr(w_status, 0, 45, "Acorn");
+
+    // Handle status line
+    wattron(w_status, COLOR_PAIR(2));
+    mvwprintw(w_status, 0, 0, "Cycles:       ");
+    wattron(w_status, COLOR_PAIR(3));
+    mvwprintw(w_status, 0, 7, "%d", cycle_counter);
+
+    wattron(w_status, COLOR_PAIR(2));
+    mvwprintw(w_status, 0, 16, "Cells:      ");
+    wattron(w_status, COLOR_PAIR(3));
+    mvwprintw(w_status, 0, 22, "%d", cells_alive);
+
+    wattron(w_status, COLOR_PAIR(2));
+    mvwprintw(w_status, 0, 30, "Speed:  ");
+    wattron(w_status, COLOR_PAIR(3));
+    mvwprintw(w_status, 0, 36, "%d", speed);
+
+    wattroff(w_status, COLOR_PAIR(0));
+    wrefresh(w_status);
 }
 
 
