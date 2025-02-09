@@ -5,7 +5,9 @@
 // Brief:   A very basic python implementation for Conway's "Game of Life"
 //          using ncurses for the GUI. The simulation can be controlled by
 //          the arrow keys and the buttons for different initial states.
+
 // Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+
 
 
 #include <curses.h>
@@ -17,9 +19,11 @@
 // Define SW name and Version
 #define SW_NAME "ncgol"
 #define SW_VERS "v0.1"
+#define AUTHOR  "by domo"
+#define SW_STR  SW_NAME " " SW_VERS " " AUTHOR
 
 // Define the size of the grid
-#define GRID_WIDTH    200
+#define GRID_WIDTH    100
 #define GRID_HEIGHT   100
 
 // Define the size of the grid
@@ -125,19 +129,19 @@ static void draw_grid(void)
 
     // Handle status line
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 0, "Cycles:");
+    mvwprintw(w_status, 0, 0, "Cycles:       ");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 7, "%7d", cycle_counter);
+    mvwprintw(w_status, 0, 7, "%d", cycle_counter);
 
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 20, "Cells:");
+    mvwprintw(w_status, 0, 16, "Cells:      ");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 26, "%5d", cells_alive);
+    mvwprintw(w_status, 0, 22, "%d", cells_alive);
 
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 40, "Speed:");
+    mvwprintw(w_status, 0, 30, "Speed:  ");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 46, "%2d", speed);
+    mvwprintw(w_status, 0, 36, "%d", speed);
 
     wattroff(w_status, COLOR_PAIR(0));
     wrefresh(w_status);
@@ -198,7 +202,7 @@ int main(void)
   wattroff(w_status_box, COLOR_PAIR(0));
   wrefresh(w_status_box);
   w_status = newwin(1, COLS-2, LINES-2, 1);
-  mvwaddstr(w_status, 0, 80-strlen(SW_VERS), SW_VERS); // Todo: Subtract from real width
+  mvwaddstr(w_status, 0, getmaxx(w_status)-strlen(SW_STR), SW_STR); // Todo: Subtract from real width
   wrefresh(w_status);
   keypad(w_status, TRUE); // Enable special keys
 
