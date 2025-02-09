@@ -14,6 +14,9 @@
 #include <unistd.h>
 
 
+// Define SW name and Version
+#define SW_NAME "ncgol"
+#define SW_VERS "v0.1"
 
 // Define the size of the grid
 #define GRID_WIDTH    200
@@ -22,7 +25,7 @@
 // Define the size of the grid
 static uint8_t grid[GRID_WIDTH][GRID_HEIGHT];
 static uint8_t new_grid[GRID_WIDTH][GRID_HEIGHT];
-int speed = 5;
+int speed = 4;
 int cells_alive = 0;
 int cycle_counter = 0;
 #define END_DET_CNT 60
@@ -195,6 +198,7 @@ int main(void)
   wattroff(w_status_box, COLOR_PAIR(0));
   wrefresh(w_status_box);
   w_status = newwin(1, COLS-2, LINES-2, 1);
+  mvwaddstr(w_status, 0, 80-strlen(SW_VERS), SW_VERS); // Todo: Subtract from real width
   wrefresh(w_status);
   keypad(w_status, TRUE); // Enable special keys
 
@@ -237,7 +241,7 @@ int main(void)
 
     // Handle input
     int z = wgetch(w_grid);
-    if(z == 27)
+    if((z=='q') || (z==27)) // 'q' or ESC
     {
       endwin();
       exit(0);
