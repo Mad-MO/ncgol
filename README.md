@@ -18,8 +18,8 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 ## Features
 
 - (Todo) Startup screen
-- (Todo) Adjustable speed (with up and down keys)
-- Init with different modes (with right and left keys)
+- Adjustable speed (with up and down keys)
+- (Todo) Init with different modes (with right and left keys)
   - Random
   - (Todo) Blinker
   - (Todo) Glider
