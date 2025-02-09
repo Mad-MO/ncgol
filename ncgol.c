@@ -377,7 +377,13 @@ int main(void)
     else                usleep(     0);
 
     // Handle one cycle
-    cycle_counter++;
+    if(end_detection())
+    {
+    }
+    else
+    {
+      cycle_counter++;
+    }
     update_grid();
     draw_grid();
     wrefresh(w_grid);
