@@ -112,19 +112,19 @@ static void draw_grid(void)
 
     // Handle status line
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 0, "Cycles =");
+    mvwprintw(w_status, 0, 0, "Cycles:");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 9, "%7d", cycle_counter);
+    mvwprintw(w_status, 0, 7, "%7d", cycle_counter);
 
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 20, "Cells =");
+    mvwprintw(w_status, 0, 20, "Cells:");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 28, "%5d", cells_alive);
+    mvwprintw(w_status, 0, 26, "%5d", cells_alive);
 
     wattron(w_status, COLOR_PAIR(2));
-    mvwprintw(w_status, 0, 40, "Speed =");
+    mvwprintw(w_status, 0, 40, "Speed:");
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0, 48, "%2d", speed);
+    mvwprintw(w_status, 0, 46, "%2d", speed);
 
     wattroff(w_status, COLOR_PAIR(3));
     wrefresh(w_status);
@@ -169,8 +169,8 @@ int main(void)
   // Prepare coloring
   start_color();
   init_pair(1, COLOR_WHITE, COLOR_BLACK);
-  init_pair(2, COLOR_RED,   COLOR_BLACK);
-  init_pair(3, COLOR_WHITE,  COLOR_BLUE);
+  init_pair(2, COLOR_WHITE, COLOR_RED);
+  init_pair(3, COLOR_WHITE, COLOR_BLUE);
   ESCDELAY = 1; // Set the delay for escape sequences
 
   // Create status window
