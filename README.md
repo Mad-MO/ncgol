@@ -19,14 +19,14 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 - (Todo) Startup screen
 - Adjustable speed (with up and down keys)
-- (Todo) Init with different modes (with right and left keys)
+- Init with different modes (with right and left keys)
   - Random
-  - (Todo) Blinker
-  - (Todo) Glider
-  - (Todo) Glider gun
-  - (Todo) Pentomino
-  - (Todo) Diehard
-  - (Todo) Acorn
+  - Blinker
+  - Glider
+  - Glider gun
+  - Pentomino
+  - Diehard
+  - Acorn
 - Show current count of living cells
 - Show current number of cycles
 - (Todo) End detection with automated start of new pattern

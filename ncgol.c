@@ -29,7 +29,7 @@
 // Define the size of the grid
 static uint8_t grid[GRID_WIDTH][GRID_HEIGHT];
 static uint8_t new_grid[GRID_WIDTH][GRID_HEIGHT];
-int speed = 4;
+static uint8_t speed;
 int cells_alive = 0;
 int cycle_counter = 0;
 #define END_DET_CNT 60
@@ -41,6 +41,21 @@ WINDOW *w_grid;
 WINDOW *w_status_box;
 WINDOW *w_status;
 
+typedef enum
+{
+    ModeTypeRandom,
+    ModeTypeBlinker,
+    ModeTypeGlider,
+    ModeTypeGliderGun,
+    ModeTypePentomino,
+    ModeTypeDiehard,
+    ModeTypeAcorn,
+    // ----------------
+    ModeTypeMax
+} ModeType;
+static ModeType mode;
+
+
 
 
 // Function to initialize the grid
@@ -48,11 +63,73 @@ void init_grid(void)
 {
     memset(grid, 0, sizeof(grid));
 
+    if(mode == ModeTypeRandom)
     {
         uint8_t x, y;
         for(x=0; x<GRID_WIDTH; x++)
             for(y=0; y<GRID_HEIGHT; y++)
                 grid[x][y] = (random() & 1);
+    }
+    else if(mode == ModeTypeBlinker)
+    {
+        grid[1+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+    }
+    else if(mode == ModeTypeGlider)
+    {
+        grid[0+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+        grid[2+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
+        grid[2+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+    }
+    else if(mode == ModeTypeGliderGun)
+    {
+        grid[ 1][5] = 1; grid[ 1][6] = 1;
+        grid[ 2][5] = 1; grid[ 2][6] = 1;
+        grid[11][5] = 1; grid[11][6] = 1; grid[11][7] = 1;
+        grid[12][4] = 1; grid[12][8] = 1;
+        grid[13][3] = 1; grid[13][9] = 1;
+        grid[14][3] = 1; grid[14][9] = 1;
+        grid[15][6] = 1;
+        grid[16][4] = 1; grid[16][8] = 1;
+        grid[17][5] = 1; grid[17][6] = 1; grid[17][7] = 1;
+        grid[18][6] = 1;
+        grid[21][3] = 1; grid[21][4] = 1; grid[21][5] = 1;
+        grid[22][3] = 1; grid[22][4] = 1; grid[22][5] = 1;
+        grid[23][2] = 1; grid[23][6] = 1;
+        grid[25][1] = 1; grid[25][2] = 1; grid[25][6] = 1; grid[25][7] = 1;
+        grid[35][3] = 1; grid[35][4] = 1;
+        grid[36][3] = 1; grid[36][4] = 1;
+    }
+    else if(mode == ModeTypePentomino)
+    {
+        grid[0+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][1+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+        grid[2+(GRID_WIDTH/2)][0+(GRID_HEIGHT/2)] = 1;
+    }
+    else if(mode == ModeTypeDiehard)
+    {
+        grid[0+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
+        grid[5+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
+        grid[6+(GRID_WIDTH/2)][3+(GRID_HEIGHT/2)] = 1;
+        grid[6+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
+        grid[7+(GRID_WIDTH/2)][5+(GRID_HEIGHT/2)] = 1;
+    }
+    else if(mode == ModeTypeAcorn)
+    {
+        grid[0+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][2+(GRID_HEIGHT/2)] = 1;
+        grid[1+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[3+(GRID_WIDTH/2)][3+(GRID_HEIGHT/2)] = 1;
+        grid[4+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[5+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
+        grid[6+(GRID_WIDTH/2)][4+(GRID_HEIGHT/2)] = 1;
     }
 
     cycle_counter = 0;
@@ -145,6 +222,64 @@ static void draw_grid(void)
 
     wattroff(w_status, COLOR_PAIR(0));
     wrefresh(w_status);
+
+    // Handle mode info
+    wattron(w_status, COLOR_PAIR(2));
+    mvwprintw(w_status, 0, 40, "Mode:          ");
+    wattron(w_status, COLOR_PAIR(3));
+    if     (mode == ModeTypeRandom)
+        mvwaddstr(w_status, 0, 45, "Random");
+    else if(mode == ModeTypeBlinker)
+        mvwaddstr(w_status, 0, 45, "Blinker");
+    else if(mode == ModeTypeGlider)
+        mvwaddstr(w_status, 0, 45, "Glider");
+    else if(mode == ModeTypeGliderGun)
+        mvwaddstr(w_status, 0, 45, "Glider gun");
+    else if(mode == ModeTypePentomino)
+        mvwaddstr(w_status, 0, 45, "Pentomino");
+    else if(mode == ModeTypeDiehard)
+        mvwaddstr(w_status, 0, 45, "Diehard");
+    else if(mode == ModeTypeAcorn)
+        mvwaddstr(w_status, 0, 45, "Acorn");
+}
+
+
+
+// Function to handle input events
+void handle_inputs(void)
+{
+    int z = wgetch(w_grid);
+    if((z=='q') || (z==27)) // 'q' or ESC
+    {
+      endwin();
+      exit(0);
+    }
+    else if(z == KEY_UP)
+    {
+      if(speed < 10) speed++;
+    }
+    else if(z == KEY_DOWN)
+    {
+      if(speed > 1) speed--;
+    }
+    else if(z == KEY_RIGHT)
+    {
+      mode++;
+      mode %= ModeTypeMax;
+
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(z == KEY_LEFT)
+    {
+      if(mode == 0) mode = ModeTypeMax - 1;
+      else          mode--;
+
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
 }
 
 
@@ -218,14 +353,18 @@ int main(void)
   nodelay(w_grid, TRUE); // Non-blocking input
   keypad(w_grid, TRUE); // Enable special keys
 
-  // Do something
+  // Init
+  mode  = ModeTypeRandom;
+  speed = 5;
+
   init_grid();
   draw_grid();
   wrefresh(w_grid);
 
+  // Loop until back key is pressed
   while(1)
   {
-    // Handle timeout
+    // Handle speed
     if     (speed == 1) usleep(500000);
     else if(speed == 2) usleep(100000);
     else if(speed == 3) usleep( 50000);
@@ -244,32 +383,7 @@ int main(void)
     wrefresh(w_grid);
 
     // Handle input
-    int z = wgetch(w_grid);
-    if((z=='q') || (z==27)) // 'q' or ESC
-    {
-      endwin();
-      exit(0);
-    }
-    else if(z == KEY_RIGHT)
-    {
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
-    }
-    else if(z == KEY_LEFT)
-    {
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
-    }
-    else if(z == KEY_UP)
-    {
-      if(speed < 10) speed++;
-    }
-    else if(z == KEY_DOWN)
-    {
-      if(speed > 1) speed--;
-    }
+    handle_inputs();
   }
 
   // Ask to end program
