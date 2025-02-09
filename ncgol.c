@@ -210,8 +210,19 @@ int main(void)
 
   while(1)
   {
+    // Handle timeout
+    if     (speed == 1) usleep(500000);
+    else if(speed == 2) usleep(100000);
+    else if(speed == 3) usleep( 50000);
+    else if(speed == 4) usleep( 10000);
+    else if(speed == 5) usleep(  5000);
+    else if(speed == 6) usleep(  1000);
+    else if(speed == 7) usleep(   500);
+    else if(speed == 8) usleep(   100);
+    else if(speed == 9) usleep(    50);
+    else                usleep(     0);
+
     // Handle one cycle
-    usleep(10000);
     cycle_counter++;
     update_grid();
     draw_grid();
@@ -229,6 +240,14 @@ int main(void)
       init_grid();
       draw_grid();
       wrefresh(w_grid);
+    }
+    else if(z == KEY_UP)
+    {
+      if(speed < 10) speed++;
+    }
+    else if(z == KEY_DOWN)
+    {
+      if(speed > 1) speed--;
     }
   }
 
