@@ -192,14 +192,16 @@ static void draw_grid(void)
             if(grid[x][y])
             {
               wattron(w_grid, COLOR_PAIR(4));
+              mvwaddch(w_grid, y, x*2+0, '[');
+              mvwaddch(w_grid, y, x*2+1, ']');
               cells_alive++;
             }
             else
             {
               wattron(w_grid, COLOR_PAIR(5));
+              mvwaddch(w_grid, y, x*2+0, ' ');
+              mvwaddch(w_grid, y, x*2+1, ' ');
             }
-            mvwaddch(w_grid, y, x*2+0, ' ');
-            mvwaddch(w_grid, y, x*2+1, ' ');
       }
     }
     wattroff(w_status, COLOR_PAIR(1));
@@ -321,12 +323,12 @@ int main(void)
 
   // Prepare coloring
   start_color();
-  init_pair(1, COLOR_WHITE, COLOR_BLACK);  // Standard
-  init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Label
+  init_pair(1, COLOR_WHITE,  COLOR_BLACK); // Standard
+  init_pair(2, COLOR_GREEN,  COLOR_BLACK); // Label
   init_pair(3, COLOR_YELLOW, COLOR_BLACK); // Value
-  init_pair(4, COLOR_RED,   COLOR_RED);    // Live cell
-  init_pair(5, COLOR_BLACK, COLOR_BLACK);  // Dead cell
-  init_pair(6, COLOR_CYAN, COLOR_BLACK);   // Title
+  init_pair(4, COLOR_BLACK,  COLOR_RED);   // Live cell
+  init_pair(5, COLOR_BLACK,  COLOR_BLACK); // Dead cell
+  init_pair(6, COLOR_CYAN,   COLOR_BLACK); // Title
   ESCDELAY = 1; // Set the delay for escape sequences
 
   // Create status window
@@ -355,7 +357,7 @@ int main(void)
 
   // Init
   mode  = ModeTypeRandom;
-  speed = 5;
+  speed = 4;
 
   init_grid();
   draw_grid();
