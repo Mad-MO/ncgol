@@ -200,6 +200,8 @@ void init_grid(void)
 void update_grid(void)
 {
     uint16_t x, y;
+    memset(new_grid, 0, sizeof(new_grid));
+
     for(x=0; x<grid_width; x++)
     {
         for(y=0; y<grid_height; y++)
