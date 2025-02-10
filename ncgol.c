@@ -19,7 +19,7 @@
 
 // Define SW name and Version
 #define SW_NAME "ncgol"
-#define SW_VERS "v0.1"
+#define SW_VERS "v0.2"
 #define AUTHOR  "by domo"
 #define SW_STR  SW_NAME " " SW_VERS " " AUTHOR
 
