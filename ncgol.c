@@ -271,30 +271,30 @@ static void draw_grid(void)
 
     // Handle status line
     wattron(w_status, COLOR_PAIR(2));
-    //                              1000x400_       123456_      400000_      10_     Glider gun
-    mvwaddstr(w_status, 0, 0, "Grid:         Cycles:       Cells:       Speed:   Mode:          ");
+    //                               1000x400_       123456_      400000_      10_     Glider gun
+    mvwaddstr(w_status, 0, 0, " Grid:         Cycles:       Cells:       Speed:   Mode:          ");
 
     wattron(w_status, COLOR_PAIR(3));
-    mvwprintw(w_status, 0,  5, "%dx%d", grid_width, grid_height);
-    mvwprintw(w_status, 0, 21, "%d", cycle_counter);
-    mvwprintw(w_status, 0, 34, "%d", cells_alive);
-    mvwprintw(w_status, 0, 47, "%d", speed);
+    mvwprintw(w_status, 0,  6, "%dx%d", grid_width, grid_height);
+    mvwprintw(w_status, 0, 22, "%d", cycle_counter);
+    mvwprintw(w_status, 0, 35, "%d", cells_alive);
+    mvwprintw(w_status, 0, 48, "%d", speed);
 
     // Handle mode info
     if     (mode == ModeTypeRandom)
-        mvwaddstr(w_status, 0, 55, "Random");
+        mvwaddstr(w_status, 0, 56, "Random");
     else if(mode == ModeTypeBlinker)
-        mvwaddstr(w_status, 0, 55, "Blinker");
+        mvwaddstr(w_status, 0, 56, "Blinker");
     else if(mode == ModeTypeGlider)
-        mvwaddstr(w_status, 0, 55, "Glider");
+        mvwaddstr(w_status, 0, 56, "Glider");
     else if(mode == ModeTypeGliderGun)
-        mvwaddstr(w_status, 0, 55, "Glider gun");
+        mvwaddstr(w_status, 0, 56, "Glider gun");
     else if(mode == ModeTypePentomino)
-        mvwaddstr(w_status, 0, 55, "Pentomino");
+        mvwaddstr(w_status, 0, 56, "Pentomino");
     else if(mode == ModeTypeDiehard)
-        mvwaddstr(w_status, 0, 55, "Diehard");
+        mvwaddstr(w_status, 0, 56, "Diehard");
     else if(mode == ModeTypeAcorn)
-        mvwaddstr(w_status, 0, 55, "Acorn");
+        mvwaddstr(w_status, 0, 56, "Acorn");
 
     wattroff(w_status, COLOR_PAIR(0));
     wrefresh(w_status);
@@ -417,7 +417,7 @@ int main(void)
 
   // Ask to end program
   wattron(w_status, COLOR_PAIR(1));
-  mvwaddstr(w_status, 0, 0, "Press any key to quit");
+  mvwaddstr(w_status, 0, 0, " Press any key to quit");
   wattroff(w_status, COLOR_PAIR(1));
   wrefresh(w_status);
   wgetch(w_status);
