@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <locale.h>
 
 
 // Define SW name and Version
@@ -55,6 +55,65 @@ typedef enum
     ModeTypeMax
 } ModeType;
 static ModeType mode;
+
+
+
+// Function to initialize the User Interface
+void init_tui(void)
+{
+
+  // Set locale
+  setlocale(LC_ALL, "");
+
+  // Initialize ncurses
+  initscr();   // Determine terminal type
+  cbreak();    // Disable buffering
+  noecho();    // Disable echo to the screen
+  curs_set(0); // Hide the cursor
+  clear();     // Clear the screen
+
+  // Prepare coloring
+  start_color();
+  init_pair(1, COLOR_WHITE,  COLOR_BLACK); // Standard
+  init_pair(2, COLOR_GREEN,  COLOR_BLACK); // Label
+  init_pair(3, COLOR_YELLOW, COLOR_BLACK); // Value
+  init_pair(4, COLOR_RED,    COLOR_BLACK); // Live cell
+  init_pair(5, COLOR_BLACK,  COLOR_BLACK); // Dead cell
+  init_pair(6, COLOR_CYAN,   COLOR_BLACK); // Title
+  ESCDELAY = 1; // Set the delay for escape sequences
+
+  // Create status window
+  w_status_box = newwin(3, COLS, LINES-3, 0);
+  box(w_status_box, 0, 0); // Draw a box around the screen
+  wattron(w_status_box, COLOR_PAIR(6));
+  mvwaddstr(w_status_box, 0, 3, " Status ");
+  wattroff(w_status_box, COLOR_PAIR(0));
+  wrefresh(w_status_box);
+  w_status = newwin(1, COLS-2, LINES-2, 1);
+  mvwaddstr(w_status, 0, getmaxx(w_status)-strlen(SW_STR)-1, SW_STR); // Todo: Subtract from real width
+  wrefresh(w_status);
+  keypad(w_status, TRUE); // Enable special keys
+
+  // Create grid window
+  w_grid_box = newwin(LINES-3, COLS, 0, 0);
+  box(w_grid_box, 0, 0); // Draw a box around the screen
+  wattron(w_grid_box, COLOR_PAIR(6));
+  mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
+  wattroff(w_grid_box, COLOR_PAIR(0));
+  wrefresh(w_grid_box);
+  w_grid = newwin(LINES-5, COLS-2, 1, 1);
+  wrefresh(w_grid);
+  nodelay(w_grid, TRUE); // Non-blocking input
+  keypad(w_grid, TRUE); // Enable special keys
+
+  // Init
+  grid_width  = getmaxx(w_grid) / 2;
+  grid_height = getmaxy(w_grid);
+  if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
+  if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
+  mode  = ModeTypeRandom;
+  speed = 4;
+}
 
 
 
@@ -191,9 +250,11 @@ static void draw_grid(void)
         {
             if(grid[x][y])
             {
+              // Using background color with an empy space works not very well in ncurses,
+              // because the background color is only dimmed and not bright.
+              // A unicode full block uses the foreground color and works better.
               wattron(w_grid, COLOR_PAIR(4));
-              mvwaddch(w_grid, y, x*2+0, '[');
-              mvwaddch(w_grid, y, x*2+1, ']');
+              mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block
               cells_alive++;
             }
             else
@@ -274,6 +335,14 @@ void handle_inputs(void)
       draw_grid();
       wrefresh(w_grid);
     }
+    else if(z==KEY_RESIZE)
+    {
+        init_tui();
+    }
+    else
+    {
+        // Do nothing
+    }
 }
 
 
@@ -306,62 +375,17 @@ uint8_t end_detection(void)
 // Function to handle one life cycle of the simulation
 int main(void)
 {
-  // Initialize ncurses
-  initscr(); // Determine terminal type
-  cbreak();  // Disable buffering
-  noecho();  // Disable echo to the screen
-  curs_set(0); // Hide the cursor
-  clear();   // Clear the screen
-
-  // Prepare coloring
-  start_color();
-  init_pair(1, COLOR_WHITE,  COLOR_BLACK); // Standard
-  init_pair(2, COLOR_GREEN,  COLOR_BLACK); // Label
-  init_pair(3, COLOR_YELLOW, COLOR_BLACK); // Value
-  init_pair(4, COLOR_BLACK,  COLOR_RED);   // Live cell
-  init_pair(5, COLOR_BLACK,  COLOR_BLACK); // Dead cell
-  init_pair(6, COLOR_CYAN,   COLOR_BLACK); // Title
-  ESCDELAY = 1; // Set the delay for escape sequences
-
-  // Create status window
-  w_status_box = newwin(3, COLS, LINES-3, 0);
-  box(w_status_box, 0, 0); // Draw a box around the screen
-  wattron(w_status_box, COLOR_PAIR(6));
-  mvwaddstr(w_status_box, 0, 3, " Status ");
-  wattroff(w_status_box, COLOR_PAIR(0));
-  wrefresh(w_status_box);
-  w_status = newwin(1, COLS-2, LINES-2, 1);
-  mvwaddstr(w_status, 0, getmaxx(w_status)-strlen(SW_STR), SW_STR); // Todo: Subtract from real width
-  wrefresh(w_status);
-  keypad(w_status, TRUE); // Enable special keys
-
-  // Create grid window
-  w_grid_box = newwin(LINES-3, COLS, 0, 0);
-  box(w_grid_box, 0, 0); // Draw a box around the screen
-  wattron(w_grid_box, COLOR_PAIR(6));
-  mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
-  wattroff(w_grid_box, COLOR_PAIR(0));
-  wrefresh(w_grid_box);
-  w_grid = newwin(LINES-5, COLS-2, 1, 1);
-  wrefresh(w_grid);
-  nodelay(w_grid, TRUE); // Non-blocking input
-  keypad(w_grid, TRUE); // Enable special keys
-
-  // Init
-  grid_width  = getmaxx(w_grid) / 2;
-  grid_height = getmaxy(w_grid);
-  if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
-  if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
-  mode  = ModeTypeRandom;
-  speed = 4;
-
+  init_tui();
   init_grid();
-  draw_grid();
-  wrefresh(w_grid);
+  //draw_grid();
+  //wrefresh(w_grid);
 
   // Loop until back key is pressed
   while(1)
   {
+    // Handle input
+    handle_inputs();
+
     // Handle speed
     if     (speed == 1) usleep(500000);
     else if(speed == 2) usleep(100000);
@@ -383,11 +407,10 @@ int main(void)
       cycle_counter++;
     }
     update_grid();
+
+    // Draw grid
     draw_grid();
     wrefresh(w_grid);
-
-    // Handle input
-    handle_inputs();
   }
 
   // Ask to end program
