@@ -30,7 +30,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 - Show current count of living cells
 - Show current number of cycles
 - (Todo) End detection with automated start of new pattern
-- (Todo) Dynamic adjustment of changing terminal size
+- Dynamic adjustment of changing terminal size
 
 ## Usage
 
