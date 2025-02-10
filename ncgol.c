@@ -13,6 +13,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
+#include <ctype.h>
+
 
 
 // Define SW name and Version
@@ -305,21 +307,21 @@ static void draw_grid(void)
 // Function to handle input events
 void handle_inputs(void)
 {
-    int z = wgetch(w_grid);
-    if((z=='q') || (z==27)) // 'q' or ESC
+    int key = wgetch(w_grid);
+    if((key=='q') || (key==27)) // 'q' or ESC
     {
       endwin();
       exit(0);
     }
-    else if(z == KEY_UP)
+    else if(key == KEY_UP)
     {
       if(speed < 10) speed++;
     }
-    else if(z == KEY_DOWN)
+    else if(key == KEY_DOWN)
     {
       if(speed > 1) speed--;
     }
-    else if(z == KEY_RIGHT)
+    else if(key == KEY_RIGHT)
     {
       mode++;
       mode %= ModeTypeMax;
@@ -328,7 +330,7 @@ void handle_inputs(void)
       draw_grid();
       wrefresh(w_grid);
     }
-    else if(z == KEY_LEFT)
+    else if(key == KEY_LEFT)
     {
       if(mode == 0) mode = ModeTypeMax - 1;
       else          mode--;
@@ -337,9 +339,66 @@ void handle_inputs(void)
       draw_grid();
       wrefresh(w_grid);
     }
-    else if(z==KEY_RESIZE)
+    else if(key==KEY_RESIZE)
     {
         init_tui();
+    }
+    else if((key>='1') && (key<='9'))
+    {
+        speed = key - '0';
+    }
+    else if(key == '0')
+    {
+        speed = 10;
+    }
+    else if((tolower(key) == 'r') || (key == ' '))
+    {
+      mode = ModeTypeRandom;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(tolower(key) == 'b')
+    {
+      mode = ModeTypeBlinker;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(tolower(key) == 'g')
+    {
+      mode = ModeTypeGlider;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(tolower(key) == 'l')
+    {
+      mode = ModeTypeGliderGun;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(tolower(key) == 'p')
+    {
+      mode = ModeTypePentomino;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(tolower(key) == 'd')
+    {
+      mode = ModeTypeDiehard;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(tolower(key) == 'a')
+    {
+      mode = ModeTypeAcorn;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
     }
     else
     {
@@ -379,8 +438,8 @@ int main(void)
 {
   init_tui();
   init_grid();
-  //draw_grid();
-  //wrefresh(w_grid);
+  draw_grid();
+  wrefresh(w_grid);
 
   // Loop until back key is pressed
   while(1)
