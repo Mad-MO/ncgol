@@ -6,7 +6,10 @@
 //          using ncurses for the GUI. The simulation can be controlled by
 //          the arrow keys and the buttons for different initial states.
 
-// TODO Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+// Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+// Unicode: https://www.compart.com/en/unicode/block/U+2580
+// Unicode: https://www.compart.com/en/unicode/block/U+2800
+
 // TODO Status Bar: Reduce on small terminals
 // TODO Status Bar: Redraw SW Name and Version?!
 
@@ -26,8 +29,10 @@
 #define SW_STR  SW_NAME " " SW_VERS " " AUTHOR
 
 // Define the size of the grid
-#define GRID_WIDTH_MAX  1000 // Ultrawidescreen 250 -> 1000
-#define GRID_HEIGHT_MAX  400 // Ultrawidescreen 100 ->  400
+// Example: Fullscreen Terminal on Ultrawidescreen Monitor has ~569x110 characters
+//          -> 1134x420 cells when using braille style
+#define GRID_WIDTH_MAX  2500 // 2500*1000*2 = ~5 MB
+#define GRID_HEIGHT_MAX 1000
 
 // Create the grid to represent the cells
 static uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
@@ -67,13 +72,14 @@ typedef enum
     StyleTypeUnicodeBlock2,
     StyleTypeASCIIblockSquare,
     StyleTypeASCIIhash,
-    StyleTypeASCIIasterisk,
 
     // Styles which show two cells in one char
     StyleTypeUnicodeDoubleBlock,
     StyleTypeUnicodeDoubleDots,
     StyleTypeASCIIdouble,
 
+    // Braile style with 8 dots per char
+    StyleTypeUnicodeBraille,
     // ----------------
     StyleTypeMax
 } StyleType;
@@ -137,7 +143,12 @@ void init_tui(void)
   keypad(w_grid, TRUE); // Enable special keys
 
   // Init
-  if(style >= StyleTypeUnicodeDoubleBlock)
+  if (style == StyleTypeUnicodeBraille)
+  {
+    grid_width  = getmaxx(w_grid) * 2;
+    grid_height = getmaxy(w_grid) * 4;
+  }
+  else if(style >= StyleTypeUnicodeDoubleBlock)
   {
     grid_width  = getmaxx(w_grid);
     grid_height = getmaxy(w_grid)*2;
@@ -325,6 +336,31 @@ static void draw_grid(void)
                 }
                 y++;
             }
+            else if (style == StyleTypeUnicodeBraille)
+            {
+                uint16_t braille = 0;
+                wchar_t braille_char;
+                char braille_str[4] = {0};
+
+                // Convert braille pattern to unicode character
+                if (grid[x+0][y+0]) {braille |= 0x01; cells_alive++;}
+                if (grid[x+0][y+1]) {braille |= 0x02; cells_alive++;}
+                if (grid[x+0][y+2]) {braille |= 0x04; cells_alive++;}
+                if (grid[x+0][y+3]) {braille |= 0x40; cells_alive++;}
+                if (grid[x+1][y+0]) {braille |= 0x08; cells_alive++;}
+                if (grid[x+1][y+1]) {braille |= 0x10; cells_alive++;}
+                if (grid[x+1][y+2]) {braille |= 0x20; cells_alive++;}
+                if (grid[x+1][y+3]) {braille |= 0x80; cells_alive++;}
+                braille |= 0x2800;
+                braille_char = braille;
+                wcstombs(braille_str, &braille_char, 4);
+
+                mvwaddstr(w_grid, y/4, x/2, braille_str);
+
+                y+=3;
+                if(y >= grid_height)
+                  x+=1;
+            }
             else
             {
                 // Using background color with an empy space works not very well in ncurses,
@@ -336,8 +372,6 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
                     else if (style == StyleTypeUnicodeBlock2)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
-                    else if (style == StyleTypeASCIIasterisk)
-                        mvwaddstr(w_grid, y, x*2, "* ");           // *  -> Looks best on a terminal which has problems with unicode characters
                     else if (style == StyleTypeASCIIhash)
                         mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
                     else
