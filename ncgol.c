@@ -58,6 +58,25 @@ typedef enum
 } ModeType;
 static ModeType mode;
 
+typedef enum
+{
+    // Styles which use two chars per cell
+    StyleTypeUnicodeBlock1,
+    StyleTypeUnicodeBlock2,
+    StyleTypeASCIIblockSquare,
+    StyleTypeASCIIhash,
+    StyleTypeASCIIasterisk,
+
+    // Styles which show two cells in one char
+    StyleTypeUnicodeDoubleBlock,
+    StyleTypeUnicodeDoubleDots,
+    StyleTypeASCIIdouble,
+
+    // ----------------
+    StyleTypeMax
+} StyleType;
+static StyleType style;
+
 
 
 // Function to initialize the User Interface
@@ -109,12 +128,18 @@ void init_tui(void)
   keypad(w_grid, TRUE); // Enable special keys
 
   // Init
-  grid_width  = getmaxx(w_grid) / 2;
-  grid_height = getmaxy(w_grid);
+  if(style >= StyleTypeUnicodeDoubleBlock)
+  {
+    grid_width  = getmaxx(w_grid);
+    grid_height = getmaxy(w_grid)*2;
+  }
+  else
+  {
+    grid_width  = getmaxx(w_grid) / 2;
+    grid_height = getmaxy(w_grid);
+  }
   if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
   if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
-  mode  = ModeTypeRandom;
-  speed = 4;
 }
 
 
@@ -248,28 +273,76 @@ static void draw_grid(void)
     cells_alive = 0;
 
     // Draw grid to canvas
+    wattron(w_grid, A_BOLD | COLOR_PAIR(4));
     for(x=0; x<grid_width; x++)
     {
         for(y=0; y<grid_height; y++)
         {
-            if(grid[x][y])
+            if ((style == StyleTypeUnicodeDoubleBlock) || (style == StyleTypeUnicodeDoubleDots) || (style == StyleTypeASCIIdouble))
             {
-              // Using background color with an empy space works not very well in ncurses,
-              // because the background color is only dimmed and not bright.
-              // A unicode full block uses the foreground color and works better.
-              wattron(w_grid, COLOR_PAIR(4));
-              mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block
-              cells_alive++;
+                if (grid[x][y] && grid[x][y + 1])
+                {
+                    if (style == StyleTypeUnicodeDoubleBlock)
+                        mvwaddstr(w_grid, y/2, x, "\u2588");
+                    else if (style == StyleTypeUnicodeDoubleDots)
+                        mvwaddstr(w_grid, y/2, x, "\u2805");
+                    else // StyleTypeASCIIdouble
+                        mvwaddch(w_grid, y/2, x, ':');
+                    cells_alive += 2;
+                }
+                else if (grid[x][y])
+                {
+                    if (style == StyleTypeUnicodeDoubleBlock)
+                        mvwaddstr(w_grid, y/2, x, "\u2580");
+                    else if (style == StyleTypeUnicodeDoubleDots)
+                        mvwaddstr(w_grid, y/2, x, "\u2801");
+                    else // StyleTypeASCIIdouble
+                        mvwaddch(w_grid, y/2, x, '\'');
+                    cells_alive++;
+                }
+                else if (grid[x][y + 1])
+                {
+                    if (style == StyleTypeUnicodeDoubleBlock)
+                        mvwaddstr(w_grid, y/2, x, "\u2584");
+                    else if (style == StyleTypeUnicodeDoubleDots)
+                        mvwaddstr(w_grid, y/2, x, "\u2804");
+                    else // StyleTypeASCIIdouble
+                        mvwaddch(w_grid, y/2, x, '.');
+                    cells_alive++;
+                }
+                else
+                {
+                    mvwaddch(w_grid, y/2, x, ' ');
+                }
+                y++;
             }
             else
             {
-              wattron(w_grid, COLOR_PAIR(5));
-              mvwaddch(w_grid, y, x*2+0, ' ');
-              mvwaddch(w_grid, y, x*2+1, ' ');
+                // Using background color with an empy space works not very well in ncurses,
+                // because the background color is only dimmed and not bright.
+                // A unicode full block uses the foreground color and works better.
+                if (grid[x][y])
+                {
+                    if (style == StyleTypeUnicodeBlock1)
+                        mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
+                    else if (style == StyleTypeUnicodeBlock2)
+                        mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
+                    else if (style == StyleTypeASCIIasterisk)
+                        mvwaddstr(w_grid, y, x*2, "* ");           // *  -> Looks best on a terminal which has problems with unicode characters
+                    else if (style == StyleTypeASCIIhash)
+                        mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
+                    else
+                        mvwaddstr(w_grid, y, x*2, "[]");           // [] -> Looks best on a terminal which has problems with unicode characters
+                    cells_alive++;
+                }
+                else
+                {
+                    mvwaddstr(w_grid, y, x*2, "  ");
+                }
             }
-      }
+        }
     }
-    wattroff(w_status, COLOR_PAIR(1));
+    wattroff(w_grid, A_BOLD);
 
     // Handle status line
     wattron(w_status, COLOR_PAIR(2));
@@ -338,6 +411,12 @@ void handle_inputs(void)
       init_grid();
       draw_grid();
       wrefresh(w_grid);
+    }
+    else if(tolower(key) == 's')
+    {
+        style++;
+        style %= StyleTypeMax;
+        init_tui();
     }
     else if(key==KEY_RESIZE)
     {
@@ -436,6 +515,12 @@ uint8_t end_detection(void)
 // Function to handle one life cycle of the simulation
 int main(void)
 {
+  // Initialize variables
+  mode  = ModeTypeRandom;
+  speed = 4;
+  style = StyleTypeUnicodeBlock1;
+
+  // Initialize ncurses and grid
   init_tui();
   init_grid();
   draw_grid();
