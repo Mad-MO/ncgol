@@ -10,8 +10,10 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 // Unicode: https://www.compart.com/en/unicode/block/U+2800
 
-// TODO Status Bar: Reduce on small terminals
-// TODO Status Bar: Redraw SW Name and Version?!
+// TODO: Status Bar - Reduce on small terminals
+// TODO: Status Bar - Redraw SW Name and Version
+// TODO: Commandline options
+// TODO: Codecosmetic / Indentation
 
 #include <curses.h>
 #include <stdlib.h>
@@ -301,6 +303,7 @@ static void draw_grid(void)
         {
             if ((style == StyleTypeUnicodeDoubleBlock) || (style == StyleTypeUnicodeDoubleDots) || (style == StyleTypeASCIIdouble))
             {
+                // Two dots per character
                 if (grid[x][y] && grid[x][y + 1])
                 {
                     if (style == StyleTypeUnicodeDoubleBlock)
@@ -339,6 +342,7 @@ static void draw_grid(void)
             }
             else if (style == StyleTypeUnicodeBraille)
             {
+                // The braille pattern allows the usage of 8 dots per character
                 uint16_t braille = 0;
                 wchar_t braille_char;
                 char braille_str[4] = {0};
@@ -364,6 +368,7 @@ static void draw_grid(void)
             }
             else
             {
+                // Two characters represent one cell
                 // Using background color with an empy space works not very well in ncurses,
                 // because the background color is only dimmed and not bright.
                 // A unicode full block uses the foreground color and works better.
