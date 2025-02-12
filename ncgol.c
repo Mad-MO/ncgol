@@ -79,6 +79,15 @@ typedef enum
 } StyleType;
 static StyleType style;
 
+typedef enum
+{
+    COLOR_PAIR_STANDARD = 1,
+    COLOR_PAIR_LABEL,
+    COLOR_PAIR_VALUE,
+    COLOR_PAIR_LIVE_CELL,
+    COLOR_PAIR_TITLE
+} ColorPairType;
+static ColorPairType color_pair;
 
 
 // Function to initialize the User Interface
@@ -96,18 +105,17 @@ void init_tui(void)
 
   // Prepare coloring
   start_color();
-  init_pair(1, COLOR_WHITE,  COLOR_BLACK); // Standard
-  init_pair(2, COLOR_GREEN,  COLOR_BLACK); // Label
-  init_pair(3, COLOR_YELLOW, COLOR_BLACK); // Value
-  init_pair(4, COLOR_RED,    COLOR_BLACK); // Live cell
-  init_pair(5, COLOR_BLACK,  COLOR_BLACK); // Dead cell
-  init_pair(6, COLOR_CYAN,   COLOR_BLACK); // Title
+  init_pair(COLOR_PAIR_STANDARD,  COLOR_WHITE,  COLOR_BLACK); // Standard
+  init_pair(COLOR_PAIR_LABEL,     COLOR_GREEN,  COLOR_BLACK); // Label
+  init_pair(COLOR_PAIR_VALUE,     COLOR_YELLOW, COLOR_BLACK); // Value
+  init_pair(COLOR_PAIR_LIVE_CELL, COLOR_WHITE,  COLOR_BLACK); // Live cell
+  init_pair(COLOR_PAIR_TITLE,     COLOR_CYAN,   COLOR_BLACK); // Title
   ESCDELAY = 1; // Set the delay for escape sequences
 
   // Create status window
   w_status_box = newwin(3, COLS, LINES-3, 0);
   box(w_status_box, 0, 0); // Draw a box around the screen
-  wattron(w_status_box, COLOR_PAIR(6));
+  wattron(w_status_box, COLOR_PAIR(COLOR_PAIR_TITLE));
   mvwaddstr(w_status_box, 0, 3, " Status ");
   wattroff(w_status_box, COLOR_PAIR(0));
   wrefresh(w_status_box);
@@ -119,9 +127,9 @@ void init_tui(void)
   // Create grid window
   w_grid_box = newwin(LINES-3, COLS, 0, 0);
   box(w_grid_box, 0, 0); // Draw a box around the screen
-  wattron(w_grid_box, COLOR_PAIR(6));
+  wattron(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
   mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
-  wattroff(w_grid_box, COLOR_PAIR(0));
+  wattroff(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
   wrefresh(w_grid_box);
   w_grid = newwin(LINES-5, COLS-2, 1, 1);
   wrefresh(w_grid);
@@ -274,7 +282,7 @@ static void draw_grid(void)
     cells_alive = 0;
 
     // Draw grid to canvas
-    wattron(w_grid, A_BOLD | COLOR_PAIR(4));
+    wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_LIVE_CELL));
     for(x=0; x<grid_width; x++)
     {
         for(y=0; y<grid_height; y++)
@@ -346,11 +354,11 @@ static void draw_grid(void)
     wattroff(w_grid, A_BOLD);
 
     // Handle status line
-    wattron(w_status, COLOR_PAIR(2));
+    wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
     //                               1000x400_       123456_      400000_      10_     Glider gun
     mvwaddstr(w_status, 0, 0, " Grid:         Cycles:       Cells:       Speed:   Mode:          ");
 
-    wattron(w_status, COLOR_PAIR(3));
+    wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
     mvwprintw(w_status, 0,  6, "%dx%d", grid_width, grid_height);
     mvwprintw(w_status, 0, 22, "%d", cycle_counter);
     mvwprintw(w_status, 0, 35, "%d", cells_alive);
@@ -372,7 +380,7 @@ static void draw_grid(void)
     else if(mode == ModeTypeAcorn)
         mvwaddstr(w_status, 0, 56, "Acorn");
 
-    wattroff(w_status, COLOR_PAIR(0));
+    wattroff(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
     wrefresh(w_status);
 }
 
@@ -561,9 +569,9 @@ int main(void)
   }
 
   // Ask to end program
-  wattron(w_status, COLOR_PAIR(1));
+  wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
   mvwaddstr(w_status, 0, 0, " Press any key to quit");
-  wattroff(w_status, COLOR_PAIR(1));
+  wattroff(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
   wrefresh(w_status);
   wgetch(w_status);
 
