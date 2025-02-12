@@ -5,6 +5,17 @@
 
 
 
+ifeq ($(shell uname -s), Darwin)
+  CC     = gcc
+  LDLIBS = -lncurses
+endif
+ifeq ($(shell uname -s), Linux)
+  CC     = gcc
+  LDLIBS = -lncursesw
+endif
+
+
+
 run: ncgol
 	./ncgol
 
@@ -14,7 +25,8 @@ clean:
 	rm -f ncgol ncgol.o
 
 ncgol: ncgol.o Makefile
-	gcc -o ncgol ncgol.o -lncurses
+	$(CC) -o ncgol ncgol.o $(LDLIBS)
 
 ncgol.o: ncgol.c Makefile
-	gcc -c ncgol.c
+	$(CC) -c ncgol.c
+
