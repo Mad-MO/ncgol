@@ -6,7 +6,9 @@
 //          using ncurses for the GUI. The simulation can be controlled by
 //          the arrow keys and the buttons for different initial states.
 
-// Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+// TODO Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
+// TODO Status Bar: Reduce on small terminals
+// TODO Status Bar: Redraw SW Name and Version?!
 
 #include <curses.h>
 #include <stdlib.h>
@@ -31,8 +33,8 @@
 static uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t speed;
-int cells_alive = 0;
-int cycle_counter = 0;
+static uint16_t cells_alive = 0;
+static uint32_t cycle_counter = 0;
 #define END_DET_CNT 60
 static uint8_t end_det[END_DET_CNT];
 static uint8_t end_det_pos;
@@ -82,7 +84,6 @@ static StyleType style;
 // Function to initialize the User Interface
 void init_tui(void)
 {
-
   // Set locale
   setlocale(LC_ALL, "");
 
@@ -227,7 +228,7 @@ void init_grid(void)
 void update_grid(void)
 {
     uint16_t x, y;
-    memset(new_grid, 0, sizeof(new_grid));
+    memset(new_grid, 0, sizeof(new_grid)); // TODO Optimize: Move to init_tui()?!
 
     for(x=0; x<grid_width; x++)
     {
@@ -430,7 +431,7 @@ void handle_inputs(void)
     {
         speed = 10;
     }
-    else if((tolower(key) == 'r') || (key == ' '))
+    else if((tolower(key) == 'r') || (key == ' ')) // TODO: Restart with space
     {
       mode = ModeTypeRandom;
       init_grid();
