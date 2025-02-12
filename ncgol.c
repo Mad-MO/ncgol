@@ -10,8 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 // Unicode: https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Status Bar - Reduce on small terminals
-// TODO: Status Bar - Redraw SW Name and Version
 // TODO: Commandline options
 // TODO: Codecosmetic / Indentation
 
@@ -28,7 +26,6 @@
 #define SW_NAME "ncgol"
 #define SW_VERS "v0.3"
 #define AUTHOR  "by domo"
-#define SW_STR  SW_NAME " " SW_VERS " " AUTHOR
 
 // Define the size of the grid
 // Example: Fullscreen Terminal on Ultrawidescreen Monitor has ~569x110 characters
@@ -128,8 +125,6 @@ void init_tui(void)
   wattroff(w_status_box, COLOR_PAIR(0));
   wrefresh(w_status_box);
   w_status = newwin(1, COLS-2, LINES-2, 1);
-  mvwaddstr(w_status, 0, getmaxx(w_status)-strlen(SW_STR)-1, SW_STR); // Todo: Subtract from real width
-  wrefresh(w_status);
   keypad(w_status, TRUE); // Enable special keys
 
   // Create grid window
@@ -140,7 +135,6 @@ void init_tui(void)
   wattroff(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
   wrefresh(w_grid_box);
   w_grid = newwin(LINES-5, COLS-2, 1, 1);
-  wrefresh(w_grid);
   nodelay(w_grid, TRUE); // Non-blocking input
   keypad(w_grid, TRUE); // Enable special keys
 
@@ -394,31 +388,139 @@ static void draw_grid(void)
     wattroff(w_grid, A_BOLD);
 
     // Handle status line
-    wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
-    //                               1000x400_       123456_      400000_      10_     Glider gun
-    mvwaddstr(w_status, 0, 0, " Grid:         Cycles:       Cells:       Speed:   Mode:          ");
+    {
+        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Mode:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
+        char str_label[20];
+        char str_value[20];
+        uint16_t pos = 0;
+        uint16_t width = getmaxx(w_status);
+        wmove(w_status, 0, 0);
 
-    wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
-    mvwprintw(w_status, 0,  6, "%dx%d", grid_width, grid_height);
-    mvwprintw(w_status, 0, 22, "%d", cycle_counter);
-    mvwprintw(w_status, 0, 35, "%d", cells_alive);
-    mvwprintw(w_status, 0, 48, "%d", speed);
+        // Grid
+        strcpy(str_label, " Grid:");
+        sprintf(str_value, "%ux%u", grid_width, grid_height);
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
 
-    // Handle mode info
-    if     (mode == ModeTypeRandom)
-        mvwaddstr(w_status, 0, 56, "Random");
-    else if(mode == ModeTypeBlinker)
-        mvwaddstr(w_status, 0, 56, "Blinker");
-    else if(mode == ModeTypeGlider)
-        mvwaddstr(w_status, 0, 56, "Glider");
-    else if(mode == ModeTypeGliderGun)
-        mvwaddstr(w_status, 0, 56, "Glider gun");
-    else if(mode == ModeTypePentomino)
-        mvwaddstr(w_status, 0, 56, "Pentomino");
-    else if(mode == ModeTypeDiehard)
-        mvwaddstr(w_status, 0, 56, "Diehard");
-    else if(mode == ModeTypeAcorn)
-        mvwaddstr(w_status, 0, 56, "Acorn");
+        // Cycles
+        strcpy(str_label, " Cycles:");
+        sprintf(str_value, "%3u", cycle_counter);
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
+
+        // Cells
+        strcpy(str_label, " Cells:");
+        sprintf(str_value, "%3u", cells_alive);
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
+
+        // Speed
+        strcpy(str_label, " Speed:");
+        sprintf(str_value, "%u", speed);
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
+
+        // Mode
+        strcpy(str_label, " Mode:");
+        if     (mode == ModeTypeRandom)
+            strcpy(str_value, "Random");
+        else if(mode == ModeTypeBlinker)
+            strcpy(str_value, "Blinker");
+        else if(mode == ModeTypeGlider)
+            strcpy(str_value, "Glider");
+        else if(mode == ModeTypeGliderGun)
+            strcpy(str_value, "Glider gun");
+        else if(mode == ModeTypePentomino)
+            strcpy(str_value, "Pentomino");
+        else if(mode == ModeTypeDiehard)
+            strcpy(str_value, "Diehard");
+        else if(mode == ModeTypeAcorn)
+            strcpy(str_value, "Acorn");
+        else
+            strcpy(str_value, "?");
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
+
+        // Style
+        strcpy(str_label, " Style:");
+        if     (style == StyleTypeUnicodeBlock1)
+            strcpy(str_value, "Block1");
+        else if(style == StyleTypeUnicodeBlock2)
+            strcpy(str_value, "Block2");
+        else if(style == StyleTypeASCIIblockSquare)
+            strcpy(str_value, "SquareASCII");
+        else if(style == StyleTypeASCIIhash)
+            strcpy(str_value, "#ASCII");
+        else if(style == StyleTypeUnicodeDoubleBlock)
+            strcpy(str_value, "DoubleBlock");
+        else if(style == StyleTypeUnicodeDoubleDots)
+            strcpy(str_value, "DoubleDots");
+        else if(style == StyleTypeASCIIdouble)
+            strcpy(str_value, "DoubleASCII");
+        else if(style == StyleTypeUnicodeBraille)
+            strcpy(str_value, "Braille");
+        else
+            strcpy(str_value, "?");
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
+
+        // Remember position and clear rest of line
+        waddstr(w_status, "   ");
+        pos = getcurx(w_status);
+        for(int i=pos; i<width; i++)
+            waddch(w_status, ' ');
+
+        // Author
+        if((width-strlen(AUTHOR)-1) > pos)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+            mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1, AUTHOR);
+        }
+
+        // SW Version
+        if((width-strlen(AUTHOR)-1-strlen(SW_VERS)-1) > pos)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1-strlen(SW_VERS)-1, SW_VERS);
+        }
+
+        // SW Name
+        if((width-strlen(AUTHOR)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1) > pos)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+            mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
+        }
+    }
 
     wattroff(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
     wrefresh(w_status);
