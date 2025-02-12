@@ -5,10 +5,11 @@
 // Brief:   A very basic python implementation for Conway's "Game of Life"
 //          using ncurses for the GUI. The simulation can be controlled by
 //          the arrow keys and the buttons for different initial states.
-
+//
+// Rules:   https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 // Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
-// Unicode: https://www.compart.com/en/unicode/block/U+2800
+//          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: Commandline options
 // TODO: Codecosmetic / Indentation
