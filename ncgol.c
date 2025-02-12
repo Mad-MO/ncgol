@@ -143,6 +143,8 @@ void init_tui(void)
   keypad(w_grid, TRUE); // Enable special keys
 
   // Init
+  memset(new_grid, 0, sizeof(new_grid));
+
   if (style == StyleTypeUnicodeBraille)
   {
     grid_width  = getmaxx(w_grid) * 2;
@@ -247,7 +249,6 @@ void init_grid(void)
 void update_grid(void)
 {
     uint16_t x, y;
-    memset(new_grid, 0, sizeof(new_grid)); // TODO Optimize: Move to init_tui()?!
 
     for(x=0; x<grid_width; x++)
     {
