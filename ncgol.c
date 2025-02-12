@@ -474,9 +474,15 @@ void handle_inputs(void)
     {
         speed = 10;
     }
-    else if((tolower(key) == 'r') || (key == ' ')) // TODO: Restart with space
+    else if(tolower(key) == 'r')
     {
       mode = ModeTypeRandom;
+      init_grid();
+      draw_grid();
+      wrefresh(w_grid);
+    }
+    else if(key == ' ')
+    {
       init_grid();
       draw_grid();
       wrefresh(w_grid);
