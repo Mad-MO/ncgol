@@ -423,7 +423,7 @@ static void draw_grid(void)
                 mvwaddstr(w_grid, y/4, x/2, braille_str);
 
                 y+=3;
-                if(y >= grid_height)
+                if(y >= (grid_height-1))
                     x+=1;
             }
             else
