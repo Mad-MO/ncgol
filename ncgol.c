@@ -30,7 +30,7 @@
 
 // Define SW name and Version
 #define SW_NAME "ncgol"
-#define SW_VERS "v0.3"
+#define SW_VERS "v0.4"
 #define AUTHOR  "by domo"
 
 // Define the size of the grid
