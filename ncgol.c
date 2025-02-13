@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <locale.h>
 #include <ctype.h>
+#include <time.h>
 
 
 
@@ -67,6 +68,16 @@ static ModeType mode;
 
 typedef enum
 {
+    StageTypeStartup,  // Show startup screen
+    StageTypeInit,     // Initialize grid
+    StageTypeShowInfo, // Show info for current mode
+    StageTypeRunning,  // Running simulation
+    StageTypeEnd       // End of simulation has been reached
+} StageType;
+static StageType stage;
+
+typedef enum
+{
     // Styles which use two chars per cell
     StyleTypeUnicodeBlock1,
     StyleTypeUnicodeBlock2,
@@ -91,7 +102,8 @@ typedef enum
     COLOR_PAIR_LABEL,
     COLOR_PAIR_VALUE,
     COLOR_PAIR_LIVE_CELL,
-    COLOR_PAIR_TITLE
+    COLOR_PAIR_TITLE,
+    COLOR_PAIR_MODE_INFO
 } ColorPairType;
 static ColorPairType color_pair;
 
@@ -111,11 +123,12 @@ void init_tui(void)
 
   // Prepare coloring
   start_color();
-  init_pair(COLOR_PAIR_STANDARD,  COLOR_WHITE,  COLOR_BLACK); // Standard
-  init_pair(COLOR_PAIR_LABEL,     COLOR_GREEN,  COLOR_BLACK); // Label
-  init_pair(COLOR_PAIR_VALUE,     COLOR_YELLOW, COLOR_BLACK); // Value
-  init_pair(COLOR_PAIR_LIVE_CELL, COLOR_WHITE,  COLOR_BLACK); // Live cell
-  init_pair(COLOR_PAIR_TITLE,     COLOR_CYAN,   COLOR_BLACK); // Title
+  init_pair(COLOR_PAIR_STANDARD,  COLOR_WHITE,   COLOR_BLACK);   // Standard
+  init_pair(COLOR_PAIR_LABEL,     COLOR_GREEN,   COLOR_BLACK);   // Label
+  init_pair(COLOR_PAIR_VALUE,     COLOR_YELLOW,  COLOR_BLACK);   // Value
+  init_pair(COLOR_PAIR_LIVE_CELL, COLOR_WHITE,   COLOR_BLACK);   // Live cell
+  init_pair(COLOR_PAIR_TITLE,     COLOR_CYAN,    COLOR_BLACK);   // Title
+  init_pair(COLOR_PAIR_MODE_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Mode info
   ESCDELAY = 1; // Set the delay for escape sequences
 
   // Create status window
@@ -282,6 +295,26 @@ void update_grid(void)
 
 
 
+// Function to draw a string in a rounded frame for the mode name
+static void draw_str_in_frame(const char * str)
+{
+    int len=strlen(str);
+    int x = (getmaxx(w_grid) - len) / 2 - 2;
+    int y = (getmaxy(w_grid)) / 4;
+
+    wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_MODE_INFO));
+    for(int i=0; i<len+4; i++)
+    {
+        mvwaddch(w_grid, y+0, x+i, ' ');
+        mvwaddch(w_grid, y+1, x+i, ' ');
+        mvwaddch(w_grid, y+2, x+i, ' ');
+    }
+    mvwaddstr(w_grid, y+1, x+2, str);
+    wattroff(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_MODE_INFO));
+}
+
+
+
 // Function to draw the grid on the canvas
 static void draw_grid(void)
 {
@@ -387,6 +420,53 @@ static void draw_grid(void)
         }
     }
     wattroff(w_grid, A_BOLD);
+
+    // Handle startup screen
+    if(stage == StageTypeStartup)
+    {
+        wmove(w_grid, 0, 0);
+        waddstr(w_grid, " \n");
+        wattron(w_grid, A_BOLD | A_REVERSE);
+        waddstr(w_grid, " A ncurses based Simulation for Conways \"Game of Life\" \n");
+        wattroff(w_grid, A_BOLD | A_REVERSE);
+        waddstr(w_grid, " \n");
+        waddstr(w_grid, " Basic command keys:\n");
+        waddstr(w_grid, "   \'ESC\' or \'q\'        End program\n");
+        waddstr(w_grid, "   \'0\'...\'9\'           Set speed directly\n");
+        waddstr(w_grid, "   \'Up\' and \'Down\'     Adjust speed\n");
+        waddstr(w_grid, "   \'Left\' and \'Right\'  Change mode\n");
+        waddstr(w_grid, "   \'Space\'             Restart current mode\n");
+        waddstr(w_grid, "   \'s\'                 Change style\n");
+        waddstr(w_grid, "   \'h\'                 This Help\n");
+        waddstr(w_grid, " \n");
+        waddstr(w_grid, " Mode keys:\n");
+        waddstr(w_grid, "   \'r\'                 Random\n");
+        waddstr(w_grid, "   \'b\'                 Blinker\n");
+        waddstr(w_grid, "   \'g\'                 Glider\n");
+        waddstr(w_grid, "   \'l\'                 Glider gun\n");
+        waddstr(w_grid, "   \'p\'                 Pentomino\n");
+        waddstr(w_grid, "   \'d\'                 Diehard\n");
+        waddstr(w_grid, "   \'a\'                 Acorn\n");
+    }
+
+    // Handle mode info
+    if(stage == StageTypeShowInfo)
+    {
+        if     (mode == ModeTypeRandom)
+            draw_str_in_frame("Random");
+        else if(mode == ModeTypeBlinker)
+            draw_str_in_frame("Blinker");
+        else if(mode == ModeTypeGlider)
+            draw_str_in_frame("Glider");
+        else if(mode == ModeTypeGliderGun)
+            draw_str_in_frame("Glider gun");
+        else if(mode == ModeTypePentomino)
+            draw_str_in_frame("Pentomino");
+        else if(mode == ModeTypeDiehard)
+            draw_str_in_frame("Diehard");
+        else if(mode == ModeTypeAcorn)
+            draw_str_in_frame("Acorn");
+    }
 
     // Handle status line
     {
@@ -550,19 +630,13 @@ void handle_inputs(void)
     {
       mode++;
       mode %= ModeTypeMax;
-
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(key == KEY_LEFT)
     {
       if(mode == 0) mode = ModeTypeMax - 1;
       else          mode--;
-
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(tolower(key) == 's')
     {
@@ -584,58 +658,47 @@ void handle_inputs(void)
     }
     else if(tolower(key) == 'r')
     {
-      mode = ModeTypeRandom;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+        mode = ModeTypeRandom;
+        stage = StageTypeInit;
     }
     else if(key == ' ')
     {
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'b')
     {
       mode = ModeTypeBlinker;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(tolower(key) == 'g')
     {
       mode = ModeTypeGlider;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(tolower(key) == 'l')
     {
       mode = ModeTypeGliderGun;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(tolower(key) == 'p')
     {
       mode = ModeTypePentomino;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(tolower(key) == 'd')
     {
       mode = ModeTypeDiehard;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
     }
     else if(tolower(key) == 'a')
     {
       mode = ModeTypeAcorn;
-      init_grid();
-      draw_grid();
-      wrefresh(w_grid);
+      stage = StageTypeInit;
+    }
+    else if(tolower(key) == 'h')
+    {
+      stage = StageTypeStartup;
+      memset(grid, 0, sizeof(grid));
     }
     else
     {
@@ -680,13 +743,26 @@ int main(void)
 
   // Initialize ncurses and grid
   init_tui();
-  init_grid();
-  draw_grid();
   wrefresh(w_grid);
+
+  // Init
+  static uint16_t last_ticks;
+  struct timespec ts;
+  clock_gettime(CLOCK_REALTIME, &ts);
+  last_ticks = ts.tv_nsec / 1000000;
 
   // Loop until back key is pressed
   while(1)
   {
+    static uint16_t timer;
+    uint16_t ticks;
+
+    // Handle passed time
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ticks = ts.tv_nsec / 1000000; // ticks = 0...999
+    timer += (ticks - last_ticks + 1000) % 1000;
+    last_ticks = ticks;
+
     // Handle input
     handle_inputs();
 
@@ -702,15 +778,53 @@ int main(void)
     else if(speed == 9) usleep(    50);
     else                usleep(     0);
 
-    // Handle one cycle
-    if(end_detection())
+    // Handle different modes and update grid
+    if     (stage == StageTypeStartup)
     {
+        if(timer >= 20000)
+        {
+            stage = StageTypeInit;
+            timer = 0;
+        }
     }
-    else
+    else if(stage == StageTypeInit)
     {
-      cycle_counter++;
+        init_grid();
+        stage = StageTypeShowInfo;
+        timer = 0;
     }
-    update_grid();
+    else if(stage == StageTypeShowInfo)
+    {
+        if(timer >= 2000)
+        {
+            stage = StageTypeRunning;
+            timer = 0;
+        }
+    }
+    else if(stage == StageTypeRunning)
+    {
+        if(end_detection())
+        {
+            stage = StageTypeEnd;
+            timer = 0;
+        }
+        else
+        {
+            cycle_counter++;
+            update_grid();
+        }
+    }
+    else if(stage == StageTypeEnd)
+    {
+        update_grid();
+        if(timer >= 5000)
+        {
+            mode++;
+            mode %= ModeTypeMax;
+            stage = StageTypeInit;
+            timer = 0;
+        }
+    }
 
     // Draw grid
     draw_grid();
