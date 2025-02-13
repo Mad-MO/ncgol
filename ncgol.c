@@ -435,7 +435,7 @@ static void draw_grid(void)
         wattroff(w_grid, A_BOLD | A_REVERSE);
         waddstr(w_grid, " \n");
         waddstr(w_grid, " Basic command keys:\n");
-        waddstr(w_grid, "   \'ESC\' or \'q\'        End program\n");
+        waddstr(w_grid, "   \'q\'                 End program\n");
         waddstr(w_grid, "   \'0\'...\'9\'           Set speed directly\n");
         waddstr(w_grid, "   \'Up\' and \'Down\'     Adjust speed\n");
         waddstr(w_grid, "   \'Left\' and \'Right\'  Change mode\n");
@@ -617,10 +617,21 @@ static void draw_grid(void)
 void handle_inputs(void)
 {
     int key = wgetch(w_grid);
-    if((key=='q') || (key==27)) // 'q' or ESC
+    if(tolower(key) == 'q')
     {
       endwin();
       exit(0);
+    }
+    if(key==27) // ESC
+    {
+        if(stage == StageTypeStartup)
+        {
+            stage = StageTypeInit;
+        }
+        else if(stage == StageTypeShowInfo)
+        {
+            stage = StageTypeRunning;
+        }
     }
     else if(key == KEY_UP)
     {

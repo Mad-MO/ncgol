@@ -1,9 +1,7 @@
 
 # Ncurses Game of Life
 
-Currently in Development.
-
-Might still contain a lot of bugs!
+TODO: Currently in Development. Might still contain a lot of bugs!
 
 Based on Ncurses.
 
@@ -30,7 +28,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 ## Usage
 
-- "Esc" or "q" key ends the program
+- "q" key ends the program
 - "Up", "Down" and "0" through "9" keys adjust the speed
 - "Right" and "Left" keys reset the cells to a different mode
   - "r" Random
