@@ -13,6 +13,10 @@
 
 // TODO: Commandline options
 // TODO: Codecosmetic / Indentation
+// TODO: Improve the end detection (Large grid with gliders)
+// TODO: Rename "mode" -> "pattern"
+// TODO: Mode: once / loop / next
+// TODO: Detect terminal type and set best style
 
 #include <curses.h>
 #include <stdlib.h>
