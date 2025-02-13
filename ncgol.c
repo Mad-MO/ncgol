@@ -738,8 +738,8 @@ int main(void)
 {
   // Initialize variables
   mode  = ModeTypeRandom;
-  speed = 4;
-  style = StyleTypeUnicodeBlock1;
+  speed = 3;
+  style = StyleTypeUnicodeBlock2;
 
   // Initialize ncurses and grid
   init_tui();
