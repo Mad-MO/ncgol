@@ -14,7 +14,6 @@
 // TODO: Commandline options
 // TODO: Codecosmetic / Indentation
 // TODO: Improve the end detection (Large grid with gliders)
-// TODO: Mode: once / loop / next
 // TODO: Detect terminal type and set best style
 
 #include <curses.h>
@@ -109,6 +108,17 @@ typedef enum
     COLOR_PAIR_PATTERN_INFO
 } ColorPairType;
 static ColorPairType color_pair;
+
+typedef enum
+{
+    MODE_NEXT, // When current pattern ends, switch to next pattern
+    MODE_LOOP, // When current pattern ends, restart current pattern
+    MODE_STOP, // When current pattern ends, stop the simulation
+    // ----------------
+    MODE_MAX
+} ModeType;
+static ModeType mode;
+
 
 
 // Function to initialize the User Interface
@@ -440,6 +450,7 @@ static void draw_grid(void)
         waddstr(w_grid, "   \'Left\' and \'Right\'  Change pattern\n");
         waddstr(w_grid, "   \'Space\'             Restart current pattern\n");
         waddstr(w_grid, "   \'s\'                 Change style\n");
+        waddstr(w_grid, "   \'m\'                 Change mode\n");
         waddstr(w_grid, "   \'h\'                 This Help\n");
         waddstr(w_grid, " \n");
         waddstr(w_grid, " Pattern keys:\n");
@@ -578,6 +589,24 @@ static void draw_grid(void)
             waddstr(w_status, str_value);
         }
 
+        // Mode
+        strcpy(str_label, " Mode:");
+        if     (mode == MODE_NEXT)
+            strcpy(str_value, "Next");
+        else if(mode == MODE_LOOP)
+            strcpy(str_value, "Loop");
+        else if(mode == MODE_STOP)
+            strcpy(str_value, "Stop");
+        else
+            strcpy(str_value, "?");
+        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        {
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            waddstr(w_status, str_label);
+            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            waddstr(w_status, str_value);
+        }
+
         // Remember position and clear rest of line
         waddstr(w_status, "   ");
         pos = getcurx(w_status);
@@ -657,6 +686,11 @@ void handle_inputs(void)
         style++;
         style %= StyleTypeMax;
         init_tui();
+    }
+    else if(tolower(key) == 'm')
+    {
+        mode++;
+        mode %= MODE_MAX;
     }
     else if(key==KEY_RESIZE)
     {
@@ -754,6 +788,7 @@ int main(void)
   pattern  = PatternTypeRandom;
   speed = 3;
   style = StyleTypeUnicodeBlock2;
+  mode = MODE_NEXT;
 
   // Initialize ncurses and grid
   init_tui();
@@ -833,10 +868,23 @@ int main(void)
         update_grid();
         if(timer >= 5000)
         {
-            pattern++;
-            pattern %= PatternTypeMax;
-            stage = StageTypeInit;
-            timer = 0;
+            if(mode == MODE_NEXT)
+            {
+                pattern++;
+                pattern %= PatternTypeMax;
+                stage = StageTypeInit;
+                timer = 0;
+            }
+            else if(mode == MODE_LOOP)
+            {
+                stage = StageTypeInit;
+                timer = 0;
+            }
+            else // MODE_STOP
+            {
+                // Do nothing
+                timer = 5000;
+            }
         }
     }
 

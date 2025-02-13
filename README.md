@@ -43,6 +43,10 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - 2 chars representing 1 cell (Unicode blocks / "#")
   - 1 char represents 2 cells (Unicode braille dots / Unicode half blocks / ASCII)
   - 1 char represents 8 cells (Unicode braille dots)
+- "m" key changes the mode
+  - NEXT: Jump to next pattern
+  - LOOP: Restart current pattern
+  - STOP: Stop when pattern is finished
 
 ## Background
 
