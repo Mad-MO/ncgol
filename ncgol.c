@@ -501,6 +501,12 @@ static void draw_grid(void)
             draw_str_in_frame("Acorn");
     }
 
+    // Handle end message
+    if(stage == StageTypeEnd)
+    {
+        draw_str_in_frame("End of simulation");
+    }
+
     // Handle status line
     {
         // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Pattern:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
