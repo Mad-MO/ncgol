@@ -12,7 +12,6 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: Commandline options
-// TODO: Codecosmetic / Indentation
 // TODO: Improve the end detection (Large grid with gliders)
 // TODO: Detect terminal type and set best style
 
@@ -32,20 +31,21 @@
 #define AUTHOR  "by domo"
 
 // Define the size of the grid
-// Example: Fullscreen Terminal on Ultrawidescreen Monitor has ~569x110 characters
-//          -> 1134x420 cells when using braille style
+// Example: Fullscreen Terminal on Ultrawidescreen Monitor
+//          -> ~569x110 characters
+//          -> 1134x420 cells (when using braille style)
 #define GRID_WIDTH_MAX  2500 // 2500*1000*2 = ~5 MB
 #define GRID_HEIGHT_MAX 1000
 
 // Create the grid to represent the cells
-static uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
-static uint8_t new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
-static uint8_t speed;
+static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
+static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
+static uint8_t  speed;
 static uint16_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
 #define END_DET_CNT 60
-static uint8_t end_det[END_DET_CNT];
-static uint8_t end_det_pos;
+static uint8_t  end_det[END_DET_CNT];
+static uint8_t  end_det_pos;
 static uint16_t grid_width;
 static uint16_t grid_height;
 
@@ -124,67 +124,67 @@ static ModeType mode;
 // Function to initialize the User Interface
 void init_tui(void)
 {
-  // Set locale
-  setlocale(LC_ALL, "");
+    // Set locale
+    setlocale(LC_ALL, "");
 
-  // Initialize ncurses
-  initscr();   // Determine terminal type
-  cbreak();    // Disable buffering
-  noecho();    // Disable echo to the screen
-  curs_set(0); // Hide the cursor
-  clear();     // Clear the screen
+    // Initialize ncurses
+    initscr();   // Determine terminal type
+    cbreak();    // Disable buffering
+    noecho();    // Disable echo to the screen
+    curs_set(0); // Hide the cursor
+    clear();     // Clear the screen
 
-  // Prepare coloring
-  start_color();
-  init_pair(COLOR_PAIR_STANDARD,     COLOR_WHITE,   COLOR_BLACK);   // Standard
-  init_pair(COLOR_PAIR_LABEL,        COLOR_GREEN,   COLOR_BLACK);   // Label
-  init_pair(COLOR_PAIR_VALUE,        COLOR_YELLOW,  COLOR_BLACK);   // Value
-  init_pair(COLOR_PAIR_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
-  init_pair(COLOR_PAIR_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
-  init_pair(COLOR_PAIR_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
-  ESCDELAY = 1; // Set the delay for escape sequences
+    // Prepare coloring
+    start_color();
+    init_pair(COLOR_PAIR_STANDARD,     COLOR_WHITE,   COLOR_BLACK);   // Standard
+    init_pair(COLOR_PAIR_LABEL,        COLOR_GREEN,   COLOR_BLACK);   // Label
+    init_pair(COLOR_PAIR_VALUE,        COLOR_YELLOW,  COLOR_BLACK);   // Value
+    init_pair(COLOR_PAIR_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
+    init_pair(COLOR_PAIR_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
+    init_pair(COLOR_PAIR_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
+    ESCDELAY = 1; // Set the delay for escape sequences
 
-  // Create status window
-  w_status_box = newwin(3, COLS, LINES-3, 0);
-  box(w_status_box, 0, 0); // Draw a box around the screen
-  wattron(w_status_box, COLOR_PAIR(COLOR_PAIR_TITLE));
-  mvwaddstr(w_status_box, 0, 3, " Status ");
-  wattroff(w_status_box, COLOR_PAIR(0));
-  wrefresh(w_status_box);
-  w_status = newwin(1, COLS-2, LINES-2, 1);
-  keypad(w_status, TRUE); // Enable special keys
+    // Create status window
+    w_status_box = newwin(3, COLS, LINES-3, 0);
+    box(w_status_box, 0, 0); // Draw a box around the screen
+    wattron(w_status_box, COLOR_PAIR(COLOR_PAIR_TITLE));
+    mvwaddstr(w_status_box, 0, 3, " Status ");
+    wattroff(w_status_box, COLOR_PAIR(0));
+    wrefresh(w_status_box);
+    w_status = newwin(1, COLS-2, LINES-2, 1);
+    keypad(w_status, TRUE); // Enable special keys
 
-  // Create grid window
-  w_grid_box = newwin(LINES-3, COLS, 0, 0);
-  box(w_grid_box, 0, 0); // Draw a box around the screen
-  wattron(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
-  mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
-  wattroff(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
-  wrefresh(w_grid_box);
-  w_grid = newwin(LINES-5, COLS-2, 1, 1);
-  nodelay(w_grid, TRUE); // Non-blocking input
-  keypad(w_grid, TRUE); // Enable special keys
+    // Create grid window
+    w_grid_box = newwin(LINES-3, COLS, 0, 0);
+    box(w_grid_box, 0, 0); // Draw a box around the screen
+    wattron(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
+    mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
+    wattroff(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
+    wrefresh(w_grid_box);
+    w_grid = newwin(LINES-5, COLS-2, 1, 1);
+    nodelay(w_grid, TRUE); // Non-blocking input
+    keypad(w_grid, TRUE); // Enable special keys
 
-  // Init
-  memset(new_grid, 0, sizeof(new_grid));
+    // Init
+    memset(new_grid, 0, sizeof(new_grid));
 
-  if (style == StyleTypeUnicodeBraille)
-  {
-    grid_width  = getmaxx(w_grid) * 2;
-    grid_height = getmaxy(w_grid) * 4;
-  }
-  else if(style >= StyleTypeUnicodeDoubleBlock)
-  {
-    grid_width  = getmaxx(w_grid);
-    grid_height = getmaxy(w_grid)*2;
-  }
-  else
-  {
-    grid_width  = getmaxx(w_grid) / 2;
-    grid_height = getmaxy(w_grid);
-  }
-  if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
-  if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
+    if     (style == StyleTypeUnicodeBraille)
+    {
+        grid_width  = getmaxx(w_grid) * 2;
+        grid_height = getmaxy(w_grid) * 4;
+    }
+    else if(style >= StyleTypeUnicodeDoubleBlock)
+    {
+        grid_width  = getmaxx(w_grid);
+        grid_height = getmaxy(w_grid)*2;
+    }
+    else
+    {
+        grid_width  = getmaxx(w_grid) / 2;
+        grid_height = getmaxy(w_grid);
+    }
+    if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
+    if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
 }
 
 
@@ -194,7 +194,7 @@ void init_grid(void)
 {
     memset(grid, 0, sizeof(grid));
 
-    if(pattern == PatternTypeRandom)
+    if     (pattern == PatternTypeRandom)
     {
         uint16_t x, y;
         for(x=0; x<grid_width; x++)
@@ -217,22 +217,42 @@ void init_grid(void)
     }
     else if(pattern == PatternTypeGliderGun)
     {
-        grid[ 1][5] = 1; grid[ 1][6] = 1;
-        grid[ 2][5] = 1; grid[ 2][6] = 1;
-        grid[11][5] = 1; grid[11][6] = 1; grid[11][7] = 1;
-        grid[12][4] = 1; grid[12][8] = 1;
-        grid[13][3] = 1; grid[13][9] = 1;
-        grid[14][3] = 1; grid[14][9] = 1;
+        grid[1][5] = 1;
+        grid[1][6] = 1;
+        grid[2][5] = 1;
+        grid[2][6] = 1;
+        grid[11][5] = 1;
+        grid[11][6] = 1;
+        grid[11][7] = 1;
+        grid[12][4] = 1;
+        grid[12][8] = 1;
+        grid[13][3] = 1;
+        grid[13][9] = 1;
+        grid[14][3] = 1;
+        grid[14][9] = 1;
         grid[15][6] = 1;
-        grid[16][4] = 1; grid[16][8] = 1;
-        grid[17][5] = 1; grid[17][6] = 1; grid[17][7] = 1;
+        grid[16][4] = 1;
+        grid[16][8] = 1;
+        grid[17][5] = 1;
+        grid[17][6] = 1;
+        grid[17][7] = 1;
         grid[18][6] = 1;
-        grid[21][3] = 1; grid[21][4] = 1; grid[21][5] = 1;
-        grid[22][3] = 1; grid[22][4] = 1; grid[22][5] = 1;
-        grid[23][2] = 1; grid[23][6] = 1;
-        grid[25][1] = 1; grid[25][2] = 1; grid[25][6] = 1; grid[25][7] = 1;
-        grid[35][3] = 1; grid[35][4] = 1;
-        grid[36][3] = 1; grid[36][4] = 1;
+        grid[21][3] = 1;
+        grid[21][4] = 1;
+        grid[21][5] = 1;
+        grid[22][3] = 1;
+        grid[22][4] = 1;
+        grid[22][5] = 1;
+        grid[23][2] = 1;
+        grid[23][6] = 1;
+        grid[25][1] = 1;
+        grid[25][2] = 1;
+        grid[25][6] = 1;
+        grid[25][7] = 1;
+        grid[35][3] = 1;
+        grid[35][4] = 1;
+        grid[36][3] = 1;
+        grid[36][4] = 1;
     }
     else if(pattern == PatternTypePentomino)
     {
@@ -311,12 +331,12 @@ void update_grid(void)
 // Function to draw a string in a rounded frame for the pattern name
 static void draw_str_in_frame(const char * str)
 {
-    int len=strlen(str);
-    int x = (getmaxx(w_grid) - len) / 2 - 2;
-    int y = (getmaxy(w_grid)) / 4;
+    uint16_t len=strlen(str);
+    uint16_t x = (getmaxx(w_grid) - len) / 2 - 2;
+    uint16_t y = (getmaxy(w_grid)) / 4;
 
     wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_PATTERN_INFO));
-    for(int i=0; i<len+4; i++)
+    for(uint16_t i=0; i<len+4; i++)
     {
         mvwaddch(w_grid, y+0, x+i, ' ');
         mvwaddch(w_grid, y+1, x+i, ' ');
@@ -342,34 +362,34 @@ static void draw_grid(void)
     {
         for(y=0; y<grid_height; y++)
         {
-            if ((style == StyleTypeUnicodeDoubleBlock) || (style == StyleTypeUnicodeDoubleDots) || (style == StyleTypeASCIIdouble))
+            if((style == StyleTypeUnicodeDoubleBlock) || (style == StyleTypeUnicodeDoubleDots) || (style == StyleTypeASCIIdouble))
             {
                 // Two dots per character
-                if (grid[x][y] && grid[x][y + 1])
+                if(grid[x][y] && grid[x][y + 1])
                 {
-                    if (style == StyleTypeUnicodeDoubleBlock)
+                    if     (style == StyleTypeUnicodeDoubleBlock)
                         mvwaddstr(w_grid, y/2, x, "\u2588");
-                    else if (style == StyleTypeUnicodeDoubleDots)
+                    else if(style == StyleTypeUnicodeDoubleDots)
                         mvwaddstr(w_grid, y/2, x, "\u2805");
                     else // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, ':');
                     cells_alive += 2;
                 }
-                else if (grid[x][y])
+                else if(grid[x][y])
                 {
-                    if (style == StyleTypeUnicodeDoubleBlock)
+                    if     (style == StyleTypeUnicodeDoubleBlock)
                         mvwaddstr(w_grid, y/2, x, "\u2580");
-                    else if (style == StyleTypeUnicodeDoubleDots)
+                    else if(style == StyleTypeUnicodeDoubleDots)
                         mvwaddstr(w_grid, y/2, x, "\u2801");
                     else // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, '\'');
                     cells_alive++;
                 }
-                else if (grid[x][y + 1])
+                else if(grid[x][y + 1])
                 {
-                    if (style == StyleTypeUnicodeDoubleBlock)
+                    if     (style == StyleTypeUnicodeDoubleBlock)
                         mvwaddstr(w_grid, y/2, x, "\u2584");
-                    else if (style == StyleTypeUnicodeDoubleDots)
+                    else if(style == StyleTypeUnicodeDoubleDots)
                         mvwaddstr(w_grid, y/2, x, "\u2804");
                     else // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, '.');
@@ -381,7 +401,7 @@ static void draw_grid(void)
                 }
                 y++;
             }
-            else if (style == StyleTypeUnicodeBraille)
+            else if(style == StyleTypeUnicodeBraille)
             {
                 // The braille pattern allows the usage of 8 dots per character
                 uint16_t braille = 0;
@@ -389,14 +409,14 @@ static void draw_grid(void)
                 char braille_str[4] = {0};
 
                 // Convert braille pattern to unicode character
-                if (grid[x+0][y+0]) {braille |= 0x01; cells_alive++;}
-                if (grid[x+0][y+1]) {braille |= 0x02; cells_alive++;}
-                if (grid[x+0][y+2]) {braille |= 0x04; cells_alive++;}
-                if (grid[x+0][y+3]) {braille |= 0x40; cells_alive++;}
-                if (grid[x+1][y+0]) {braille |= 0x08; cells_alive++;}
-                if (grid[x+1][y+1]) {braille |= 0x10; cells_alive++;}
-                if (grid[x+1][y+2]) {braille |= 0x20; cells_alive++;}
-                if (grid[x+1][y+3]) {braille |= 0x80; cells_alive++;}
+                if(grid[x+0][y+0]) {braille |= 0x01; cells_alive++;}
+                if(grid[x+0][y+1]) {braille |= 0x02; cells_alive++;}
+                if(grid[x+0][y+2]) {braille |= 0x04; cells_alive++;}
+                if(grid[x+0][y+3]) {braille |= 0x40; cells_alive++;}
+                if(grid[x+1][y+0]) {braille |= 0x08; cells_alive++;}
+                if(grid[x+1][y+1]) {braille |= 0x10; cells_alive++;}
+                if(grid[x+1][y+2]) {braille |= 0x20; cells_alive++;}
+                if(grid[x+1][y+3]) {braille |= 0x80; cells_alive++;}
                 braille |= 0x2800;
                 braille_char = braille;
                 wcstombs(braille_str, &braille_char, 4);
@@ -405,7 +425,7 @@ static void draw_grid(void)
 
                 y+=3;
                 if(y >= grid_height)
-                  x+=1;
+                    x+=1;
             }
             else
             {
@@ -413,13 +433,13 @@ static void draw_grid(void)
                 // Using background color with an empy space works not very well in ncurses,
                 // because the background color is only dimmed and not bright.
                 // A unicode full block uses the foreground color and works better.
-                if (grid[x][y])
+                if(grid[x][y])
                 {
-                    if (style == StyleTypeUnicodeBlock1)
+                    if     (style == StyleTypeUnicodeBlock1)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
-                    else if (style == StyleTypeUnicodeBlock2)
+                    else if(style == StyleTypeUnicodeBlock2)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
-                    else if (style == StyleTypeASCIIhash)
+                    else if(style == StyleTypeASCIIhash)
                         mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
                     else
                         mvwaddstr(w_grid, y, x*2, "[]");           // [] -> Looks best on a terminal which has problems with unicode characters
@@ -610,7 +630,7 @@ static void draw_grid(void)
         // Remember position and clear rest of line
         waddstr(w_status, "   ");
         pos = getcurx(w_status);
-        for(int i=pos; i<width; i++)
+        for(uint16_t i=pos; i<width; i++)
             waddch(w_status, ' ');
 
         // Author
@@ -647,12 +667,12 @@ void handle_inputs(void)
     int key = wgetch(w_grid);
     if(tolower(key) == 'q')
     {
-      endwin();
-      exit(0);
+        endwin();
+        exit(0);
     }
     if(key==27) // ESC
     {
-        if(stage == StageTypeStartup)
+        if     (stage == StageTypeStartup)
         {
             stage = StageTypeInit;
         }
@@ -663,23 +683,23 @@ void handle_inputs(void)
     }
     else if(key == KEY_UP)
     {
-      if(speed < 10) speed++;
+        if(speed < 10) speed++;
     }
     else if(key == KEY_DOWN)
     {
-      if(speed > 1) speed--;
+        if(speed > 1) speed--;
     }
     else if(key == KEY_RIGHT)
     {
-      pattern++;
-      pattern %= PatternTypeMax;
-      stage = StageTypeInit;
+        pattern++;
+        pattern %= PatternTypeMax;
+        stage = StageTypeInit;
     }
     else if(key == KEY_LEFT)
     {
-      if(pattern == 0) pattern = PatternTypeMax - 1;
-      else          pattern--;
-      stage = StageTypeInit;
+        if(pattern == 0) pattern = PatternTypeMax - 1;
+        else             pattern--;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 's')
     {
@@ -715,38 +735,38 @@ void handle_inputs(void)
     }
     else if(tolower(key) == 'b')
     {
-      pattern = PatternTypeBlinker;
-      stage = StageTypeInit;
+        pattern = PatternTypeBlinker;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'g')
     {
-      pattern = PatternTypeGlider;
-      stage = StageTypeInit;
+        pattern = PatternTypeGlider;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'l')
     {
-      pattern = PatternTypeGliderGun;
-      stage = StageTypeInit;
+        pattern = PatternTypeGliderGun;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'p')
     {
-      pattern = PatternTypePentomino;
-      stage = StageTypeInit;
+        pattern = PatternTypePentomino;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'd')
     {
-      pattern = PatternTypeDiehard;
-      stage = StageTypeInit;
+        pattern = PatternTypeDiehard;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'a')
     {
-      pattern = PatternTypeAcorn;
-      stage = StageTypeInit;
+        pattern = PatternTypeAcorn;
+        stage = StageTypeInit;
     }
     else if(tolower(key) == 'h')
     {
-      stage = StageTypeStartup;
-      memset(grid, 0, sizeof(grid));
+        stage = StageTypeStartup;
+        memset(grid, 0, sizeof(grid));
     }
     else
     {
@@ -784,123 +804,123 @@ uint8_t end_detection(void)
 // Function to handle one life cycle of the simulation
 int main(void)
 {
-  // Initialize variables
-  pattern  = PatternTypeRandom;
-  speed = 3;
-  style = StyleTypeUnicodeBlock2;
-  mode = MODE_NEXT;
+    // Initialize variables
+    pattern  = PatternTypeRandom;
+    speed = 3;
+    style = StyleTypeUnicodeBlock2;
+    mode = MODE_NEXT;
 
-  // Initialize ncurses and grid
-  init_tui();
-  wrefresh(w_grid);
-
-  // Init
-  static uint16_t last_ticks;
-  struct timespec ts;
-  clock_gettime(CLOCK_REALTIME, &ts);
-  last_ticks = ts.tv_nsec / 1000000;
-
-  // Loop until back key is pressed
-  while(1)
-  {
-    static uint16_t timer;
-    uint16_t ticks;
-
-    // Handle passed time
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ticks = ts.tv_nsec / 1000000; // ticks = 0...999
-    timer += (ticks - last_ticks + 1000) % 1000;
-    last_ticks = ticks;
-
-    // Handle input
-    handle_inputs();
-
-    // Handle speed
-    if     (speed == 1) usleep(500000);
-    else if(speed == 2) usleep(100000);
-    else if(speed == 3) usleep( 50000);
-    else if(speed == 4) usleep( 10000);
-    else if(speed == 5) usleep(  5000);
-    else if(speed == 6) usleep(  1000);
-    else if(speed == 7) usleep(   500);
-    else if(speed == 8) usleep(   100);
-    else if(speed == 9) usleep(    50);
-    else                usleep(     0);
-
-    // Handle different patterns and update grid
-    if     (stage == StageTypeStartup)
-    {
-        if(timer >= 20000)
-        {
-            stage = StageTypeInit;
-            timer = 0;
-        }
-    }
-    else if(stage == StageTypeInit)
-    {
-        init_grid();
-        stage = StageTypeShowInfo;
-        timer = 0;
-    }
-    else if(stage == StageTypeShowInfo)
-    {
-        if(timer >= 2000)
-        {
-            stage = StageTypeRunning;
-            timer = 0;
-        }
-    }
-    else if(stage == StageTypeRunning)
-    {
-        if(end_detection())
-        {
-            stage = StageTypeEnd;
-            timer = 0;
-        }
-        else
-        {
-            cycle_counter++;
-            update_grid();
-        }
-    }
-    else if(stage == StageTypeEnd)
-    {
-        update_grid();
-        if(timer >= 5000)
-        {
-            if(mode == MODE_NEXT)
-            {
-                pattern++;
-                pattern %= PatternTypeMax;
-                stage = StageTypeInit;
-                timer = 0;
-            }
-            else if(mode == MODE_LOOP)
-            {
-                stage = StageTypeInit;
-                timer = 0;
-            }
-            else // MODE_STOP
-            {
-                // Do nothing
-                timer = 5000;
-            }
-        }
-    }
-
-    // Draw grid
-    draw_grid();
+    // Initialize ncurses and grid
+    init_tui();
     wrefresh(w_grid);
-  }
 
-  // Ask to end program
-  wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
-  mvwaddstr(w_status, 0, 0, " Press any key to quit");
-  wattroff(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
-  wrefresh(w_status);
-  wgetch(w_status);
+    // Init
+    static uint16_t last_ticks;
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    last_ticks = ts.tv_nsec / 1000000;
 
-  // End program
-  endwin();
-  exit(0);
+    // Loop until back key is pressed
+    while(1)
+    {
+        static uint16_t timer;
+        uint16_t ticks;
+
+        // Handle passed time
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ticks = ts.tv_nsec / 1000000; // ticks = 0...999
+        timer += (ticks - last_ticks + 1000) % 1000;
+        last_ticks = ticks;
+
+        // Handle input
+        handle_inputs();
+
+        // Handle speed
+        if     (speed == 1) usleep(500000);
+        else if(speed == 2) usleep(100000);
+        else if(speed == 3) usleep( 50000);
+        else if(speed == 4) usleep( 10000);
+        else if(speed == 5) usleep(  5000);
+        else if(speed == 6) usleep(  1000);
+        else if(speed == 7) usleep(   500);
+        else if(speed == 8) usleep(   100);
+        else if(speed == 9) usleep(    50);
+        else                usleep(     0);
+
+        // Handle different patterns and update grid
+        if     (stage == StageTypeStartup)
+        {
+            if(timer >= 20000)
+            {
+                stage = StageTypeInit;
+                timer = 0;
+            }
+        }
+        else if(stage == StageTypeInit)
+        {
+            init_grid();
+            stage = StageTypeShowInfo;
+            timer = 0;
+        }
+        else if(stage == StageTypeShowInfo)
+        {
+            if(timer >= 2000)
+            {
+                stage = StageTypeRunning;
+                timer = 0;
+            }
+        }
+        else if(stage == StageTypeRunning)
+        {
+            if(end_detection())
+            {
+                stage = StageTypeEnd;
+                timer = 0;
+            }
+            else
+            {
+                cycle_counter++;
+                update_grid();
+            }
+        }
+        else if(stage == StageTypeEnd)
+        {
+            update_grid();
+            if(timer >= 5000)
+            {
+                if(mode == MODE_NEXT)
+                {
+                    pattern++;
+                    pattern %= PatternTypeMax;
+                    stage = StageTypeInit;
+                    timer = 0;
+                }
+                else if(mode == MODE_LOOP)
+                {
+                    stage = StageTypeInit;
+                    timer = 0;
+                }
+                else // MODE_STOP
+                {
+                    // Do nothing
+                    timer = 5000;
+                }
+            }
+        }
+
+        // Draw grid
+        draw_grid();
+        wrefresh(w_grid);
+    }
+
+    // Ask to end program
+    wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+    mvwaddstr(w_status, 0, 0, " Press any key to quit");
+    wattroff(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+    wrefresh(w_status);
+    wgetch(w_status);
+
+    // End program
+    endwin();
+    exit(0);
 }
