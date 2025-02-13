@@ -19,12 +19,12 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 ## Features
 
-- TODO: Startup screen
+- Startup screen
 - Adjustable speed (with up and down keys)
 - Init with different modes (with right and left keys)
 - Show current count of living cells
 - Show current number of cycles
-- TODO: End detection with automated start of next pattern
+- End detection with automated start of next pattern
 - Dynamic adjustment of changing terminal size
 - Different styles of cells
 
@@ -34,6 +34,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 - "Up", "Down" and "0" through "9" keys adjust the speed
 - "Right" and "Left" keys reset the cells to a different mode
   - "r" Random
+  - "b" Blinker
   - "g" Glider
   - "l" Glider gun
   - "p" Pentomino
