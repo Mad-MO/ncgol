@@ -370,7 +370,7 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y/2, x, "\u2588");
                     else if(style == StyleTypeUnicodeDoubleDots)
                         mvwaddstr(w_grid, y/2, x, "\u2805");
-                    else // StyleTypeASCIIdouble
+                    else          // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, ':');
                     cells_alive += 2;
                 }
@@ -380,7 +380,7 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y/2, x, "\u2580");
                     else if(style == StyleTypeUnicodeDoubleDots)
                         mvwaddstr(w_grid, y/2, x, "\u2801");
-                    else // StyleTypeASCIIdouble
+                    else          // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, '\'');
                     cells_alive++;
                 }
@@ -390,7 +390,7 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y/2, x, "\u2584");
                     else if(style == StyleTypeUnicodeDoubleDots)
                         mvwaddstr(w_grid, y/2, x, "\u2804");
-                    else // StyleTypeASCIIdouble
+                    else          // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, '.');
                     cells_alive++;
                 }
@@ -506,7 +506,7 @@ static void draw_grid(void)
         // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Pattern:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
         char str_label[20];
         char str_value[20];
-        uint16_t pos = 0;
+        uint16_t pos   = 0;
         uint16_t width = getmaxx(w_status);
         wmove(w_status, 0, 0);
 
@@ -723,48 +723,48 @@ void handle_inputs(void)
     {
         speed = 10;
     }
+    else if(key == ' ')
+    {
+        stage   = StageTypeInit;
+    }
     else if(tolower(key) == 'r')
     {
         pattern = PatternTypeRandom;
-        stage = StageTypeInit;
-    }
-    else if(key == ' ')
-    {
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'b')
     {
         pattern = PatternTypeBlinker;
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'g')
     {
         pattern = PatternTypeGlider;
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'l')
     {
         pattern = PatternTypeGliderGun;
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'p')
     {
         pattern = PatternTypePentomino;
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'd')
     {
         pattern = PatternTypeDiehard;
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'a')
     {
         pattern = PatternTypeAcorn;
-        stage = StageTypeInit;
+        stage   = StageTypeInit;
     }
     else if(tolower(key) == 'h')
     {
-        stage = StageTypeStartup;
+        stage   = StageTypeStartup;
         memset(grid, 0, sizeof(grid));
     }
     else
@@ -829,7 +829,7 @@ int main(void)
     while(1)
     {
         static uint16_t timer;
-        uint16_t ticks;
+               uint16_t ticks;
 
         // Handle passed time
         clock_gettime(CLOCK_REALTIME, &ts);
