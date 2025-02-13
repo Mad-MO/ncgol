@@ -40,7 +40,7 @@
 static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  speed;
-static uint16_t cells_alive = 0;
+static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
 #define END_DET_CNT 60
 static uint8_t  end_det[END_DET_CNT];
