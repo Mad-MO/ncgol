@@ -13,7 +13,6 @@
 
 // TODO: Commandline options
 // TODO: Improve the end detection (Large grid with gliders)
-// TODO: Detect terminal type and set best style
 
 #include <curses.h>
 #include <stdlib.h>
@@ -805,10 +804,16 @@ uint8_t end_detection(void)
 int main(void)
 {
     // Initialize variables
-    pattern  = PatternTypeRandom;
-    speed = 3;
-    style = StyleTypeUnicodeBlock2;
-    mode = MODE_NEXT;
+    pattern = PatternTypeRandom;
+    speed   = 3;
+    mode    = MODE_NEXT;
+    #if  (defined __APPLE__)
+        style = StyleTypeUnicodeBlock2;
+    #elif(defined __linux__)
+        style = StyleTypeUnicodeBlock1;
+    #else
+        style = StyleTypeASCIIhash;
+    #endif
 
     // Initialize ncurses and grid
     init_tui();
