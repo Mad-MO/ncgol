@@ -19,7 +19,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 - Startup screen
 - Adjustable speed (with up and down keys)
-- Init with different modes (with right and left keys)
+- Init with different patterns (with right and left keys)
 - Show current count of living cells
 - Show current number of cycles
 - End detection with automated start of next pattern
@@ -30,7 +30,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 - "q" key ends the program
 - "Up", "Down" and "0" through "9" keys adjust the speed
-- "Right" and "Left" keys reset the cells to a different mode
+- "Right" and "Left" keys initialize the cells to a different pattern
   - "r" Random
   - "b" Blinker
   - "g" Glider
@@ -38,7 +38,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - "p" Pentomino
   - "d" Diehard
   - "a" Acorn
-- "Space" key restarts the current mode
+- "Space" key restarts the current pattern
 - "s" key changes the style
   - 2 chars representing 1 cell (Unicode blocks / "#")
   - 1 char represents 2 cells (Unicode braille dots / Unicode half blocks / ASCII)

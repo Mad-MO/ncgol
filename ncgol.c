@@ -14,7 +14,6 @@
 // TODO: Commandline options
 // TODO: Codecosmetic / Indentation
 // TODO: Improve the end detection (Large grid with gliders)
-// TODO: Rename "mode" -> "pattern"
 // TODO: Mode: once / loop / next
 // TODO: Detect terminal type and set best style
 
@@ -58,23 +57,23 @@ WINDOW *w_status;
 
 typedef enum
 {
-    ModeTypeRandom,
-    ModeTypeBlinker,
-    ModeTypeGlider,
-    ModeTypeGliderGun,
-    ModeTypePentomino,
-    ModeTypeDiehard,
-    ModeTypeAcorn,
+    PatternTypeRandom,
+    PatternTypeBlinker,
+    PatternTypeGlider,
+    PatternTypeGliderGun,
+    PatternTypePentomino,
+    PatternTypeDiehard,
+    PatternTypeAcorn,
     // ----------------
-    ModeTypeMax
-} ModeType;
-static ModeType mode;
+    PatternTypeMax
+} PatternType;
+static PatternType pattern;
 
 typedef enum
 {
     StageTypeStartup,  // Show startup screen
     StageTypeInit,     // Initialize grid
-    StageTypeShowInfo, // Show info for current mode
+    StageTypeShowInfo, // Show info for current pattern
     StageTypeRunning,  // Running simulation
     StageTypeEnd       // End of simulation has been reached
 } StageType;
@@ -107,7 +106,7 @@ typedef enum
     COLOR_PAIR_VALUE,
     COLOR_PAIR_LIVE_CELL,
     COLOR_PAIR_TITLE,
-    COLOR_PAIR_MODE_INFO
+    COLOR_PAIR_PATTERN_INFO
 } ColorPairType;
 static ColorPairType color_pair;
 
@@ -127,12 +126,12 @@ void init_tui(void)
 
   // Prepare coloring
   start_color();
-  init_pair(COLOR_PAIR_STANDARD,  COLOR_WHITE,   COLOR_BLACK);   // Standard
-  init_pair(COLOR_PAIR_LABEL,     COLOR_GREEN,   COLOR_BLACK);   // Label
-  init_pair(COLOR_PAIR_VALUE,     COLOR_YELLOW,  COLOR_BLACK);   // Value
-  init_pair(COLOR_PAIR_LIVE_CELL, COLOR_WHITE,   COLOR_BLACK);   // Live cell
-  init_pair(COLOR_PAIR_TITLE,     COLOR_CYAN,    COLOR_BLACK);   // Title
-  init_pair(COLOR_PAIR_MODE_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Mode info
+  init_pair(COLOR_PAIR_STANDARD,     COLOR_WHITE,   COLOR_BLACK);   // Standard
+  init_pair(COLOR_PAIR_LABEL,        COLOR_GREEN,   COLOR_BLACK);   // Label
+  init_pair(COLOR_PAIR_VALUE,        COLOR_YELLOW,  COLOR_BLACK);   // Value
+  init_pair(COLOR_PAIR_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
+  init_pair(COLOR_PAIR_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
+  init_pair(COLOR_PAIR_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
   ESCDELAY = 1; // Set the delay for escape sequences
 
   // Create status window
@@ -185,20 +184,20 @@ void init_grid(void)
 {
     memset(grid, 0, sizeof(grid));
 
-    if(mode == ModeTypeRandom)
+    if(pattern == PatternTypeRandom)
     {
         uint16_t x, y;
         for(x=0; x<grid_width; x++)
             for(y=0; y<grid_height; y++)
                 grid[x][y] = (random() & 1);
     }
-    else if(mode == ModeTypeBlinker)
+    else if(pattern == PatternTypeBlinker)
     {
         grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
     }
-    else if(mode == ModeTypeGlider)
+    else if(pattern == PatternTypeGlider)
     {
         grid[0+(grid_width/2)][2+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
@@ -206,7 +205,7 @@ void init_grid(void)
         grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[2+(grid_width/2)][2+(grid_height/2)] = 1;
     }
-    else if(mode == ModeTypeGliderGun)
+    else if(pattern == PatternTypeGliderGun)
     {
         grid[ 1][5] = 1; grid[ 1][6] = 1;
         grid[ 2][5] = 1; grid[ 2][6] = 1;
@@ -225,7 +224,7 @@ void init_grid(void)
         grid[35][3] = 1; grid[35][4] = 1;
         grid[36][3] = 1; grid[36][4] = 1;
     }
-    else if(mode == ModeTypePentomino)
+    else if(pattern == PatternTypePentomino)
     {
         grid[0+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
@@ -233,7 +232,7 @@ void init_grid(void)
         grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
         grid[2+(grid_width/2)][0+(grid_height/2)] = 1;
     }
-    else if(mode == ModeTypeDiehard)
+    else if(pattern == PatternTypeDiehard)
     {
         grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
@@ -243,7 +242,7 @@ void init_grid(void)
         grid[6+(grid_width/2)][5+(grid_height/2)] = 1;
         grid[7+(grid_width/2)][5+(grid_height/2)] = 1;
     }
-    else if(mode == ModeTypeAcorn)
+    else if(pattern == PatternTypeAcorn)
     {
         grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
@@ -299,14 +298,14 @@ void update_grid(void)
 
 
 
-// Function to draw a string in a rounded frame for the mode name
+// Function to draw a string in a rounded frame for the pattern name
 static void draw_str_in_frame(const char * str)
 {
     int len=strlen(str);
     int x = (getmaxx(w_grid) - len) / 2 - 2;
     int y = (getmaxy(w_grid)) / 4;
 
-    wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_MODE_INFO));
+    wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_PATTERN_INFO));
     for(int i=0; i<len+4; i++)
     {
         mvwaddch(w_grid, y+0, x+i, ' ');
@@ -314,7 +313,7 @@ static void draw_str_in_frame(const char * str)
         mvwaddch(w_grid, y+2, x+i, ' ');
     }
     mvwaddstr(w_grid, y+1, x+2, str);
-    wattroff(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_MODE_INFO));
+    wattroff(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_PATTERN_INFO));
 }
 
 
@@ -438,12 +437,12 @@ static void draw_grid(void)
         waddstr(w_grid, "   \'q\'                 End program\n");
         waddstr(w_grid, "   \'0\'...\'9\'           Set speed directly\n");
         waddstr(w_grid, "   \'Up\' and \'Down\'     Adjust speed\n");
-        waddstr(w_grid, "   \'Left\' and \'Right\'  Change mode\n");
-        waddstr(w_grid, "   \'Space\'             Restart current mode\n");
+        waddstr(w_grid, "   \'Left\' and \'Right\'  Change pattern\n");
+        waddstr(w_grid, "   \'Space\'             Restart current pattern\n");
         waddstr(w_grid, "   \'s\'                 Change style\n");
         waddstr(w_grid, "   \'h\'                 This Help\n");
         waddstr(w_grid, " \n");
-        waddstr(w_grid, " Mode keys:\n");
+        waddstr(w_grid, " Pattern keys:\n");
         waddstr(w_grid, "   \'r\'                 Random\n");
         waddstr(w_grid, "   \'b\'                 Blinker\n");
         waddstr(w_grid, "   \'g\'                 Glider\n");
@@ -453,28 +452,28 @@ static void draw_grid(void)
         waddstr(w_grid, "   \'a\'                 Acorn\n");
     }
 
-    // Handle mode info
+    // Handle pattern info
     if(stage == StageTypeShowInfo)
     {
-        if     (mode == ModeTypeRandom)
+        if     (pattern == PatternTypeRandom)
             draw_str_in_frame("Random");
-        else if(mode == ModeTypeBlinker)
+        else if(pattern == PatternTypeBlinker)
             draw_str_in_frame("Blinker");
-        else if(mode == ModeTypeGlider)
+        else if(pattern == PatternTypeGlider)
             draw_str_in_frame("Glider");
-        else if(mode == ModeTypeGliderGun)
+        else if(pattern == PatternTypeGliderGun)
             draw_str_in_frame("Glider gun");
-        else if(mode == ModeTypePentomino)
+        else if(pattern == PatternTypePentomino)
             draw_str_in_frame("Pentomino");
-        else if(mode == ModeTypeDiehard)
+        else if(pattern == PatternTypeDiehard)
             draw_str_in_frame("Diehard");
-        else if(mode == ModeTypeAcorn)
+        else if(pattern == PatternTypeAcorn)
             draw_str_in_frame("Acorn");
     }
 
     // Handle status line
     {
-        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Mode:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
+        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Pattern:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
         char str_label[20];
         char str_value[20];
         uint16_t pos = 0;
@@ -525,21 +524,21 @@ static void draw_grid(void)
             waddstr(w_status, str_value);
         }
 
-        // Mode
-        strcpy(str_label, " Mode:");
-        if     (mode == ModeTypeRandom)
+        // Pattern
+        strcpy(str_label, " Pattern:");
+        if     (pattern == PatternTypeRandom)
             strcpy(str_value, "Random");
-        else if(mode == ModeTypeBlinker)
+        else if(pattern == PatternTypeBlinker)
             strcpy(str_value, "Blinker");
-        else if(mode == ModeTypeGlider)
+        else if(pattern == PatternTypeGlider)
             strcpy(str_value, "Glider");
-        else if(mode == ModeTypeGliderGun)
+        else if(pattern == PatternTypeGliderGun)
             strcpy(str_value, "Glider gun");
-        else if(mode == ModeTypePentomino)
+        else if(pattern == PatternTypePentomino)
             strcpy(str_value, "Pentomino");
-        else if(mode == ModeTypeDiehard)
+        else if(pattern == PatternTypeDiehard)
             strcpy(str_value, "Diehard");
-        else if(mode == ModeTypeAcorn)
+        else if(pattern == PatternTypeAcorn)
             strcpy(str_value, "Acorn");
         else
             strcpy(str_value, "?");
@@ -643,14 +642,14 @@ void handle_inputs(void)
     }
     else if(key == KEY_RIGHT)
     {
-      mode++;
-      mode %= ModeTypeMax;
+      pattern++;
+      pattern %= PatternTypeMax;
       stage = StageTypeInit;
     }
     else if(key == KEY_LEFT)
     {
-      if(mode == 0) mode = ModeTypeMax - 1;
-      else          mode--;
+      if(pattern == 0) pattern = PatternTypeMax - 1;
+      else          pattern--;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 's')
@@ -673,7 +672,7 @@ void handle_inputs(void)
     }
     else if(tolower(key) == 'r')
     {
-        mode = ModeTypeRandom;
+        pattern = PatternTypeRandom;
         stage = StageTypeInit;
     }
     else if(key == ' ')
@@ -682,32 +681,32 @@ void handle_inputs(void)
     }
     else if(tolower(key) == 'b')
     {
-      mode = ModeTypeBlinker;
+      pattern = PatternTypeBlinker;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 'g')
     {
-      mode = ModeTypeGlider;
+      pattern = PatternTypeGlider;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 'l')
     {
-      mode = ModeTypeGliderGun;
+      pattern = PatternTypeGliderGun;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 'p')
     {
-      mode = ModeTypePentomino;
+      pattern = PatternTypePentomino;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 'd')
     {
-      mode = ModeTypeDiehard;
+      pattern = PatternTypeDiehard;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 'a')
     {
-      mode = ModeTypeAcorn;
+      pattern = PatternTypeAcorn;
       stage = StageTypeInit;
     }
     else if(tolower(key) == 'h')
@@ -752,7 +751,7 @@ uint8_t end_detection(void)
 int main(void)
 {
   // Initialize variables
-  mode  = ModeTypeRandom;
+  pattern  = PatternTypeRandom;
   speed = 3;
   style = StyleTypeUnicodeBlock2;
 
@@ -793,7 +792,7 @@ int main(void)
     else if(speed == 9) usleep(    50);
     else                usleep(     0);
 
-    // Handle different modes and update grid
+    // Handle different patterns and update grid
     if     (stage == StageTypeStartup)
     {
         if(timer >= 20000)
@@ -834,8 +833,8 @@ int main(void)
         update_grid();
         if(timer >= 5000)
         {
-            mode++;
-            mode %= ModeTypeMax;
+            pattern++;
+            pattern %= PatternTypeMax;
             stage = StageTypeInit;
             timer = 0;
         }
