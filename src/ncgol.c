@@ -13,6 +13,9 @@
 
 // TODO: Commandline options
 // TODO: Improve the end detection (Large grid with gliders)
+// TODO: Add more patterns
+// TODO: Output max grid size in startup screen
+// TODO: New source file for Game of Life functions grid.c/h
 
 #include <curses.h>
 #include <stdlib.h>

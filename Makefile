@@ -5,6 +5,10 @@
 
 
 
+BUILD = ./build
+BIN   = ./bin
+SRC   = ./src
+
 ifeq ($(shell uname -s), Darwin)
   CC     = gcc
   LDLIBS = -lncurses
@@ -16,17 +20,23 @@ endif
 
 
 
+build: ncgol
+
 run: ncgol
-	./ncgol
+	$(BIN)/ncgol
 
 distclean: clean
+	@rm -vf $(BIN)/*
 
 clean:
-	rm -f ncgol ncgol.o
+	@rm -vf $(BUILD)/*
 
-ncgol: ncgol.o Makefile
-	$(CC) -o ncgol ncgol.o $(LDLIBS)
+ncgol: $(BIN)/ncgol
 
-ncgol.o: ncgol.c Makefile
-	$(CC) -c ncgol.c
+$(BIN)/ncgol: $(BUILD)/*.o
+	@mkdir -vp $(BIN)
+	$(CC) -o $@ $< $(LDLIBS)
 
+$(BUILD)/%.o: $(SRC)/%.c
+	@mkdir -vp $(BUILD)
+	$(CC) -o $@ -c $<

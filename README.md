@@ -11,9 +11,9 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 ## Screenshot
 
-![Screenshot](./Screenshot1.png)
+![Screenshot](./doc/Screenshot1.png)
 
-![Screenshot](./Screenshot2.png)
+![Screenshot](./doc/Screenshot2.png)
 
 ## Features
 
