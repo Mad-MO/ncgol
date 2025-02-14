@@ -17,14 +17,13 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 ## Features
 
-- Startup screen
-- Adjustable speed (with up and down keys)
-- Init with different patterns (with right and left keys)
-- Show current count of living cells
-- Show current number of cycles
-- End detection with automated start of next pattern
-- Dynamic adjustment of changing terminal size
-- Different styles of cells
+- Adjustable speed
+- Different sart patterns
+- Show count of living cells
+- Show number of cycles
+- Detection for end of simulation
+- Dynamic adjustment to changed terminal size
+- Different ui styles of living cells
 
 ## Usage
 
@@ -39,6 +38,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - "d" Diehard
   - "a" Acorn
 - "Space" key restarts the current pattern
+- "h" show help
 - "s" key changes the style
   - 2 chars representing 1 cell (Unicode blocks / "#")
   - 1 char represents 2 cells (Unicode braille dots / Unicode half blocks / ASCII)
