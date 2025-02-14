@@ -15,7 +15,6 @@
 // TODO: Add more patterns
 // TODO: Output max grid size in startup screen
 // TODO: New source file for Game of Life functions grid.c/h
-// TODO: Reduce styles
 
 #include <curses.h>
 #include <stdlib.h>
@@ -57,18 +56,16 @@ static StageType stage;
 typedef enum
 {
     // Styles which use two chars per cell
-    StyleTypeUnicodeBlock1,
-    StyleTypeUnicodeBlock2,
-    StyleTypeASCIIblockSquare,
-    StyleTypeASCIIhash,
+    StyleTypeBlock1,
+    StyleTypeBlock2,
+    StyleTypeHash,
 
     // Styles which show two cells in one char
-    StyleTypeUnicodeDoubleBlock,
-    StyleTypeUnicodeDoubleDots,
-    StyleTypeASCIIdouble,
+    StyleTypeDoubleBlock,
+    StyleTypeDoubleDot,
 
     // Braile style with 8 dots per char
-    StyleTypeUnicodeBraille,
+    StyleTypeBraille,
     // ----------------
     StyleTypeMax
 } StyleType;
@@ -142,12 +139,12 @@ void init_tui(void)
     keypad(w_grid, TRUE); // Enable special keys
 
     // Init
-    if     (style == StyleTypeUnicodeBraille)
+    if     (style == StyleTypeBraille)
     {
         grid_width  = getmaxx(w_grid) * 2;
         grid_height = getmaxy(w_grid) * 4;
     }
-    else if(style >= StyleTypeUnicodeDoubleBlock)
+    else if(style >= StyleTypeDoubleBlock)
     {
         grid_width  = getmaxx(w_grid);
         grid_height = getmaxy(w_grid)*2;
@@ -196,34 +193,28 @@ static void draw_grid(void)
     {
         for(y=0; y<grid_height; y++)
         {
-            if((style == StyleTypeUnicodeDoubleBlock) || (style == StyleTypeUnicodeDoubleDots) || (style == StyleTypeASCIIdouble))
+            if((style == StyleTypeDoubleBlock) || (style == StyleTypeDoubleDot))
             {
                 // Two dots per character
                 if(grid[x][y] && grid[x][y + 1])
                 {
-                    if     (style == StyleTypeUnicodeDoubleBlock)
+                    if     (style == StyleTypeDoubleBlock)
                         mvwaddstr(w_grid, y/2, x, "\u2588");
-                    else if(style == StyleTypeUnicodeDoubleDots)
-                        mvwaddstr(w_grid, y/2, x, "\u2805");
-                    else          // StyleTypeASCIIdouble
+                    else          // StyleTypeDoubleDot
                         mvwaddch(w_grid, y/2, x, ':');
                 }
                 else if(grid[x][y])
                 {
-                    if     (style == StyleTypeUnicodeDoubleBlock)
+                    if     (style == StyleTypeDoubleBlock)
                         mvwaddstr(w_grid, y/2, x, "\u2580");
-                    else if(style == StyleTypeUnicodeDoubleDots)
-                        mvwaddstr(w_grid, y/2, x, "\u2801");
-                    else          // StyleTypeASCIIdouble
+                    else          // StyleTypeDoubleDot
                         mvwaddch(w_grid, y/2, x, '\'');
                 }
                 else if(grid[x][y + 1])
                 {
-                    if     (style == StyleTypeUnicodeDoubleBlock)
+                    if     (style == StyleTypeDoubleBlock)
                         mvwaddstr(w_grid, y/2, x, "\u2584");
-                    else if(style == StyleTypeUnicodeDoubleDots)
-                        mvwaddstr(w_grid, y/2, x, "\u2804");
-                    else          // StyleTypeASCIIdouble
+                    else          // StyleTypeDoubleDot
                         mvwaddch(w_grid, y/2, x, '.');
                 }
                 else
@@ -232,7 +223,7 @@ static void draw_grid(void)
                 }
                 y++;
             }
-            else if(style == StyleTypeUnicodeBraille)
+            else if(style == StyleTypeBraille)
             {
                 // The braille pattern allows the usage of 8 dots per character
                 uint16_t braille = 0;
@@ -266,14 +257,12 @@ static void draw_grid(void)
                 // A unicode full block uses the foreground color and works better.
                 if(grid[x][y])
                 {
-                    if     (style == StyleTypeUnicodeBlock1)
+                    if     (style == StyleTypeBlock1)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
-                    else if(style == StyleTypeUnicodeBlock2)
+                    else if(style == StyleTypeBlock2)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
-                    else if(style == StyleTypeASCIIhash)
+                    else          // StyleTypeHash
                         mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
-                    else
-                        mvwaddstr(w_grid, y, x*2, "[]");           // [] -> Looks best on a terminal which has problems with unicode characters
                 }
                 else
                 {
@@ -419,21 +408,17 @@ static void draw_grid(void)
 
         // Style
         strcpy(str_label, " Style:");
-        if     (style == StyleTypeUnicodeBlock1)
+        if     (style == StyleTypeBlock1)
             strcpy(str_value, "Block1");
-        else if(style == StyleTypeUnicodeBlock2)
+        else if(style == StyleTypeBlock2)
             strcpy(str_value, "Block2");
-        else if(style == StyleTypeASCIIblockSquare)
-            strcpy(str_value, "SquareASCII");
-        else if(style == StyleTypeASCIIhash)
-            strcpy(str_value, "#ASCII");
-        else if(style == StyleTypeUnicodeDoubleBlock)
+        else if(style == StyleTypeHash)
+            strcpy(str_value, "Hash");
+        else if(style == StyleTypeDoubleBlock)
             strcpy(str_value, "DoubleBlock");
-        else if(style == StyleTypeUnicodeDoubleDots)
-            strcpy(str_value, "DoubleDots");
-        else if(style == StyleTypeASCIIdouble)
-            strcpy(str_value, "DoubleASCII");
-        else if(style == StyleTypeUnicodeBraille)
+        else if(style == StyleTypeDoubleDot)
+            strcpy(str_value, "DoubleDot");
+        else if(style == StyleTypeBraille)
             strcpy(str_value, "Braille");
         else
             strcpy(str_value, "?");
@@ -620,11 +605,11 @@ int main(void)
     speed   = 3;
     mode    = MODE_NEXT;
     #if  (defined __APPLE__)
-        style = StyleTypeUnicodeBlock2;
+        style = StyleTypeBlock2;
     #elif(defined __linux__)
-        style = StyleTypeUnicodeBlock1;
+        style = StyleTypeBlock1;
     #else
-        style = StyleTypeASCIIhash;
+        style = StyleTypeHash;
     #endif
 
     // Initialize ncurses and grid
