@@ -6,7 +6,6 @@
 //          using ncurses for the GUI. The simulation can be controlled by
 //          the arrow keys and the buttons for different initial states.
 //
-// Rules:   https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 // Ncurses: https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
@@ -16,6 +15,7 @@
 // TODO: Add more patterns
 // TODO: Output max grid size in startup screen
 // TODO: New source file for Game of Life functions grid.c/h
+// TODO: Reduce styles
 
 #include <curses.h>
 #include <stdlib.h>
@@ -24,6 +24,7 @@
 #include <locale.h>
 #include <ctype.h>
 #include <time.h>
+#include "grid.h"
 
 
 
@@ -32,22 +33,7 @@
 #define SW_VERS "v0.4"
 #define AUTHOR  "by domo"
 
-// Define the size of the grid
-// Example: Fullscreen Terminal on Ultrawidescreen Monitor
-//          -> ~569x110 characters
-//          -> 1134x420 cells (when using braille style)
-#define GRID_WIDTH_MAX  2500 // 2500*1000*2 = ~5 MB
-#define GRID_HEIGHT_MAX 1000
-
-// Create the grid to represent the cells
-static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
-static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  speed;
-static uint32_t cells_alive = 0;
-static uint32_t cycle_counter = 0;
-#define END_DET_CNT 60
-static uint8_t  end_det[END_DET_CNT];
-static uint8_t  end_det_pos;
 static uint16_t grid_width;
 static uint16_t grid_height;
 
@@ -56,18 +42,6 @@ WINDOW *w_grid;
 WINDOW *w_status_box;
 WINDOW *w_status;
 
-typedef enum
-{
-    PatternTypeRandom,
-    PatternTypeBlinker,
-    PatternTypeGlider,
-    PatternTypeGliderGun,
-    PatternTypePentomino,
-    PatternTypeDiehard,
-    PatternTypeAcorn,
-    // ----------------
-    PatternTypeMax
-} PatternType;
 static PatternType pattern;
 
 typedef enum
@@ -168,8 +142,6 @@ void init_tui(void)
     keypad(w_grid, TRUE); // Enable special keys
 
     // Init
-    memset(new_grid, 0, sizeof(new_grid));
-
     if     (style == StyleTypeUnicodeBraille)
     {
         grid_width  = getmaxx(w_grid) * 2;
@@ -187,145 +159,7 @@ void init_tui(void)
     }
     if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
     if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
-}
-
-
-
-// Function to initialize the grid
-void init_grid(void)
-{
-    memset(grid, 0, sizeof(grid));
-
-    if     (pattern == PatternTypeRandom)
-    {
-        uint16_t x, y;
-        for(x=0; x<grid_width; x++)
-            for(y=0; y<grid_height; y++)
-                grid[x][y] = (random() & 1);
-    }
-    else if(pattern == PatternTypeBlinker)
-    {
-        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-    }
-    else if(pattern == PatternTypeGlider)
-    {
-        grid[0+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][2+(grid_height/2)] = 1;
-    }
-    else if(pattern == PatternTypeGliderGun)
-    {
-        grid[1][5] = 1;
-        grid[1][6] = 1;
-        grid[2][5] = 1;
-        grid[2][6] = 1;
-        grid[11][5] = 1;
-        grid[11][6] = 1;
-        grid[11][7] = 1;
-        grid[12][4] = 1;
-        grid[12][8] = 1;
-        grid[13][3] = 1;
-        grid[13][9] = 1;
-        grid[14][3] = 1;
-        grid[14][9] = 1;
-        grid[15][6] = 1;
-        grid[16][4] = 1;
-        grid[16][8] = 1;
-        grid[17][5] = 1;
-        grid[17][6] = 1;
-        grid[17][7] = 1;
-        grid[18][6] = 1;
-        grid[21][3] = 1;
-        grid[21][4] = 1;
-        grid[21][5] = 1;
-        grid[22][3] = 1;
-        grid[22][4] = 1;
-        grid[22][5] = 1;
-        grid[23][2] = 1;
-        grid[23][6] = 1;
-        grid[25][1] = 1;
-        grid[25][2] = 1;
-        grid[25][6] = 1;
-        grid[25][7] = 1;
-        grid[35][3] = 1;
-        grid[35][4] = 1;
-        grid[36][3] = 1;
-        grid[36][4] = 1;
-    }
-    else if(pattern == PatternTypePentomino)
-    {
-        grid[0+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][0+(grid_height/2)] = 1;
-    }
-    else if(pattern == PatternTypeDiehard)
-    {
-        grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[7+(grid_width/2)][5+(grid_height/2)] = 1;
-    }
-    else if(pattern == PatternTypeAcorn)
-    {
-        grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[4+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][4+(grid_height/2)] = 1;
-    }
-
-    cycle_counter = 0;
-}
-
-
-
-// Function to update the grid based on the game of life rules
-void update_grid(void)
-{
-    uint16_t x, y;
-
-    for(x=0; x<grid_width; x++)
-    {
-        for(y=0; y<grid_height; y++)
-        {
-            uint8_t neighbors = 0;
-            for(int8_t dx=-1; dx<=1; dx++)
-            {
-                for(int8_t dy=-1; dy<=1; dy++)
-                {
-                    if(dx == 0 && dy == 0)
-                    {
-                        continue;
-                    }
-                    uint16_t nx = (grid_width + x + dx) % grid_width;
-                    uint16_t ny = (grid_height + y + dy) % grid_height;
-                    neighbors += grid[nx][ny];
-                }
-            }
-
-            if     ((grid[x][y] == 1) && (neighbors  < 2)) // Underpopulation
-                new_grid[x][y] = 0;
-            else if((grid[x][y] == 1) && (neighbors  > 3)) // Overpopulation
-                new_grid[x][y] = 0;
-            else if((grid[x][y] == 0) && (neighbors == 3)) // Reproduction
-                new_grid[x][y] = 1;
-            else                                           // Stasis
-                new_grid[x][y] = grid[x][y];
-        }
-    }
-
-    memcpy(grid, new_grid, sizeof(grid));
+    set_grid_size(grid_width, grid_height);
 }
 
 
@@ -356,8 +190,6 @@ static void draw_grid(void)
     uint16_t x, y;
     char str[16];
 
-    cells_alive = 0;
-
     // Draw grid to canvas
     wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_LIVE_CELL));
     for(x=0; x<grid_width; x++)
@@ -375,7 +207,6 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y/2, x, "\u2805");
                     else          // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, ':');
-                    cells_alive += 2;
                 }
                 else if(grid[x][y])
                 {
@@ -385,7 +216,6 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y/2, x, "\u2801");
                     else          // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, '\'');
-                    cells_alive++;
                 }
                 else if(grid[x][y + 1])
                 {
@@ -395,7 +225,6 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y/2, x, "\u2804");
                     else          // StyleTypeASCIIdouble
                         mvwaddch(w_grid, y/2, x, '.');
-                    cells_alive++;
                 }
                 else
                 {
@@ -411,14 +240,14 @@ static void draw_grid(void)
                 char braille_str[4] = {0};
 
                 // Convert braille pattern to unicode character
-                if(grid[x+0][y+0]) {braille |= 0x01; cells_alive++;}
-                if(grid[x+0][y+1]) {braille |= 0x02; cells_alive++;}
-                if(grid[x+0][y+2]) {braille |= 0x04; cells_alive++;}
-                if(grid[x+0][y+3]) {braille |= 0x40; cells_alive++;}
-                if(grid[x+1][y+0]) {braille |= 0x08; cells_alive++;}
-                if(grid[x+1][y+1]) {braille |= 0x10; cells_alive++;}
-                if(grid[x+1][y+2]) {braille |= 0x20; cells_alive++;}
-                if(grid[x+1][y+3]) {braille |= 0x80; cells_alive++;}
+                if(grid[x+0][y+0]) {braille |= 0x01;}
+                if(grid[x+0][y+1]) {braille |= 0x02;}
+                if(grid[x+0][y+2]) {braille |= 0x04;}
+                if(grid[x+0][y+3]) {braille |= 0x40;}
+                if(grid[x+1][y+0]) {braille |= 0x08;}
+                if(grid[x+1][y+1]) {braille |= 0x10;}
+                if(grid[x+1][y+2]) {braille |= 0x20;}
+                if(grid[x+1][y+3]) {braille |= 0x80;}
                 braille |= 0x2800;
                 braille_char = braille;
                 wcstombs(braille_str, &braille_char, 4);
@@ -445,7 +274,6 @@ static void draw_grid(void)
                         mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
                     else
                         mvwaddstr(w_grid, y, x*2, "[]");           // [] -> Looks best on a terminal which has problems with unicode characters
-                    cells_alive++;
                 }
                 else
                 {
@@ -532,7 +360,7 @@ static void draw_grid(void)
 
         // Cycles
         strcpy(str_label, " Cycles:");
-        sprintf(str_value, "%3u", cycle_counter);
+        sprintf(str_value, "%3u", get_cycle_counter());
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
@@ -543,7 +371,7 @@ static void draw_grid(void)
 
         // Cells
         strcpy(str_label, " Cells:");
-        sprintf(str_value, "%3u", cells_alive);
+        sprintf(str_value, "%3u", get_cells_alive());
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
@@ -773,38 +601,13 @@ void handle_inputs(void)
     }
     else if(tolower(key) == 'h')
     {
+        pattern = PatternTypeClear;
         stage   = StageTypeStartup;
-        memset(grid, 0, sizeof(grid));
     }
     else
     {
         // Do nothing
     }
-}
-
-
-
-uint8_t end_detection(void)
-{
-    end_det_pos++;
-    end_det_pos %= END_DET_CNT;
-    end_det[end_det_pos] = cells_alive;
-    if(cells_alive == 0)
-        return 1;
-    if(cycle_counter > END_DET_CNT)                                 // At least END_DET_CNT cycles needed for detection
-    {
-        for(uint8_t pattern=1; pattern<=(END_DET_CNT/2); pattern++) // Test pattern in the length of 1 to half of the buffer
-        {
-            for(uint8_t testpos=pattern; testpos<END_DET_CNT; testpos++)
-            {
-                if(end_det[testpos] != end_det[testpos % pattern])  // Pattern not found? -> End loop and test next pattern
-                    break;
-                if(testpos == END_DET_CNT - 1)                      // End of loop reached? -> Pattern found!
-                    return 1;
-            }
-        }
-    }
-    return 0;
 }
 
 
@@ -872,7 +675,7 @@ int main(void)
         }
         else if(stage == StageTypeInit)
         {
-            init_grid();
+            init_grid(pattern);
             stage = StageTypeShowInfo;
             timer = 0;
         }
@@ -893,7 +696,6 @@ int main(void)
             }
             else
             {
-                cycle_counter++;
                 update_grid();
             }
         }

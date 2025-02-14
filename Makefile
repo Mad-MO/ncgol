@@ -3,8 +3,6 @@
 # Author:  Martin Ochs
 # License: MIT
 
-
-
 BUILD = ./build
 BIN   = ./bin
 SRC   = ./src
@@ -17,6 +15,9 @@ ifeq ($(shell uname -s), Linux)
   CC     = gcc
   LDLIBS = -lncursesw
 endif
+
+OBJECTS = $(BUILD)/ncgol.o \
+          $(BUILD)/grid.o
 
 
 
@@ -33,10 +34,10 @@ clean:
 
 ncgol: $(BIN)/ncgol
 
-$(BIN)/ncgol: $(BUILD)/*.o
+$(BIN)/ncgol: $(OBJECTS)
 	@mkdir -vp $(BIN)
-	$(CC) -o $@ $< $(LDLIBS)
+	$(CC) -o $@ $^ $(LDLIBS)
 
-$(BUILD)/%.o: $(SRC)/%.c
+$(BUILD)/%.o: $(SRC)/%.c $(SRC)/*.h Makefile
 	@mkdir -vp $(BUILD)
 	$(CC) -o $@ -c $<
