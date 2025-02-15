@@ -40,13 +40,14 @@ void set_grid_size(uint16_t width, uint16_t height)
 // Function to initialize the grid
 void init_grid(PatternType pattern)
 {
+    if(pattern < PatternTypeMax)
+        pattern = pattern;
+    else
+        return;
+
     memset(grid, 0, sizeof(grid));
 
-    if     (pattern == PatternTypeClear)
-    {
-        // Do nothing
-    }
-    else if(pattern == PatternTypeRandom)
+    if     (pattern == PatternTypeRandom)
     {
         uint16_t x, y;
         for(x=0; x<grid_width; x++)
@@ -133,6 +134,10 @@ void init_grid(PatternType pattern)
         grid[4+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[6+(grid_width/2)][4+(grid_height/2)] = 1;
+    }
+    else            // PatternTypeClear
+    {
+        // Do nothing
     }
 
     cycle_counter = 0;

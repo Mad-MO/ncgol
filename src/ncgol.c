@@ -43,11 +43,12 @@ static PatternType pattern;
 
 typedef enum
 {
-    StageTypeStartup,  // Show startup screen
-    StageTypeInit,     // Initialize grid
-    StageTypeShowInfo, // Show info for current pattern
-    StageTypeRunning,  // Running simulation
-    StageTypeEnd       // End of simulation has been reached
+    StageTypeStartup,   // Show startup screen
+    StageTypeStartwait, // Timeout for startup window
+    StageTypeInit,      // Initialize grid
+    StageTypeShowInfo,  // Show info for current pattern
+    StageTypeRunning,   // Running simulation
+    StageTypeEnd        // End of simulation has been reached
 } StageType;
 static StageType stage;
 
@@ -273,7 +274,7 @@ static void draw_grid(void)
     wattroff(w_grid, A_BOLD);
 
     // Handle startup screen
-    if(stage == StageTypeStartup)
+    if((stage == StageTypeStartup) || (stage == StageTypeStartwait))
     {
         wmove(w_grid, 0, 0);
         waddstr(w_grid, " \n");
@@ -494,7 +495,7 @@ void handle_inputs(void)
     }
     if(key==27) // ESC
     {
-        if     (stage == StageTypeStartup)
+        if     (stage == StageTypeStartwait)
         {
             stage = StageTypeInit;
         }
@@ -514,12 +515,12 @@ void handle_inputs(void)
     else if(key == KEY_RIGHT)
     {
         pattern++;
-        pattern %= PatternTypeMax;
+        pattern %= PatternTypeCycleMax;
         stage = StageTypeInit;
     }
     else if(key == KEY_LEFT)
     {
-        if(pattern == 0) pattern = PatternTypeMax - 1;
+        if(pattern == 0) pattern = PatternTypeCycleMax - 1;
         else             pattern--;
         stage = StageTypeInit;
     }
@@ -587,7 +588,6 @@ void handle_inputs(void)
     }
     else if(tolower(key) == 'h')
     {
-        pattern = PatternTypeClear;
         stage   = StageTypeStartup;
     }
     else
@@ -653,6 +653,12 @@ int main(void)
         // Handle different patterns and update grid
         if     (stage == StageTypeStartup)
         {
+            init_grid(PatternTypeClear);
+            stage = StageTypeStartwait;
+            timer = 0;
+        }
+        else if(stage == StageTypeStartwait)
+        {
             if(timer >= 20000)
             {
                 stage = StageTypeInit;
@@ -693,7 +699,7 @@ int main(void)
                 if(mode == MODE_NEXT)
                 {
                     pattern++;
-                    pattern %= PatternTypeMax;
+                    pattern %= PatternTypeCycleMax;
                     stage = StageTypeInit;
                     timer = 0;
                 }

@@ -22,7 +22,6 @@ typedef const uint8_t grid_t[GRID_HEIGHT_MAX];
 
 typedef enum
 {
-    PatternTypeClear,
     PatternTypeRandom,
     PatternTypeBlinker,
     PatternTypeGlider,
@@ -31,6 +30,8 @@ typedef enum
     PatternTypeDiehard,
     PatternTypeAcorn,
     // ----------------
+    PatternTypeCycleMax, // Boundary for cycling through patterns
+    PatternTypeClear,    // Special pattern to clear the grid
     PatternTypeMax
 } PatternType;
 
