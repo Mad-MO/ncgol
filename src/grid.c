@@ -245,6 +245,66 @@ void init_grid(PatternType pattern)
         grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[6+(grid_width/2)][4+(grid_height/2)] = 1;
     }
+    else if(pattern == PatternTypeBlockEngine1)
+    {
+        grid[1+(grid_width/2)][6+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][5+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][6+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][3+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[7+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[7+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[7+(grid_width/2)][3+(grid_height/2)] = 1;
+        grid[8+(grid_width/2)][2+(grid_height/2)] = 1;
+    }
+    else if(pattern == PatternTypeBlockEngine2)
+    {
+        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[1+(grid_width/2)][5+(grid_height/2)] = 1;
+        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[2+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][5+(grid_height/2)] = 1;
+        grid[4+(grid_width/2)][3+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][3+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][5+(grid_height/2)] = 1;
+    }
+    else if(pattern == PatternTypeDoubleBlockEngine)
+    {
+        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[3+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[4+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[5+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[6+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[7+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[8+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[10+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[11+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[12+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[13+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[14+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[18+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[19+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[20+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[27+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[28+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[29+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[30+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[31+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[32+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[33+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[35+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[36+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[37+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[38+(grid_width/2)][1+(grid_height/2)] = 1;
+        grid[39+(grid_width/2)][1+(grid_height/2)] = 1;
+    }
     else            // PatternTypeClear
     {
         // Do nothing
@@ -347,6 +407,12 @@ const char * get_pattern_str(PatternType pattern)
         return "Diehard";
     else if(pattern == PatternTypeAcorn)
         return "Acorn";
+    else if(pattern == PatternTypeBlockEngine1)
+        return "Block engine 1";
+    else if(pattern == PatternTypeBlockEngine2)
+        return "Block engine 2";
+    else if(pattern == PatternTypeDoubleBlockEngine)
+        return "Double block engine";
     else
         return "?";
 }

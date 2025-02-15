@@ -31,6 +31,9 @@ typedef enum
     PatternTypePentomino,
     PatternTypeDiehard,
     PatternTypeAcorn,
+    PatternTypeBlockEngine1,
+    PatternTypeBlockEngine2,
+    PatternTypeDoubleBlockEngine,
     // ----------------
     PatternTypeCycleMax, // Boundary for cycling through patterns
     PatternTypeClear,    // Special pattern to clear the grid
