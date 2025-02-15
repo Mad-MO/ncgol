@@ -10,9 +10,13 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Commandline options
+// TODO: Handle end detection from grid_update (bugfix for wrong startup end detection???)
+// TODO: Comment how the grid is build (x/y vs. width/height and max values)
+// TODO: New Module for patterns
+// TODO: Patterns in own struct (with dimensions and name)
+// TODO: Add pattern Pulsar
 // TODO: Improve the end detection (Large grid with gliders)
-// TODO: Add more patterns
+// TODO: Commandline options
 
 #include <curses.h>
 #include <stdlib.h>
