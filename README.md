@@ -31,7 +31,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 - "Up", "Down" and "0" through "9" keys adjust the speed
 - "Right" and "Left" keys initialize the cells to a different pattern
   - "r" Random
-  - "b" Blinker
+  - "o" Oscillators
   - "g" Glider
   - "l" Glider gun
   - "p" Pentomino

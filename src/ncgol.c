@@ -13,6 +13,7 @@
 // TODO: Commandline options
 // TODO: Improve the end detection (Large grid with gliders)
 // TODO: Add more patterns
+// TODO: Get string for pattern name
 
 #include <curses.h>
 #include <stdlib.h>
@@ -296,7 +297,7 @@ static void draw_grid(void)
         waddstr(w_grid, " \n");
         waddstr(w_grid, " Pattern keys:\n");
         waddstr(w_grid, "   \'r\'                 Random\n");
-        waddstr(w_grid, "   \'b\'                 Blinker\n");
+        waddstr(w_grid, "   \'o\'                 Oscillators\n");
         waddstr(w_grid, "   \'g\'                 Glider\n");
         waddstr(w_grid, "   \'l\'                 Glider gun\n");
         waddstr(w_grid, "   \'p\'                 Pentomino\n");
@@ -309,8 +310,8 @@ static void draw_grid(void)
     {
         if     (pattern == PatternTypeRandom)
             draw_str_in_frame("Random");
-        else if(pattern == PatternTypeBlinker)
-            draw_str_in_frame("Blinker");
+        else if(pattern == PatternTypeOscillators)
+            draw_str_in_frame("Oscillators");
         else if(pattern == PatternTypeGlider)
             draw_str_in_frame("Glider");
         else if(pattern == PatternTypeGliderGun)
@@ -386,8 +387,8 @@ static void draw_grid(void)
         strcpy(str_label, " Pattern:");
         if     (pattern == PatternTypeRandom)
             strcpy(str_value, "Random");
-        else if(pattern == PatternTypeBlinker)
-            strcpy(str_value, "Blinker");
+        else if(pattern == PatternTypeOscillators)
+            strcpy(str_value, "Oscillators");
         else if(pattern == PatternTypeGlider)
             strcpy(str_value, "Glider");
         else if(pattern == PatternTypeGliderGun)
@@ -556,9 +557,9 @@ void handle_inputs(void)
         pattern = PatternTypeRandom;
         stage   = StageTypeInit;
     }
-    else if(tolower(key) == 'b')
+    else if(tolower(key) == 'o')
     {
-        pattern = PatternTypeBlinker;
+        pattern = PatternTypeOscillators;
         stage   = StageTypeInit;
     }
     else if(tolower(key) == 'g')

@@ -54,19 +54,50 @@ void init_grid(PatternType pattern)
             for(y=0; y<grid_height; y++)
                 grid[x][y] = (random() & 1);
     }
-    else if(pattern == PatternTypeBlinker)
+    else if(pattern == PatternTypeOscillators)
     {
-        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
+        // Blinker
+        grid[2][1] = 1;
+        grid[2][2] = 1;
+        grid[2][3] = 1;
+
+        // Toad
+        grid[9][2] = 1;
+        grid[10][1] = 1;
+        grid[10][2] = 1;
+        grid[11][1] = 1;
+        grid[11][2] = 1;
+        grid[12][1] = 1;
+
+        // Beacon
+        grid[18][1] = 1;
+        grid[18][2] = 1;
+        grid[19][1] = 1;
+        grid[20][4] = 1;
+        grid[21][3] = 1;
+        grid[21][4] = 1;
+
+        // Penta-decathlon
+        grid[30][6]  = 1;
+        grid[30][11] = 1;
+        grid[31][4]  = 1;
+        grid[31][5]  = 1;
+        grid[31][7]  = 1;
+        grid[31][8]  = 1;
+        grid[31][9]  = 1;
+        grid[31][10] = 1;
+        grid[31][12] = 1;
+        grid[31][13] = 1;
+        grid[32][6]  = 1;
+        grid[32][11] = 1;
     }
     else if(pattern == PatternTypeGlider)
     {
-        grid[0+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][2+(grid_height/2)] = 1;
+        grid[1][3] = 1;
+        grid[2][1] = 1;
+        grid[2][3] = 1;
+        grid[3][2] = 1;
+        grid[3][3] = 1;
     }
     else if(pattern == PatternTypeGliderGun)
     {

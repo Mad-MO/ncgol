@@ -23,7 +23,7 @@ typedef const uint8_t grid_t[GRID_HEIGHT_MAX];
 typedef enum
 {
     PatternTypeRandom,
-    PatternTypeBlinker,
+    PatternTypeOscillators,
     PatternTypeGlider,
     PatternTypeGliderGun,
     PatternTypePentomino,
