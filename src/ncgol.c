@@ -13,8 +13,6 @@
 // TODO: Commandline options
 // TODO: Improve the end detection (Large grid with gliders)
 // TODO: Add more patterns
-// TODO: Output max grid size in startup screen
-// TODO: New source file for Game of Life functions grid.c/h
 
 #include <curses.h>
 #include <stdlib.h>
@@ -282,6 +280,8 @@ static void draw_grid(void)
         wattron(w_grid, A_BOLD | A_REVERSE);
         waddstr(w_grid, " A ncurses based Simulation for Conways \"Game of Life\" \n");
         wattroff(w_grid, A_BOLD | A_REVERSE);
+        waddstr(w_grid, " \n");
+        wprintw(w_grid, " Maximum grid size:    %ux%u\n", GRID_WIDTH_MAX, GRID_HEIGHT_MAX);
         waddstr(w_grid, " \n");
         waddstr(w_grid, " Basic command keys:\n");
         waddstr(w_grid, "   \'q\'                 End program\n");
