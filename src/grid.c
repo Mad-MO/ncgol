@@ -137,6 +137,47 @@ void init_grid(PatternType pattern)
         grid[3][2] = 1;
         grid[3][3] = 1;
     }
+    else if(pattern == PatternTypeSpaceships)
+    {
+        // Lightweight spaceship (LWSS)
+        grid[1][1] = 1;
+        grid[1][3] = 1;
+        grid[2][4] = 1;
+        grid[3][4] = 1;
+        grid[4][1] = 1;
+        grid[4][4] = 1;
+        grid[5][2] = 1;
+        grid[5][3] = 1;
+        grid[5][4] = 1;
+
+        // Middleweight spaceship (MWSS)
+        grid[1][11] = 1;
+        grid[1][13] = 1;
+        grid[2][14] = 1;
+        grid[3][10] = 1;
+        grid[3][14] = 1;
+        grid[4][14] = 1;
+        grid[5][11] = 1;
+        grid[5][14] = 1;
+        grid[6][12] = 1;
+        grid[6][13] = 1;
+        grid[6][14] = 1;
+
+        // Heavyweight spaceship (HWSS)
+        grid[1][21] = 1;
+        grid[1][23] = 1;
+        grid[2][24] = 1;
+        grid[3][20] = 1;
+        grid[3][24] = 1;
+        grid[4][20] = 1;
+        grid[4][24] = 1;
+        grid[5][24] = 1;
+        grid[6][21] = 1;
+        grid[6][24] = 1;
+        grid[7][22] = 1;
+        grid[7][23] = 1;
+        grid[7][24] = 1;
+    }
     else if(pattern == PatternTypeGliderGun)
     {
         grid[1][5] = 1;
@@ -296,6 +337,8 @@ const char * get_pattern_str(PatternType pattern)
         return "Oscillators";
     else if(pattern == PatternTypeGlider)
         return "Glider";
+    else if(pattern == PatternTypeSpaceships)
+        return "Spaceships";
     else if(pattern == PatternTypeGliderGun)
         return "Glider gun";
     else if(pattern == PatternTypePentomino)

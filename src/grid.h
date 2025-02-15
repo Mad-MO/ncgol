@@ -26,6 +26,7 @@ typedef enum
     PatternTypeStillLifes,
     PatternTypeOscillators,
     PatternTypeGlider,
+    PatternTypeSpaceships,
     PatternTypeGliderGun,
     PatternTypePentomino,
     PatternTypeDiehard,
