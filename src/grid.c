@@ -78,18 +78,18 @@ void init_grid(PatternType pattern)
         grid[21][4] = 1;
 
         // Penta-decathlon
-        grid[30][6]  = 1;
-        grid[30][11] = 1;
-        grid[31][4]  = 1;
-        grid[31][5]  = 1;
-        grid[31][7]  = 1;
-        grid[31][8]  = 1;
-        grid[31][9]  = 1;
-        grid[31][10] = 1;
-        grid[31][12] = 1;
-        grid[31][13] = 1;
-        grid[32][6]  = 1;
-        grid[32][11] = 1;
+        grid[4][10]  = 1;
+        grid[5][10]  = 1;
+        grid[6][9]   = 1;
+        grid[6][11]  = 1;
+        grid[7][10]  = 1;
+        grid[8][10]  = 1;
+        grid[9][10]  = 1;
+        grid[10][10] = 1;
+        grid[11][9]  = 1;
+        grid[11][11] = 1;
+        grid[12][10] = 1;
+        grid[13][10] = 1;
     }
     else if(pattern == PatternTypeGlider)
     {
