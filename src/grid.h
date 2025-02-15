@@ -56,5 +56,8 @@ uint32_t get_cells_alive(void);
 // Get cycle counter
 uint32_t get_cycle_counter(void);
 
+// Return text string for pattern
+const char * get_pattern_str(PatternType pattern);
+
 // Function to detect the end of the simulation
 uint8_t end_detection(void);

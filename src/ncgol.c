@@ -13,7 +13,6 @@
 // TODO: Commandline options
 // TODO: Improve the end detection (Large grid with gliders)
 // TODO: Add more patterns
-// TODO: Get string for pattern name
 
 #include <curses.h>
 #include <stdlib.h>
@@ -308,20 +307,7 @@ static void draw_grid(void)
     // Handle pattern info
     if(stage == StageTypeShowInfo)
     {
-        if     (pattern == PatternTypeRandom)
-            draw_str_in_frame("Random");
-        else if(pattern == PatternTypeOscillators)
-            draw_str_in_frame("Oscillators");
-        else if(pattern == PatternTypeGlider)
-            draw_str_in_frame("Glider");
-        else if(pattern == PatternTypeGliderGun)
-            draw_str_in_frame("Glider gun");
-        else if(pattern == PatternTypePentomino)
-            draw_str_in_frame("Pentomino");
-        else if(pattern == PatternTypeDiehard)
-            draw_str_in_frame("Diehard");
-        else if(pattern == PatternTypeAcorn)
-            draw_str_in_frame("Acorn");
+        draw_str_in_frame(get_pattern_str(pattern));
     }
 
     // Handle end message
@@ -385,22 +371,7 @@ static void draw_grid(void)
 
         // Pattern
         strcpy(str_label, " Pattern:");
-        if     (pattern == PatternTypeRandom)
-            strcpy(str_value, "Random");
-        else if(pattern == PatternTypeOscillators)
-            strcpy(str_value, "Oscillators");
-        else if(pattern == PatternTypeGlider)
-            strcpy(str_value, "Glider");
-        else if(pattern == PatternTypeGliderGun)
-            strcpy(str_value, "Glider gun");
-        else if(pattern == PatternTypePentomino)
-            strcpy(str_value, "Pentomino");
-        else if(pattern == PatternTypeDiehard)
-            strcpy(str_value, "Diehard");
-        else if(pattern == PatternTypeAcorn)
-            strcpy(str_value, "Acorn");
-        else
-            strcpy(str_value, "?");
+        strcpy(str_value, get_pattern_str(pattern));
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));

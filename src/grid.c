@@ -100,12 +100,12 @@ void init_grid(PatternType pattern)
         grid[2][3] = 1;
 
         // Toad
-        grid[9][2] = 1;
-        grid[10][1] = 1;
+        grid[9][3]  = 1;
         grid[10][2] = 1;
-        grid[11][1] = 1;
+        grid[10][3] = 1;
         grid[11][2] = 1;
-        grid[12][1] = 1;
+        grid[11][3] = 1;
+        grid[12][2] = 1;
 
         // Beacon
         grid[18][1] = 1;
@@ -116,18 +116,18 @@ void init_grid(PatternType pattern)
         grid[21][4] = 1;
 
         // Penta-decathlon
-        grid[4][10]  = 1;
-        grid[5][10]  = 1;
-        grid[6][9]   = 1;
-        grid[6][11]  = 1;
-        grid[7][10]  = 1;
-        grid[8][10]  = 1;
-        grid[9][10]  = 1;
-        grid[10][10] = 1;
-        grid[11][9]  = 1;
-        grid[11][11] = 1;
-        grid[12][10] = 1;
-        grid[13][10] = 1;
+        grid[4][11]  = 1;
+        grid[5][11]  = 1;
+        grid[6][10]  = 1;
+        grid[6][12]  = 1;
+        grid[7][11]  = 1;
+        grid[8][11]  = 1;
+        grid[9][11]  = 1;
+        grid[10][11] = 1;
+        grid[11][10] = 1;
+        grid[11][12] = 1;
+        grid[12][11] = 1;
+        grid[13][11] = 1;
     }
     else if(pattern == PatternTypeGlider)
     {
@@ -281,6 +281,31 @@ uint32_t get_cells_alive(void)
 uint32_t get_cycle_counter(void)
 {
     return cycle_counter;
+}
+
+
+
+// Return text string for pattern
+const char * get_pattern_str(PatternType pattern)
+{
+    if     (pattern == PatternTypeRandom)
+        return "Random";
+    else if(pattern == PatternTypeStillLifes)
+        return "Still lifes";
+    else if(pattern == PatternTypeOscillators)
+        return "Oscillators";
+    else if(pattern == PatternTypeGlider)
+        return "Glider";
+    else if(pattern == PatternTypeGliderGun)
+        return "Glider gun";
+    else if(pattern == PatternTypePentomino)
+        return "Pentomino";
+    else if(pattern == PatternTypeDiehard)
+        return "Diehard";
+    else if(pattern == PatternTypeAcorn)
+        return "Acorn";
+    else
+        return "?";
 }
 
 
