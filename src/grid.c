@@ -54,6 +54,44 @@ void init_grid(PatternType pattern)
             for(y=0; y<grid_height; y++)
                 grid[x][y] = (random() & 1);
     }
+    else if(pattern == PatternTypeStillLifes)
+    {
+        // Block
+        grid[1][1] = 1;
+        grid[1][2] = 1;
+        grid[2][1] = 1;
+        grid[2][2] = 1;
+
+        // Beehive
+        grid[5][2] = 1;
+        grid[5][3] = 1;
+        grid[6][1] = 1;
+        grid[6][4] = 1;
+        grid[7][2] = 1;
+        grid[7][3] = 1;
+
+        // Loaf
+        grid[10][2] = 1;
+        grid[11][1] = 1;
+        grid[11][3] = 1;
+        grid[12][1] = 1;
+        grid[12][4] = 1;
+        grid[13][2] = 1;
+        grid[13][3] = 1;
+
+        // Boat
+        grid[16][1] = 1;
+        grid[16][2] = 1;
+        grid[17][1] = 1;
+        grid[17][3] = 1;
+        grid[18][2] = 1;
+
+        // Tub
+        grid[21][2] = 1;
+        grid[22][1] = 1;
+        grid[22][3] = 1;
+        grid[23][2] = 1;
+    }
     else if(pattern == PatternTypeOscillators)
     {
         // Blinker
