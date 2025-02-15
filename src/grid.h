@@ -14,7 +14,11 @@
 //          -> 1134x420 cells (when using braille style)
 #define GRID_WIDTH_MAX  2500 // 2500*1000*2 = ~5 MB
 #define GRID_HEIGHT_MAX 1000
-uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX]; // TODO: Optimize this?!
+
+// Pointertye to: uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
+typedef const uint8_t grid_t[GRID_HEIGHT_MAX];
+
+
 
 typedef enum
 {
@@ -40,6 +44,9 @@ void init_grid(PatternType pattern);
 
 // Function to update the grid based on the game of life rules
 void update_grid(void);
+
+// Get pointer to grid
+grid_t * get_grid(void);
 
 // Get count of cells which are alive
 uint32_t get_cells_alive(void);

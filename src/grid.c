@@ -14,6 +14,7 @@
 
 
 // Create the grid to represent the cells
+static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
@@ -144,7 +145,7 @@ void update_grid(void)
 {
     uint16_t x, y;
 
-    memset(new_grid, 0, sizeof(new_grid)); // TODO: Optimize this?!
+    memset(new_grid, 0, sizeof(new_grid));
     cells_alive = 0;
     cycle_counter++;
 
@@ -182,6 +183,14 @@ void update_grid(void)
     }
 
     memcpy(grid, new_grid, sizeof(grid));
+}
+
+
+
+// Get pointer to grid
+grid_t * get_grid(void)
+{
+    return grid;
 }
 
 

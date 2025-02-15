@@ -186,6 +186,7 @@ static void draw_grid(void)
 {
     uint16_t x, y;
     char str[16];
+    grid_t * grid = get_grid();
 
     // Draw grid to canvas
     wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_LIVE_CELL));
