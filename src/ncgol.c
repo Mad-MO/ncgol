@@ -12,8 +12,6 @@
 
 // TODO: Handle end detection from grid_update (bugfix for wrong startup end detection???)
 // TODO: Comment how the grid is build (x/y vs. width/height and max values)
-// TODO: New Module for patterns
-// TODO: Patterns in own struct (with dimensions and name)
 // TODO: Add pattern Pulsar
 // TODO: Improve the end detection (Large grid with gliders)
 // TODO: Commandline options
@@ -310,7 +308,7 @@ static void draw_grid(void)
     // Handle pattern info
     if(stage == STAGE_SHOWINFO)
     {
-        draw_str_in_frame(get_pattern_str(initpattern));
+        draw_str_in_frame(get_initpattern_str(initpattern));
     }
 
     // Handle end message
@@ -374,7 +372,7 @@ static void draw_grid(void)
 
         // Pattern
         strcpy(str_label, " Pattern:");
-        strcpy(str_value, get_pattern_str(initpattern));
+        strcpy(str_value, get_initpattern_str(initpattern));
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));

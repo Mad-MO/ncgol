@@ -69,258 +69,90 @@ void init_grid(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_CONWAY)
     {
-        init_pattern_to_grid(PATTERN_CONWAY, grid, 10, 10);
+        // Conway
+        set_pattern_to_grid_center(PATTERN_CONWAY, grid);
     }
     else if(pattern == INITPATTERN_STILLLIFES)
     {
         // Block
-        grid[1][1] = 1;
-        grid[1][2] = 1;
-        grid[2][1] = 1;
-        grid[2][2] = 1;
+        set_pattern_to_grid_pos(PATTERN_BLOCK, grid, 1, 1);
 
         // Beehive
-        grid[5][2] = 1;
-        grid[5][3] = 1;
-        grid[6][1] = 1;
-        grid[6][4] = 1;
-        grid[7][2] = 1;
-        grid[7][3] = 1;
+        set_pattern_to_grid_pos(PATTERN_BEEHIVE, grid, 5, 1);
 
         // Loaf
-        grid[10][2] = 1;
-        grid[11][1] = 1;
-        grid[11][3] = 1;
-        grid[12][1] = 1;
-        grid[12][4] = 1;
-        grid[13][2] = 1;
-        grid[13][3] = 1;
+        set_pattern_to_grid_pos(PATTERN_LOAF, grid, 11, 1);
 
         // Boat
-        grid[16][1] = 1;
-        grid[16][2] = 1;
-        grid[17][1] = 1;
-        grid[17][3] = 1;
-        grid[18][2] = 1;
+        set_pattern_to_grid_pos(PATTERN_BOAT, grid, 17, 1);
 
         // Tub
-        grid[21][2] = 1;
-        grid[22][1] = 1;
-        grid[22][3] = 1;
-        grid[23][2] = 1;
+        set_pattern_to_grid_pos(PATTERN_TUB, grid, 22, 1);
     }
     else if(pattern == INITPATTERN_OSCILLATORS)
     {
         // Blinker
-        grid[2][1] = 1;
-        grid[2][2] = 1;
-        grid[2][3] = 1;
+        set_pattern_to_grid_pos(PATTERN_BLINKER, grid, 1, 2);
 
         // Toad
-        grid[9][3]  = 1;
-        grid[10][2] = 1;
-        grid[10][3] = 1;
-        grid[11][2] = 1;
-        grid[11][3] = 1;
-        grid[12][2] = 1;
+        set_pattern_to_grid_pos(PATTERN_TOAD, grid, 6, 2);
 
         // Beacon
-        grid[18][1] = 1;
-        grid[18][2] = 1;
-        grid[19][1] = 1;
-        grid[20][4] = 1;
-        grid[21][3] = 1;
-        grid[21][4] = 1;
+        set_pattern_to_grid_pos(PATTERN_BEACON, grid, 12, 2);
 
         // Penta-decathlon
-        grid[4][11]  = 1;
-        grid[5][11]  = 1;
-        grid[6][10]  = 1;
-        grid[6][12]  = 1;
-        grid[7][11]  = 1;
-        grid[8][11]  = 1;
-        grid[9][11]  = 1;
-        grid[10][11] = 1;
-        grid[11][10] = 1;
-        grid[11][12] = 1;
-        grid[12][11] = 1;
-        grid[13][11] = 1;
+        set_pattern_to_grid_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
     }
     else if(pattern == INITPATTERN_GLIDER)
     {
-        grid[1][3] = 1;
-        grid[2][1] = 1;
-        grid[2][3] = 1;
-        grid[3][2] = 1;
-        grid[3][3] = 1;
+        // Glider
+        set_pattern_to_grid_pos(PATTERN_GLIDER, grid, 1, 1);
     }
     else if(pattern == INITPATTERN_SPACESHIPS)
     {
         // Lightweight spaceship (LWSS)
-        grid[1][1] = 1;
-        grid[1][3] = 1;
-        grid[2][4] = 1;
-        grid[3][4] = 1;
-        grid[4][1] = 1;
-        grid[4][4] = 1;
-        grid[5][2] = 1;
-        grid[5][3] = 1;
-        grid[5][4] = 1;
+        set_pattern_to_grid_pos(PATTERN_LWSS, grid, 1, 1);
 
         // Middleweight spaceship (MWSS)
-        grid[1][11] = 1;
-        grid[1][13] = 1;
-        grid[2][14] = 1;
-        grid[3][10] = 1;
-        grid[3][14] = 1;
-        grid[4][14] = 1;
-        grid[5][11] = 1;
-        grid[5][14] = 1;
-        grid[6][12] = 1;
-        grid[6][13] = 1;
-        grid[6][14] = 1;
+        set_pattern_to_grid_pos(PATTERN_MWSS, grid, 1, 7);
 
         // Heavyweight spaceship (HWSS)
-        grid[1][21] = 1;
-        grid[1][23] = 1;
-        grid[2][24] = 1;
-        grid[3][20] = 1;
-        grid[3][24] = 1;
-        grid[4][20] = 1;
-        grid[4][24] = 1;
-        grid[5][24] = 1;
-        grid[6][21] = 1;
-        grid[6][24] = 1;
-        grid[7][22] = 1;
-        grid[7][23] = 1;
-        grid[7][24] = 1;
+        set_pattern_to_grid_pos(PATTERN_HWSS, grid, 1, 14);
     }
     else if(pattern == INITPATTERN_GLIDERGUN)
     {
-        grid[1][5] = 1;
-        grid[1][6] = 1;
-        grid[2][5] = 1;
-        grid[2][6] = 1;
-        grid[11][5] = 1;
-        grid[11][6] = 1;
-        grid[11][7] = 1;
-        grid[12][4] = 1;
-        grid[12][8] = 1;
-        grid[13][3] = 1;
-        grid[13][9] = 1;
-        grid[14][3] = 1;
-        grid[14][9] = 1;
-        grid[15][6] = 1;
-        grid[16][4] = 1;
-        grid[16][8] = 1;
-        grid[17][5] = 1;
-        grid[17][6] = 1;
-        grid[17][7] = 1;
-        grid[18][6] = 1;
-        grid[21][3] = 1;
-        grid[21][4] = 1;
-        grid[21][5] = 1;
-        grid[22][3] = 1;
-        grid[22][4] = 1;
-        grid[22][5] = 1;
-        grid[23][2] = 1;
-        grid[23][6] = 1;
-        grid[25][1] = 1;
-        grid[25][2] = 1;
-        grid[25][6] = 1;
-        grid[25][7] = 1;
-        grid[35][3] = 1;
-        grid[35][4] = 1;
-        grid[36][3] = 1;
-        grid[36][4] = 1;
+        // Glider gun
+        set_pattern_to_grid_pos(PATTERN_GLIDERGUN, grid, 1, 1);
     }
     else if(pattern == INITPATTERN_PENTOMINO)
     {
-        grid[0+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][0+(grid_height/2)] = 1;
+        // Pentomino
+        set_pattern_to_grid_center(PATTERN_PENTOMINO, grid);
     }
     else if(pattern == INITPATTERN_DIEHARD)
     {
-        grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[7+(grid_width/2)][5+(grid_height/2)] = 1;
+        // Diehard
+        set_pattern_to_grid_center(PATTERN_DIEHARD, grid);
     }
     else if(pattern == INITPATTERN_ACORN)
     {
-        grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[4+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][4+(grid_height/2)] = 1;
+        // Acorn
+        set_pattern_to_grid_center(PATTERN_ACORN, grid);
     }
     else if(pattern == INITPATTERN_BLOCKENGINE1)
     {
-        grid[1+(grid_width/2)][6+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][6+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[7+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[7+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[7+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[8+(grid_width/2)][2+(grid_height/2)] = 1;
+        // Block engine 1
+        set_pattern_to_grid_center(PATTERN_BLOCKENGINE1, grid);
     }
     else if(pattern == INITPATTERN_BLOCKENGINE2)
     {
-        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
-        grid[1+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][5+(grid_height/2)] = 1;
-        grid[4+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][3+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][5+(grid_height/2)] = 1;
+        // Block engine 2
+        set_pattern_to_grid_center(PATTERN_BLOCKENGINE2, grid);
     }
     else if(pattern == INITPATTERN_DOUBLEBLOCKENGINE)
     {
-        grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[3+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[4+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[5+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[6+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[7+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[8+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[10+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[11+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[12+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[13+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[14+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[18+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[19+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[20+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[27+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[28+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[29+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[30+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[31+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[32+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[33+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[35+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[36+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[37+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[38+(grid_width/2)][1+(grid_height/2)] = 1;
-        grid[39+(grid_width/2)][1+(grid_height/2)] = 1;
+        // Double block engine
+        set_pattern_to_grid_center(PATTERN_DOUBLEBLOCKENGINE, grid);
     }
     else            // INITPATTERN_CLEAR
     {
@@ -404,32 +236,34 @@ uint32_t get_cycle_counter(void)
 
 
 // Return text string for pattern
-const char * get_pattern_str(initpattern_t pattern)
+const char* get_initpattern_str(initpattern_t initpattern)
 {
-    if     (pattern == INITPATTERN_RANDOM)
+    if     (initpattern == INITPATTERN_RANDOM)
         return "Random";
-    else if(pattern == INITPATTERN_STILLLIFES)
+    else if(initpattern == INITPATTERN_CONWAY)
+        return get_pattern_str(PATTERN_CONWAY);
+    else if(initpattern == INITPATTERN_STILLLIFES)
         return "Still lifes";
-    else if(pattern == INITPATTERN_OSCILLATORS)
+    else if(initpattern == INITPATTERN_OSCILLATORS)
         return "Oscillators";
-    else if(pattern == INITPATTERN_GLIDER)
-        return "Glider";
-    else if(pattern == INITPATTERN_SPACESHIPS)
+    else if(initpattern == INITPATTERN_GLIDER)
+        return get_pattern_str(PATTERN_GLIDER);
+    else if(initpattern == INITPATTERN_SPACESHIPS)
         return "Spaceships";
-    else if(pattern == INITPATTERN_GLIDERGUN)
-        return "Glider gun";
-    else if(pattern == INITPATTERN_PENTOMINO)
-        return "Pentomino";
-    else if(pattern == INITPATTERN_DIEHARD)
-        return "Diehard";
-    else if(pattern == INITPATTERN_ACORN)
-        return "Acorn";
-    else if(pattern == INITPATTERN_BLOCKENGINE1)
-        return "Block engine 1";
-    else if(pattern == INITPATTERN_BLOCKENGINE2)
-        return "Block engine 2";
-    else if(pattern == INITPATTERN_DOUBLEBLOCKENGINE)
-        return "Double block engine";
+    else if(initpattern == INITPATTERN_GLIDERGUN)
+        return get_pattern_str(PATTERN_GLIDERGUN);
+    else if(initpattern == INITPATTERN_PENTOMINO)
+        return get_pattern_str(PATTERN_PENTOMINO);
+    else if(initpattern == INITPATTERN_DIEHARD)
+        return get_pattern_str(PATTERN_DIEHARD);
+    else if(initpattern == INITPATTERN_ACORN)
+        return get_pattern_str(PATTERN_ACORN);
+    else if(initpattern == INITPATTERN_BLOCKENGINE1)
+        return get_pattern_str(PATTERN_BLOCKENGINE1);
+    else if(initpattern == INITPATTERN_BLOCKENGINE2)
+        return get_pattern_str(PATTERN_BLOCKENGINE2);
+    else if(initpattern == INITPATTERN_DOUBLEBLOCKENGINE)
+        return get_pattern_str(PATTERN_DOUBLEBLOCKENGINE);
     else
         return "?";
 }

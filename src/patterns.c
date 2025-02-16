@@ -13,7 +13,7 @@
 
 
 
-void init_pattern_to_grid(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16_t y_pos)
+void set_pattern_to_grid_pos(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16_t y_pos)
 {
     uint16_t x;
     uint16_t y;
@@ -28,4 +28,21 @@ void init_pattern_to_grid(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint1
             grid[x+x_pos][y+y_pos] = pattern_desc->pattern[x + y*pattern_desc->width];
         }
     }
+}
+
+
+
+void set_pattern_to_grid_center(pattern_t pattern, grid_t *grid)
+{
+    uint16_t x_pos = (get_grid_width()  - pattern_list[pattern]->width)  / 2;
+    uint16_t y_pos = (get_grid_height() - pattern_list[pattern]->height) / 2;
+
+    set_pattern_to_grid_pos(pattern, grid, x_pos, y_pos);
+}
+
+// Return text string for initpattern
+const char * get_pattern_str(pattern_t pattern)
+{
+    // TODO: Check boundaries
+    return pattern_list[pattern]->name;
 }
