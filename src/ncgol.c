@@ -285,24 +285,15 @@ static void draw_grid(void)
         waddstr(w_grid, " \n");
         wprintw(w_grid, " Maximum grid size:    %ux%u\n", GRID_WIDTH_MAX, GRID_HEIGHT_MAX);
         waddstr(w_grid, " \n");
-        waddstr(w_grid, " Basic command keys:\n");
+        waddstr(w_grid, " Command keys:\n");
         waddstr(w_grid, "   \'q\'                 End program\n");
-        waddstr(w_grid, "   \'0\'...\'9\'           Set speed directly\n");
         waddstr(w_grid, "   \'Up\' and \'Down\'     Adjust speed\n");
+        waddstr(w_grid, "   \'0\'...\'9\'           Set speed directly\n");
         waddstr(w_grid, "   \'Left\' and \'Right\'  Change pattern\n");
         waddstr(w_grid, "   \'Space\'             Restart current pattern\n");
         waddstr(w_grid, "   \'s\'                 Change style\n");
         waddstr(w_grid, "   \'m\'                 Change mode\n");
         waddstr(w_grid, "   \'h\'                 This Help\n");
-        waddstr(w_grid, " \n");
-        waddstr(w_grid, " Pattern keys:\n");
-        waddstr(w_grid, "   \'r\'                 Random\n");
-        waddstr(w_grid, "   \'o\'                 Oscillators\n");
-        waddstr(w_grid, "   \'g\'                 Glider\n");
-        waddstr(w_grid, "   \'l\'                 Glider gun\n");
-        waddstr(w_grid, "   \'p\'                 Pentomino\n");
-        waddstr(w_grid, "   \'d\'                 Diehard\n");
-        waddstr(w_grid, "   \'a\'                 Acorn\n");
     }
 
     // Handle pattern info
@@ -461,21 +452,14 @@ static void draw_grid(void)
 void handle_inputs(void)
 {
     int key = wgetch(w_grid);
-    if(tolower(key) == 'q')
+    if(key==KEY_RESIZE)
+    {
+        init_tui();
+    }
+    else if(tolower(key) == 'q')
     {
         endwin();
         exit(0);
-    }
-    if(key==27) // ESC
-    {
-        if     (stage == STAGE_STARTWAIT)
-        {
-            stage = STAGE_INIT;
-        }
-        else if(stage == STAGE_SHOWINFO)
-        {
-            stage = STAGE_RUNNING;
-        }
     }
     else if(key == KEY_UP)
     {
@@ -485,17 +469,29 @@ void handle_inputs(void)
     {
         if(speed > 1) speed--;
     }
-    else if(key == KEY_RIGHT)
+    else if(key == '0')
     {
-        initpattern++;
-        initpattern %= INITPATTERN_CYCLEMAX;
-        stage = STAGE_INIT;
+        speed = 10;
+    }
+    else if((key>='1') && (key<='9'))
+    {
+        speed = key - '0';
     }
     else if(key == KEY_LEFT)
     {
         if(initpattern == 0) initpattern = INITPATTERN_CYCLEMAX - 1;
         else             initpattern--;
         stage = STAGE_INIT;
+    }
+    else if(key == KEY_RIGHT)
+    {
+        initpattern++;
+        initpattern %= INITPATTERN_CYCLEMAX;
+        stage = STAGE_INIT;
+    }
+    else if(key == ' ')
+    {
+        stage   = STAGE_INIT;
     }
     else if(tolower(key) == 's')
     {
@@ -508,60 +504,20 @@ void handle_inputs(void)
         automode++;
         automode %= MODE_MAX;
     }
-    else if(key==KEY_RESIZE)
-    {
-        init_tui();
-    }
-    else if((key>='1') && (key<='9'))
-    {
-        speed = key - '0';
-    }
-    else if(key == '0')
-    {
-        speed = 10;
-    }
-    else if(key == ' ')
-    {
-        stage   = STAGE_INIT;
-    }
-    else if(tolower(key) == 'r')
-    {
-        initpattern = INITPATTERN_RANDOM;
-        stage       = STAGE_INIT;
-    }
-    else if(tolower(key) == 'o')
-    {
-        initpattern = INITPATTERN_OSCILLATORS;
-        stage       = STAGE_INIT;
-    }
-    else if(tolower(key) == 'g')
-    {
-        initpattern = INITPATTERN_GLIDER;
-        stage       = STAGE_INIT;
-    }
-    else if(tolower(key) == 'l')
-    {
-        initpattern = INITPATTERN_GLIDERGUN;
-        stage       = STAGE_INIT;
-    }
-    else if(tolower(key) == 'p')
-    {
-        initpattern = INITPATTERN_PENTOMINO;
-        stage       = STAGE_INIT;
-    }
-    else if(tolower(key) == 'd')
-    {
-        initpattern = INITPATTERN_DIEHARD;
-        stage       = STAGE_INIT;
-    }
-    else if(tolower(key) == 'a')
-    {
-        initpattern = INITPATTERN_ACORN;
-        stage       = STAGE_INIT;
-    }
     else if(tolower(key) == 'h')
     {
         stage       = STAGE_STARTUP;
+    }
+    if(key==27) // ESC
+    {
+        if     (stage == STAGE_STARTWAIT)
+        {
+            stage = STAGE_INIT;
+        }
+        else if(stage == STAGE_SHOWINFO)
+        {
+            stage = STAGE_RUNNING;
+        }
     }
     else
     {

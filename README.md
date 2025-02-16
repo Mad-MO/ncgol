@@ -29,24 +29,29 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 - "q" key ends the program
 - "Up", "Down" and "0" through "9" keys adjust the speed
-- "Right" and "Left" keys initialize the cells to a different pattern
-  - "r" Random
-  - "o" Oscillators
-  - "g" Glider
-  - "l" Glider gun
-  - "p" Pentomino
-  - "d" Diehard
-  - "a" Acorn
+- "Left" and "Right" keys initialize the cells to a different pattern
+  - Random
+  - Conway (text string)
+  - Still lifes
+  - Oscillators
+  - Glider
+  - Spaceships
+  - Glider gun
+  - Pentomino
+  - Diehard
+  - Acorn
+  - Block engine 1/2
+  - Double block engine
 - "Space" key restarts the current pattern
-- "h" show help
 - "s" key changes the style
-  - 2 chars representing 1 cell (Unicode blocks / "#")
-  - 1 char represents 2 cells (Unicode braille dots / Unicode half blocks / ASCII)
-  - 1 char represents 8 cells (Unicode braille dots)
+  - 2 terminal characters representing 1 cell (Unicode blocks / "#")
+  - 1 terminal character represents 2 cells (Unicode half blocks / ASCII)
+  - 1 terminal character represents 8 cells (Unicode braille dots)
 - "m" key changes the mode
   - NEXT: Jump to next pattern
   - LOOP: Restart current pattern
   - STOP: Stop when pattern is finished
+- "h" show help
 
 ## Background
 
