@@ -43,57 +43,56 @@ WINDOW *w_grid;
 WINDOW *w_status_box;
 WINDOW *w_status;
 
-static PatternType pattern;
+static initpattern_t initpattern;
 
 typedef enum
 {
-    StageTypeStartup,   // Show startup screen
-    StageTypeStartwait, // Timeout for startup window
-    StageTypeInit,      // Initialize grid
-    StageTypeShowInfo,  // Show info for current pattern
-    StageTypeRunning,   // Running simulation
-    StageTypeEnd        // End of simulation has been reached
-} StageType;
-static StageType stage;
+    STAGE_STARTUP,   // Show startup screen
+    STAGE_STARTWAIT, // Timeout for startup window
+    STAGE_INIT,      // Initialize grid
+    STAGE_SHOWINFO,  // Show info for current pattern
+    STAGE_RUNNING,   // Running simulation
+    STAGE_END        // End of simulation has been reached
+} stage_t;
+static stage_t stage;
 
 typedef enum
 {
     // Styles which use two chars per cell
-    StyleTypeBlock1,
-    StyleTypeBlock2,
-    StyleTypeHash,
+    STYLE_BLOCK1,
+    STYLE_BLOCK2,
+    STYLE_HASH,
 
     // Styles which show two cells in one char
-    StyleTypeDoubleBlock,
-    StyleTypeDoubleDot,
+    STYLE_DOUBLEBLOCK,
+    STYLE_DOUBLEDOT,
 
     // Braile style with 8 dots per char
-    StyleTypeBraille,
+    STYLE_BRAILLE,
     // ----------------
-    StyleTypeMax
-} StyleType;
-static StyleType style;
+    STYLE_MAX
+} style_t;
+static style_t style;
 
 typedef enum
 {
-    COLOR_PAIR_STANDARD = 1,
-    COLOR_PAIR_LABEL,
-    COLOR_PAIR_VALUE,
-    COLOR_PAIR_LIVE_CELL,
-    COLOR_PAIR_TITLE,
-    COLOR_PAIR_PATTERN_INFO
-} ColorPairType;
-static ColorPairType color_pair;
+    COLORS_STANDARD = 1,
+    COLORS_LABEL,
+    COLORS_VALUE,
+    COLORS_LIVE_CELL,
+    COLORS_TITLE,
+    COLORS_PATTERN_INFO
+} colors_t;
 
 typedef enum
 {
-    MODE_NEXT, // When current pattern ends, switch to next pattern
-    MODE_LOOP, // When current pattern ends, restart current pattern
-    MODE_STOP, // When current pattern ends, stop the simulation
+    AUTOMODE_NEXT, // When current pattern ends, switch to next pattern
+    AUTOMODE_LOOP, // When current pattern ends, restart current pattern
+    AUTOMODE_STOP, // When current pattern ends, stop the simulation
     // ----------------
     MODE_MAX
-} ModeType;
-static ModeType mode;
+} automode_t;
+static automode_t automode;
 
 
 
@@ -112,18 +111,18 @@ void init_tui(void)
 
     // Prepare coloring
     start_color();
-    init_pair(COLOR_PAIR_STANDARD,     COLOR_WHITE,   COLOR_BLACK);   // Standard
-    init_pair(COLOR_PAIR_LABEL,        COLOR_GREEN,   COLOR_BLACK);   // Label
-    init_pair(COLOR_PAIR_VALUE,        COLOR_YELLOW,  COLOR_BLACK);   // Value
-    init_pair(COLOR_PAIR_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
-    init_pair(COLOR_PAIR_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
-    init_pair(COLOR_PAIR_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
+    init_pair(COLORS_STANDARD,     COLOR_WHITE,   COLOR_BLACK);   // Standard
+    init_pair(COLORS_LABEL,        COLOR_GREEN,   COLOR_BLACK);   // Label
+    init_pair(COLORS_VALUE,        COLOR_YELLOW,  COLOR_BLACK);   // Value
+    init_pair(COLORS_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
+    init_pair(COLORS_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
+    init_pair(COLORS_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
     ESCDELAY = 1; // Set the delay for escape sequences
 
     // Create status window
     w_status_box = newwin(3, COLS, LINES-3, 0);
     box(w_status_box, 0, 0); // Draw a box around the screen
-    wattron(w_status_box, COLOR_PAIR(COLOR_PAIR_TITLE));
+    wattron(w_status_box, COLOR_PAIR(COLORS_TITLE));
     mvwaddstr(w_status_box, 0, 3, " Status ");
     wattroff(w_status_box, COLOR_PAIR(0));
     wrefresh(w_status_box);
@@ -133,21 +132,21 @@ void init_tui(void)
     // Create grid window
     w_grid_box = newwin(LINES-3, COLS, 0, 0);
     box(w_grid_box, 0, 0); // Draw a box around the screen
-    wattron(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
+    wattron(w_grid_box, COLOR_PAIR(COLORS_TITLE));
     mvwaddstr(w_grid_box, 0, 3, " Game of Life ");
-    wattroff(w_grid_box, COLOR_PAIR(COLOR_PAIR_TITLE));
+    wattroff(w_grid_box, COLOR_PAIR(COLORS_TITLE));
     wrefresh(w_grid_box);
     w_grid = newwin(LINES-5, COLS-2, 1, 1);
     nodelay(w_grid, TRUE); // Non-blocking input
     keypad(w_grid, TRUE); // Enable special keys
 
     // Init
-    if     (style == StyleTypeBraille)
+    if     (style == STYLE_BRAILLE)
     {
         grid_width  = getmaxx(w_grid) * 2;
         grid_height = getmaxy(w_grid) * 4;
     }
-    else if(style >= StyleTypeDoubleBlock)
+    else if(style >= STYLE_DOUBLEBLOCK)
     {
         grid_width  = getmaxx(w_grid);
         grid_height = getmaxy(w_grid)*2;
@@ -171,7 +170,7 @@ static void draw_str_in_frame(const char * str)
     uint16_t x = (getmaxx(w_grid) - len) / 2 - 2;
     uint16_t y = (getmaxy(w_grid)) / 4;
 
-    wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_PATTERN_INFO));
+    wattron(w_grid, A_BOLD | COLOR_PAIR(COLORS_PATTERN_INFO));
     for(uint16_t i=0; i<len+4; i++)
     {
         mvwaddch(w_grid, y+0, x+i, ' ');
@@ -179,7 +178,7 @@ static void draw_str_in_frame(const char * str)
         mvwaddch(w_grid, y+2, x+i, ' ');
     }
     mvwaddstr(w_grid, y+1, x+2, str);
-    wattroff(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_PATTERN_INFO));
+    wattroff(w_grid, A_BOLD | COLOR_PAIR(COLORS_PATTERN_INFO));
 }
 
 
@@ -192,33 +191,33 @@ static void draw_grid(void)
     grid_t * grid = get_grid();
 
     // Draw grid to canvas
-    wattron(w_grid, A_BOLD | COLOR_PAIR(COLOR_PAIR_LIVE_CELL));
+    wattron(w_grid, A_BOLD | COLOR_PAIR(COLORS_LIVE_CELL));
     for(x=0; x<grid_width; x++)
     {
         for(y=0; y<grid_height; y++)
         {
-            if((style == StyleTypeDoubleBlock) || (style == StyleTypeDoubleDot))
+            if((style == STYLE_DOUBLEBLOCK) || (style == STYLE_DOUBLEDOT))
             {
                 // Two dots per character
                 if(grid[x][y] && grid[x][y + 1])
                 {
-                    if     (style == StyleTypeDoubleBlock)
+                    if     (style == STYLE_DOUBLEBLOCK)
                         mvwaddstr(w_grid, y/2, x, "\u2588");
-                    else          // StyleTypeDoubleDot
+                    else          // STYLE_DOUBLEDOT
                         mvwaddch(w_grid, y/2, x, ':');
                 }
                 else if(grid[x][y])
                 {
-                    if     (style == StyleTypeDoubleBlock)
+                    if     (style == STYLE_DOUBLEBLOCK)
                         mvwaddstr(w_grid, y/2, x, "\u2580");
-                    else          // StyleTypeDoubleDot
+                    else          // STYLE_DOUBLEDOT
                         mvwaddch(w_grid, y/2, x, '\'');
                 }
                 else if(grid[x][y + 1])
                 {
-                    if     (style == StyleTypeDoubleBlock)
+                    if     (style == STYLE_DOUBLEBLOCK)
                         mvwaddstr(w_grid, y/2, x, "\u2584");
-                    else          // StyleTypeDoubleDot
+                    else          // STYLE_DOUBLEDOT
                         mvwaddch(w_grid, y/2, x, '.');
                 }
                 else
@@ -227,14 +226,14 @@ static void draw_grid(void)
                 }
                 y++;
             }
-            else if(style == StyleTypeBraille)
+            else if(style == STYLE_BRAILLE)
             {
-                // The braille pattern allows the usage of 8 dots per character
+                // The braille characters allows the usage of 8 dots per character
                 uint16_t braille = 0;
                 wchar_t braille_char;
                 char braille_str[4] = {0};
 
-                // Convert braille pattern to unicode character
+                // Convert grid to braille unicode character
                 if(grid[x+0][y+0]) {braille |= 0x01;}
                 if(grid[x+0][y+1]) {braille |= 0x02;}
                 if(grid[x+0][y+2]) {braille |= 0x04;}
@@ -261,11 +260,11 @@ static void draw_grid(void)
                 // A unicode full block uses the foreground color and works better.
                 if(grid[x][y])
                 {
-                    if     (style == StyleTypeBlock1)
+                    if     (style == STYLE_BLOCK1)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
-                    else if(style == StyleTypeBlock2)
+                    else if(style == STYLE_BLOCK2)
                         mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
-                    else          // StyleTypeHash
+                    else          // STYLE_HASH
                         mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
                 }
                 else
@@ -278,7 +277,7 @@ static void draw_grid(void)
     wattroff(w_grid, A_BOLD);
 
     // Handle startup screen
-    if((stage == StageTypeStartup) || (stage == StageTypeStartwait))
+    if((stage == STAGE_STARTUP) || (stage == STAGE_STARTWAIT))
     {
         wmove(w_grid, 0, 0);
         waddstr(w_grid, " \n");
@@ -309,13 +308,13 @@ static void draw_grid(void)
     }
 
     // Handle pattern info
-    if(stage == StageTypeShowInfo)
+    if(stage == STAGE_SHOWINFO)
     {
-        draw_str_in_frame(get_pattern_str(pattern));
+        draw_str_in_frame(get_pattern_str(initpattern));
     }
 
     // Handle end message
-    if(stage == StageTypeEnd)
+    if(stage == STAGE_END)
     {
         draw_str_in_frame("End of simulation");
     }
@@ -334,9 +333,9 @@ static void draw_grid(void)
         sprintf(str_value, "%ux%u", grid_width, grid_height);
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
@@ -345,9 +344,9 @@ static void draw_grid(void)
         sprintf(str_value, "%3u", get_cycle_counter());
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
@@ -356,9 +355,9 @@ static void draw_grid(void)
         sprintf(str_value, "%3u", get_cells_alive());
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
@@ -367,62 +366,62 @@ static void draw_grid(void)
         sprintf(str_value, "%u", speed);
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
         // Pattern
         strcpy(str_label, " Pattern:");
-        strcpy(str_value, get_pattern_str(pattern));
+        strcpy(str_value, get_pattern_str(initpattern));
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
         // Style
         strcpy(str_label, " Style:");
-        if     (style == StyleTypeBlock1)
+        if     (style == STYLE_BLOCK1)
             strcpy(str_value, "Block1");
-        else if(style == StyleTypeBlock2)
+        else if(style == STYLE_BLOCK2)
             strcpy(str_value, "Block2");
-        else if(style == StyleTypeHash)
+        else if(style == STYLE_HASH)
             strcpy(str_value, "Hash");
-        else if(style == StyleTypeDoubleBlock)
+        else if(style == STYLE_DOUBLEBLOCK)
             strcpy(str_value, "DoubleBlock");
-        else if(style == StyleTypeDoubleDot)
+        else if(style == STYLE_DOUBLEDOT)
             strcpy(str_value, "DoubleDot");
-        else if(style == StyleTypeBraille)
+        else if(style == STYLE_BRAILLE)
             strcpy(str_value, "Braille");
         else
             strcpy(str_value, "?");
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
         // Mode
         strcpy(str_label, " Mode:");
-        if     (mode == MODE_NEXT)
+        if     (automode == AUTOMODE_NEXT)
             strcpy(str_value, "Next");
-        else if(mode == MODE_LOOP)
+        else if(automode == AUTOMODE_LOOP)
             strcpy(str_value, "Loop");
-        else if(mode == MODE_STOP)
+        else if(automode == AUTOMODE_STOP)
             strcpy(str_value, "Stop");
         else
             strcpy(str_value, "?");
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_LABEL));
+            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
             waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             waddstr(w_status, str_value);
         }
 
@@ -435,26 +434,26 @@ static void draw_grid(void)
         // Author
         if((width-strlen(AUTHOR)-1) > pos)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+            wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
             mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1, AUTHOR);
         }
 
         // SW Version
         if((width-strlen(AUTHOR)-1-strlen(SW_VERS)-1) > pos)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
             mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1-strlen(SW_VERS)-1, SW_VERS);
         }
 
         // SW Name
         if((width-strlen(AUTHOR)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1) > pos)
         {
-            wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+            wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
             mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
         }
     }
 
-    wattroff(w_status, COLOR_PAIR(COLOR_PAIR_VALUE));
+    wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
     wrefresh(w_status);
 }
 
@@ -471,13 +470,13 @@ void handle_inputs(void)
     }
     if(key==27) // ESC
     {
-        if     (stage == StageTypeStartwait)
+        if     (stage == STAGE_STARTWAIT)
         {
-            stage = StageTypeInit;
+            stage = STAGE_INIT;
         }
-        else if(stage == StageTypeShowInfo)
+        else if(stage == STAGE_SHOWINFO)
         {
-            stage = StageTypeRunning;
+            stage = STAGE_RUNNING;
         }
     }
     else if(key == KEY_UP)
@@ -490,26 +489,26 @@ void handle_inputs(void)
     }
     else if(key == KEY_RIGHT)
     {
-        pattern++;
-        pattern %= PatternTypeCycleMax;
-        stage = StageTypeInit;
+        initpattern++;
+        initpattern %= INITPATTERN_CYCLEMAX;
+        stage = STAGE_INIT;
     }
     else if(key == KEY_LEFT)
     {
-        if(pattern == 0) pattern = PatternTypeCycleMax - 1;
-        else             pattern--;
-        stage = StageTypeInit;
+        if(initpattern == 0) initpattern = INITPATTERN_CYCLEMAX - 1;
+        else             initpattern--;
+        stage = STAGE_INIT;
     }
     else if(tolower(key) == 's')
     {
         style++;
-        style %= StyleTypeMax;
+        style %= STYLE_MAX;
         init_tui();
     }
     else if(tolower(key) == 'm')
     {
-        mode++;
-        mode %= MODE_MAX;
+        automode++;
+        automode %= MODE_MAX;
     }
     else if(key==KEY_RESIZE)
     {
@@ -525,46 +524,46 @@ void handle_inputs(void)
     }
     else if(key == ' ')
     {
-        stage   = StageTypeInit;
+        stage   = STAGE_INIT;
     }
     else if(tolower(key) == 'r')
     {
-        pattern = PatternTypeRandom;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_RANDOM;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'o')
     {
-        pattern = PatternTypeOscillators;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_OSCILLATORS;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'g')
     {
-        pattern = PatternTypeGlider;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_GLIDER;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'l')
     {
-        pattern = PatternTypeGliderGun;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_GLIDERGUN;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'p')
     {
-        pattern = PatternTypePentomino;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_PENTOMINO;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'd')
     {
-        pattern = PatternTypeDiehard;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_DIEHARD;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'a')
     {
-        pattern = PatternTypeAcorn;
-        stage   = StageTypeInit;
+        initpattern = INITPATTERN_ACORN;
+        stage       = STAGE_INIT;
     }
     else if(tolower(key) == 'h')
     {
-        stage   = StageTypeStartup;
+        stage       = STAGE_STARTUP;
     }
     else
     {
@@ -578,15 +577,15 @@ void handle_inputs(void)
 int main(void)
 {
     // Initialize variables
-    pattern = PatternTypeRandom;
-    speed   = 3;
-    mode    = MODE_NEXT;
+    initpattern = INITPATTERN_RANDOM;
+    speed       = 3;
+    automode    = AUTOMODE_NEXT;
     #if  (defined __APPLE__)
-        style = StyleTypeBlock2;
+        style   = STYLE_BLOCK2;
     #elif(defined __linux__)
-        style = StyleTypeBlock1;
+        style   = STYLE_BLOCK1;
     #else
-        style = StyleTypeHash;
+        style   = STYLE_HASH;
     #endif
 
     // Initialize ncurses and grid
@@ -627,39 +626,39 @@ int main(void)
         else                usleep(     0);
 
         // Handle different patterns and update grid
-        if     (stage == StageTypeStartup)
+        if     (stage == STAGE_STARTUP)
         {
-            init_grid(PatternTypeClear);
-            stage = StageTypeStartwait;
+            init_grid(INITPATTERN_CLEAR);
+            stage = STAGE_STARTWAIT;
             timer = 0;
         }
-        else if(stage == StageTypeStartwait)
+        else if(stage == STAGE_STARTWAIT)
         {
             if(timer >= 20000)
             {
-                stage = StageTypeInit;
+                stage = STAGE_INIT;
                 timer = 0;
             }
         }
-        else if(stage == StageTypeInit)
+        else if(stage == STAGE_INIT)
         {
-            init_grid(pattern);
-            stage = StageTypeShowInfo;
+            init_grid(initpattern);
+            stage = STAGE_SHOWINFO;
             timer = 0;
         }
-        else if(stage == StageTypeShowInfo)
+        else if(stage == STAGE_SHOWINFO)
         {
             if(timer >= 2000)
             {
-                stage = StageTypeRunning;
+                stage = STAGE_RUNNING;
                 timer = 0;
             }
         }
-        else if(stage == StageTypeRunning)
+        else if(stage == STAGE_RUNNING)
         {
             if(end_detection())
             {
-                stage = StageTypeEnd;
+                stage = STAGE_END;
                 timer = 0;
             }
             else
@@ -667,24 +666,24 @@ int main(void)
                 update_grid();
             }
         }
-        else if(stage == StageTypeEnd)
+        else if(stage == STAGE_END)
         {
             update_grid();
             if(timer >= 5000)
             {
-                if(mode == MODE_NEXT)
+                if(automode == AUTOMODE_NEXT)
                 {
-                    pattern++;
-                    pattern %= PatternTypeCycleMax;
-                    stage = StageTypeInit;
+                    initpattern++;
+                    initpattern %= INITPATTERN_CYCLEMAX;
+                    stage = STAGE_INIT;
                     timer = 0;
                 }
-                else if(mode == MODE_LOOP)
+                else if(automode == AUTOMODE_LOOP)
                 {
-                    stage = StageTypeInit;
+                    stage = STAGE_INIT;
                     timer = 0;
                 }
-                else // MODE_STOP
+                else // AUTOMODE_STOP
                 {
                     // Do nothing
                     timer = 5000;
@@ -698,9 +697,9 @@ int main(void)
     }
 
     // Ask to end program
-    wattron(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+    wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
     mvwaddstr(w_status, 0, 0, " Press any key to quit");
-    wattroff(w_status, COLOR_PAIR(COLOR_PAIR_STANDARD));
+    wattroff(w_status, COLOR_PAIR(COLORS_STANDARD));
     wrefresh(w_status);
     wgetch(w_status);
 

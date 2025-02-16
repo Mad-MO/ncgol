@@ -4,6 +4,9 @@
 // License: MIT
 // Brief:   Implementation of the grid functions for the Game of Life
 
+#ifndef __GRID_H
+#define __GRID_H
+
 #include <stdint.h>
 
 
@@ -16,37 +19,44 @@
 #define GRID_HEIGHT_MAX 1000
 
 // Pointertye to: uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
-typedef const uint8_t grid_t[GRID_HEIGHT_MAX];
+typedef uint8_t grid_t[GRID_HEIGHT_MAX];
 
 
 
 typedef enum
 {
-    PatternTypeRandom,
-    PatternTypeStillLifes,
-    PatternTypeOscillators,
-    PatternTypeGlider,
-    PatternTypeSpaceships,
-    PatternTypeGliderGun,
-    PatternTypePentomino,
-    PatternTypeDiehard,
-    PatternTypeAcorn,
-    PatternTypeBlockEngine1,
-    PatternTypeBlockEngine2,
-    PatternTypeDoubleBlockEngine,
+    INITPATTERN_RANDOM,
+    INITPATTERN_CONWAY,
+    INITPATTERN_STILLLIFES,
+    INITPATTERN_OSCILLATORS,
+    INITPATTERN_GLIDER,
+    INITPATTERN_SPACESHIPS,
+    INITPATTERN_GLIDERGUN,
+    INITPATTERN_PENTOMINO,
+    INITPATTERN_DIEHARD,
+    INITPATTERN_ACORN,
+    INITPATTERN_BLOCKENGINE1,
+    INITPATTERN_BLOCKENGINE2,
+    INITPATTERN_DOUBLEBLOCKENGINE,
     // ----------------
-    PatternTypeCycleMax, // Boundary for cycling through patterns
-    PatternTypeClear,    // Special pattern to clear the grid
-    PatternTypeMax
-} PatternType;
+    INITPATTERN_CYCLEMAX, // Boundary for cycling through patterns
+    INITPATTERN_CLEAR,    // Special pattern to clear the grid
+    INITPATTERN_MAX
+} initpattern_t;
 
 
 
 // Function to set the grid size
 void set_grid_size(uint16_t width, uint16_t height);
 
+// Function to get grid width
+uint16_t get_grid_width(void);
+
+// Function to get grid height
+uint16_t get_grid_height(void);
+
 // Function to initialize the grid
-void init_grid(PatternType pattern);
+void init_grid(initpattern_t pattern);
 
 // Function to update the grid based on the game of life rules
 void update_grid(void);
@@ -61,7 +71,9 @@ uint32_t get_cells_alive(void);
 uint32_t get_cycle_counter(void);
 
 // Return text string for pattern
-const char * get_pattern_str(PatternType pattern);
+const char * get_pattern_str(initpattern_t pattern);
 
 // Function to detect the end of the simulation
 uint8_t end_detection(void);
+
+#endif // __GRID_H

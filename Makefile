@@ -17,7 +17,8 @@ ifeq ($(shell uname -s), Linux)
 endif
 
 OBJECTS = $(BUILD)/ncgol.o \
-          $(BUILD)/grid.o
+          $(BUILD)/grid.o \
+		  $(BUILD)/patterns.o
 
 
 

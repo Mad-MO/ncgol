@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "grid.h"
+#include "patterns.h"
 
 
 
@@ -24,8 +25,6 @@ static uint8_t  end_det_pos;
 static uint16_t grid_width;
 static uint16_t grid_height;
 
-static PatternType pattern;
-
 
 
 // Function to set the grid size
@@ -37,24 +36,42 @@ void set_grid_size(uint16_t width, uint16_t height)
 
 
 
-// Function to initialize the grid
-void init_grid(PatternType pattern)
+// Function to get grid width
+uint16_t get_grid_width(void)
 {
-    if(pattern < PatternTypeMax)
-        pattern = pattern;
-    else
+    return grid_width;
+}
+
+
+
+// Function to get grid height
+uint16_t get_grid_height(void)
+{
+    return grid_height;
+}
+
+
+
+// Function to initialize the grid
+void init_grid(initpattern_t pattern)
+{
+    if(pattern >= INITPATTERN_MAX)
         return;
 
     memset(grid, 0, sizeof(grid));
 
-    if     (pattern == PatternTypeRandom)
+    if     (pattern == INITPATTERN_RANDOM)
     {
         uint16_t x, y;
         for(x=0; x<grid_width; x++)
             for(y=0; y<grid_height; y++)
                 grid[x][y] = (random() & 1);
     }
-    else if(pattern == PatternTypeStillLifes)
+    else if(pattern == INITPATTERN_CONWAY)
+    {
+        init_pattern_to_grid(PATTERN_CONWAY, grid, 10, 10);
+    }
+    else if(pattern == INITPATTERN_STILLLIFES)
     {
         // Block
         grid[1][1] = 1;
@@ -92,7 +109,7 @@ void init_grid(PatternType pattern)
         grid[22][3] = 1;
         grid[23][2] = 1;
     }
-    else if(pattern == PatternTypeOscillators)
+    else if(pattern == INITPATTERN_OSCILLATORS)
     {
         // Blinker
         grid[2][1] = 1;
@@ -129,7 +146,7 @@ void init_grid(PatternType pattern)
         grid[12][11] = 1;
         grid[13][11] = 1;
     }
-    else if(pattern == PatternTypeGlider)
+    else if(pattern == INITPATTERN_GLIDER)
     {
         grid[1][3] = 1;
         grid[2][1] = 1;
@@ -137,7 +154,7 @@ void init_grid(PatternType pattern)
         grid[3][2] = 1;
         grid[3][3] = 1;
     }
-    else if(pattern == PatternTypeSpaceships)
+    else if(pattern == INITPATTERN_SPACESHIPS)
     {
         // Lightweight spaceship (LWSS)
         grid[1][1] = 1;
@@ -178,7 +195,7 @@ void init_grid(PatternType pattern)
         grid[7][23] = 1;
         grid[7][24] = 1;
     }
-    else if(pattern == PatternTypeGliderGun)
+    else if(pattern == INITPATTERN_GLIDERGUN)
     {
         grid[1][5] = 1;
         grid[1][6] = 1;
@@ -217,7 +234,7 @@ void init_grid(PatternType pattern)
         grid[36][3] = 1;
         grid[36][4] = 1;
     }
-    else if(pattern == PatternTypePentomino)
+    else if(pattern == INITPATTERN_PENTOMINO)
     {
         grid[0+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][0+(grid_height/2)] = 1;
@@ -225,7 +242,7 @@ void init_grid(PatternType pattern)
         grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
         grid[2+(grid_width/2)][0+(grid_height/2)] = 1;
     }
-    else if(pattern == PatternTypeDiehard)
+    else if(pattern == INITPATTERN_DIEHARD)
     {
         grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][4+(grid_height/2)] = 1;
@@ -235,7 +252,7 @@ void init_grid(PatternType pattern)
         grid[6+(grid_width/2)][5+(grid_height/2)] = 1;
         grid[7+(grid_width/2)][5+(grid_height/2)] = 1;
     }
-    else if(pattern == PatternTypeAcorn)
+    else if(pattern == INITPATTERN_ACORN)
     {
         grid[0+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
@@ -245,7 +262,7 @@ void init_grid(PatternType pattern)
         grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[6+(grid_width/2)][4+(grid_height/2)] = 1;
     }
-    else if(pattern == PatternTypeBlockEngine1)
+    else if(pattern == INITPATTERN_BLOCKENGINE1)
     {
         grid[1+(grid_width/2)][6+(grid_height/2)] = 1;
         grid[3+(grid_width/2)][5+(grid_height/2)] = 1;
@@ -258,7 +275,7 @@ void init_grid(PatternType pattern)
         grid[7+(grid_width/2)][3+(grid_height/2)] = 1;
         grid[8+(grid_width/2)][2+(grid_height/2)] = 1;
     }
-    else if(pattern == PatternTypeBlockEngine2)
+    else if(pattern == INITPATTERN_BLOCKENGINE2)
     {
         grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[1+(grid_width/2)][2+(grid_height/2)] = 1;
@@ -274,7 +291,7 @@ void init_grid(PatternType pattern)
         grid[5+(grid_width/2)][4+(grid_height/2)] = 1;
         grid[5+(grid_width/2)][5+(grid_height/2)] = 1;
     }
-    else if(pattern == PatternTypeDoubleBlockEngine)
+    else if(pattern == INITPATTERN_DOUBLEBLOCKENGINE)
     {
         grid[1+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[2+(grid_width/2)][1+(grid_height/2)] = 1;
@@ -305,7 +322,7 @@ void init_grid(PatternType pattern)
         grid[38+(grid_width/2)][1+(grid_height/2)] = 1;
         grid[39+(grid_width/2)][1+(grid_height/2)] = 1;
     }
-    else            // PatternTypeClear
+    else            // INITPATTERN_CLEAR
     {
         // Do nothing
     }
@@ -387,31 +404,31 @@ uint32_t get_cycle_counter(void)
 
 
 // Return text string for pattern
-const char * get_pattern_str(PatternType pattern)
+const char * get_pattern_str(initpattern_t pattern)
 {
-    if     (pattern == PatternTypeRandom)
+    if     (pattern == INITPATTERN_RANDOM)
         return "Random";
-    else if(pattern == PatternTypeStillLifes)
+    else if(pattern == INITPATTERN_STILLLIFES)
         return "Still lifes";
-    else if(pattern == PatternTypeOscillators)
+    else if(pattern == INITPATTERN_OSCILLATORS)
         return "Oscillators";
-    else if(pattern == PatternTypeGlider)
+    else if(pattern == INITPATTERN_GLIDER)
         return "Glider";
-    else if(pattern == PatternTypeSpaceships)
+    else if(pattern == INITPATTERN_SPACESHIPS)
         return "Spaceships";
-    else if(pattern == PatternTypeGliderGun)
+    else if(pattern == INITPATTERN_GLIDERGUN)
         return "Glider gun";
-    else if(pattern == PatternTypePentomino)
+    else if(pattern == INITPATTERN_PENTOMINO)
         return "Pentomino";
-    else if(pattern == PatternTypeDiehard)
+    else if(pattern == INITPATTERN_DIEHARD)
         return "Diehard";
-    else if(pattern == PatternTypeAcorn)
+    else if(pattern == INITPATTERN_ACORN)
         return "Acorn";
-    else if(pattern == PatternTypeBlockEngine1)
+    else if(pattern == INITPATTERN_BLOCKENGINE1)
         return "Block engine 1";
-    else if(pattern == PatternTypeBlockEngine2)
+    else if(pattern == INITPATTERN_BLOCKENGINE2)
         return "Block engine 2";
-    else if(pattern == PatternTypeDoubleBlockEngine)
+    else if(pattern == INITPATTERN_DOUBLEBLOCKENGINE)
         return "Double block engine";
     else
         return "?";
@@ -427,15 +444,15 @@ uint8_t end_detection(void)
     end_det[end_det_pos] = cells_alive;
     if(cells_alive == 0)
         return 1;
-    if(cycle_counter > END_DET_CNT)                                 // At least END_DET_CNT cycles needed for detection
+    if(cycle_counter > END_DET_CNT)                                    // At least END_DET_CNT cycles needed for detection
     {
-        for(uint8_t pattern=1; pattern<=(END_DET_CNT/2); pattern++) // Test pattern in the length of 1 to half of the buffer
+        for(uint8_t sequence=1; sequence<=(END_DET_CNT/2); sequence++) // Test sequence in the length of 1 to half of the buffer
         {
-            for(uint8_t testpos=pattern; testpos<END_DET_CNT; testpos++)
+            for(uint8_t testpos=sequence; testpos<END_DET_CNT; testpos++)
             {
-                if(end_det[testpos] != end_det[testpos % pattern])  // Pattern not found? -> End loop and test next pattern
+                if(end_det[testpos] != end_det[testpos % sequence])    // Pattern not found? -> End loop and test next sequence
                     break;
-                if(testpos == END_DET_CNT - 1)                      // End of loop reached? -> Pattern found!
+                if(testpos == END_DET_CNT - 1)                         // End of loop reached? -> Pattern found!
                     return 1;
             }
         }
