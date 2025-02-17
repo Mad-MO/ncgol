@@ -73,7 +73,7 @@ uint32_t get_cycle_counter(void);
 // Return text string for initpattern
 const char* get_initpattern_str(initpattern_t initpattern);
 
-// Function to detect the end of the simulation
-uint8_t end_detection(void);
+// Return if end of simulation has been detected
+uint8_t get_end_detected(void);
 
 #endif // __GRID_H

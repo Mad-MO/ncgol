@@ -24,6 +24,10 @@ static uint8_t  end_det[END_DET_CNT];
 static uint8_t  end_det_pos;
 static uint16_t grid_width;
 static uint16_t grid_height;
+static uint8_t  end_detected = 0;
+
+// Function to detect the end of the simulation
+uint8_t end_detection(void);
 
 
 
@@ -207,6 +211,8 @@ void update_grid(void)
     }
 
     memcpy(grid, new_grid, sizeof(grid));
+
+    end_detected = end_detection();
 }
 
 
@@ -292,4 +298,12 @@ uint8_t end_detection(void)
         }
     }
     return 0;
+}
+
+
+
+// Return if end of simulation has been detected
+uint8_t get_end_detected(void)
+{
+    return end_detected;
 }

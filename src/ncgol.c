@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Handle end detection from grid_update (bugfix for wrong startup end detection???)
 // TODO: Comment how the grid is build (x/y vs. width/height and max values)
 // TODO: Add pattern Pulsar
 // TODO: Improve the end detection (Large grid with gliders)
@@ -610,14 +609,11 @@ int main(void)
         }
         else if(stage == STAGE_RUNNING)
         {
-            if(end_detection())
+            update_grid();
+            if(get_end_detected())
             {
                 stage = STAGE_END;
                 timer = 0;
-            }
-            else
-            {
-                update_grid();
             }
         }
         else if(stage == STAGE_END)
