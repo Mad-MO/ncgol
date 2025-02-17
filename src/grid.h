@@ -18,8 +18,31 @@
 #define GRID_WIDTH_MAX  2500 // 2500*1000*2 = ~5 MB
 #define GRID_HEIGHT_MAX 1000
 
-// Pointertye to: uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
+// Pointertype to: uint8_t grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 typedef uint8_t grid_t[GRID_HEIGHT_MAX];
+
+//                                     (width)     (GRID_WIDTH_MAX)
+//     0 1 2 3 4 5 6 7 8 9 . . .      grid size    reserved memory
+//     +----------------------------------|-------------->| (x)
+//   0 |                 .
+//   1 |                 .
+//   2 |                 .
+//   3 |                 .
+//   4 |                 .
+//   5 | . . . . . . . . #      <-- grid[9][5] = 1
+//   6 |                   #
+//   7 |               # # #
+//   8 |
+//   9 |
+//   . |
+//   . |
+//   . --- (height)
+//     |   grid size
+//     |
+//     |
+//     V
+//     --- (GRID_HEIGHT_MAX)
+//    (y)   reserved memory
 
 
 
