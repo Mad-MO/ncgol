@@ -27,12 +27,12 @@ static uint16_t grid_height;
 static uint8_t  end_detected = 0;
 
 // Function to detect the end of the simulation
-uint8_t end_detection(void);
+static uint8_t handle_end_detection(void);
 
 
 
 // Function to set the grid size
-void set_grid_size(uint16_t width, uint16_t height)
+void grid_set_size(uint16_t width, uint16_t height)
 {
     grid_width  = width;
     grid_height = height;
@@ -41,7 +41,7 @@ void set_grid_size(uint16_t width, uint16_t height)
 
 
 // Function to get grid width
-uint16_t get_grid_width(void)
+uint16_t grid_get_width(void)
 {
     return grid_width;
 }
@@ -49,7 +49,7 @@ uint16_t get_grid_width(void)
 
 
 // Function to get grid height
-uint16_t get_grid_height(void)
+uint16_t grid_get_height(void)
 {
     return grid_height;
 }
@@ -57,7 +57,7 @@ uint16_t get_grid_height(void)
 
 
 // Function to initialize the grid
-void init_grid(initpattern_t pattern)
+void grid_init(initpattern_t pattern)
 {
     if(pattern >= INITPATTERN_MAX)
         return;
@@ -74,89 +74,89 @@ void init_grid(initpattern_t pattern)
     else if(pattern == INITPATTERN_CONWAY)
     {
         // Conway
-        set_pattern_to_grid_center(PATTERN_CONWAY, grid);
+        patterns_set_to_center(PATTERN_CONWAY, grid);
     }
     else if(pattern == INITPATTERN_STILLLIFES)
     {
         // Block
-        set_pattern_to_grid_pos(PATTERN_BLOCK, grid, 1, 1);
+        patterns_set_to_pos(PATTERN_BLOCK, grid, 1, 1);
 
         // Beehive
-        set_pattern_to_grid_pos(PATTERN_BEEHIVE, grid, 5, 1);
+        patterns_set_to_pos(PATTERN_BEEHIVE, grid, 5, 1);
 
         // Loaf
-        set_pattern_to_grid_pos(PATTERN_LOAF, grid, 11, 1);
+        patterns_set_to_pos(PATTERN_LOAF, grid, 11, 1);
 
         // Boat
-        set_pattern_to_grid_pos(PATTERN_BOAT, grid, 17, 1);
+        patterns_set_to_pos(PATTERN_BOAT, grid, 17, 1);
 
         // Tub
-        set_pattern_to_grid_pos(PATTERN_TUB, grid, 22, 1);
+        patterns_set_to_pos(PATTERN_TUB, grid, 22, 1);
     }
     else if(pattern == INITPATTERN_OSCILLATORS)
     {
         // Blinker
-        set_pattern_to_grid_pos(PATTERN_BLINKER, grid, 1, 2);
+        patterns_set_to_pos(PATTERN_BLINKER, grid, 1, 2);
 
         // Toad
-        set_pattern_to_grid_pos(PATTERN_TOAD, grid, 6, 2);
+        patterns_set_to_pos(PATTERN_TOAD, grid, 6, 2);
 
         // Beacon
-        set_pattern_to_grid_pos(PATTERN_BEACON, grid, 12, 2);
+        patterns_set_to_pos(PATTERN_BEACON, grid, 12, 2);
 
         // Penta-decathlon
-        set_pattern_to_grid_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
+        patterns_set_to_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
     }
     else if(pattern == INITPATTERN_GLIDER)
     {
         // Glider
-        set_pattern_to_grid_pos(PATTERN_GLIDER, grid, 1, 1);
+        patterns_set_to_pos(PATTERN_GLIDER, grid, 1, 1);
     }
     else if(pattern == INITPATTERN_SPACESHIPS)
     {
         // Lightweight spaceship (LWSS)
-        set_pattern_to_grid_pos(PATTERN_LWSS, grid, 1, 1);
+        patterns_set_to_pos(PATTERN_LWSS, grid, 1, 1);
 
         // Middleweight spaceship (MWSS)
-        set_pattern_to_grid_pos(PATTERN_MWSS, grid, 1, 7);
+        patterns_set_to_pos(PATTERN_MWSS, grid, 1, 7);
 
         // Heavyweight spaceship (HWSS)
-        set_pattern_to_grid_pos(PATTERN_HWSS, grid, 1, 14);
+        patterns_set_to_pos(PATTERN_HWSS, grid, 1, 14);
     }
     else if(pattern == INITPATTERN_GLIDERGUN)
     {
         // Glider gun
-        set_pattern_to_grid_pos(PATTERN_GLIDERGUN, grid, 1, 1);
+        patterns_set_to_pos(PATTERN_GLIDERGUN, grid, 1, 1);
     }
     else if(pattern == INITPATTERN_PENTOMINO)
     {
         // Pentomino
-        set_pattern_to_grid_center(PATTERN_PENTOMINO, grid);
+        patterns_set_to_center(PATTERN_PENTOMINO, grid);
     }
     else if(pattern == INITPATTERN_DIEHARD)
     {
         // Diehard
-        set_pattern_to_grid_center(PATTERN_DIEHARD, grid);
+        patterns_set_to_center(PATTERN_DIEHARD, grid);
     }
     else if(pattern == INITPATTERN_ACORN)
     {
         // Acorn
-        set_pattern_to_grid_center(PATTERN_ACORN, grid);
+        patterns_set_to_center(PATTERN_ACORN, grid);
     }
     else if(pattern == INITPATTERN_BLOCKENGINE1)
     {
         // Block engine 1
-        set_pattern_to_grid_center(PATTERN_BLOCKENGINE1, grid);
+        patterns_set_to_center(PATTERN_BLOCKENGINE1, grid);
     }
     else if(pattern == INITPATTERN_BLOCKENGINE2)
     {
         // Block engine 2
-        set_pattern_to_grid_center(PATTERN_BLOCKENGINE2, grid);
+        patterns_set_to_center(PATTERN_BLOCKENGINE2, grid);
     }
     else if(pattern == INITPATTERN_DOUBLEBLOCKENGINE)
     {
         // Double block engine
-        set_pattern_to_grid_center(PATTERN_DOUBLEBLOCKENGINE, grid);
+        patterns_set_to_center(PATTERN_DOUBLEBLOCKENGINE, grid);
     }
     else            // INITPATTERN_CLEAR
     {
@@ -169,7 +169,7 @@ void init_grid(initpattern_t pattern)
 
 
 // Function to update the grid based on the game of life rules
-void update_grid(void)
+void grid_update(void)
 {
     uint16_t x, y;
 
@@ -212,13 +212,13 @@ void update_grid(void)
 
     memcpy(grid, new_grid, sizeof(grid));
 
-    end_detected = end_detection();
+    end_detected = handle_end_detection();
 }
 
 
 
 // Get pointer to grid
-grid_t * get_grid(void)
+grid_t * grid_get(void)
 {
     return grid;
 }
@@ -226,7 +226,7 @@ grid_t * get_grid(void)
 
 
 // Get count of cells which are alive
-uint32_t get_cells_alive(void)
+uint32_t grid_get_cells_alive(void)
 {
     return cells_alive;
 }
@@ -234,7 +234,7 @@ uint32_t get_cells_alive(void)
 
 
 // Get cycle counter
-uint32_t get_cycle_counter(void)
+uint32_t grid_get_cycle_counter(void)
 {
     return cycle_counter;
 }
@@ -242,34 +242,34 @@ uint32_t get_cycle_counter(void)
 
 
 // Return text string for pattern
-const char* get_initpattern_str(initpattern_t initpattern)
+const char* grid_get_initpattern_str(initpattern_t initpattern)
 {
     if     (initpattern == INITPATTERN_RANDOM)
         return "Random";
     else if(initpattern == INITPATTERN_CONWAY)
-        return get_pattern_str(PATTERN_CONWAY);
+        return patterns_get_str(PATTERN_CONWAY);
     else if(initpattern == INITPATTERN_STILLLIFES)
         return "Still lifes";
     else if(initpattern == INITPATTERN_OSCILLATORS)
         return "Oscillators";
     else if(initpattern == INITPATTERN_GLIDER)
-        return get_pattern_str(PATTERN_GLIDER);
+        return patterns_get_str(PATTERN_GLIDER);
     else if(initpattern == INITPATTERN_SPACESHIPS)
         return "Spaceships";
     else if(initpattern == INITPATTERN_GLIDERGUN)
-        return get_pattern_str(PATTERN_GLIDERGUN);
+        return patterns_get_str(PATTERN_GLIDERGUN);
     else if(initpattern == INITPATTERN_PENTOMINO)
-        return get_pattern_str(PATTERN_PENTOMINO);
+        return patterns_get_str(PATTERN_PENTOMINO);
     else if(initpattern == INITPATTERN_DIEHARD)
-        return get_pattern_str(PATTERN_DIEHARD);
+        return patterns_get_str(PATTERN_DIEHARD);
     else if(initpattern == INITPATTERN_ACORN)
-        return get_pattern_str(PATTERN_ACORN);
+        return patterns_get_str(PATTERN_ACORN);
     else if(initpattern == INITPATTERN_BLOCKENGINE1)
-        return get_pattern_str(PATTERN_BLOCKENGINE1);
+        return patterns_get_str(PATTERN_BLOCKENGINE1);
     else if(initpattern == INITPATTERN_BLOCKENGINE2)
-        return get_pattern_str(PATTERN_BLOCKENGINE2);
+        return patterns_get_str(PATTERN_BLOCKENGINE2);
     else if(initpattern == INITPATTERN_DOUBLEBLOCKENGINE)
-        return get_pattern_str(PATTERN_DOUBLEBLOCKENGINE);
+        return patterns_get_str(PATTERN_DOUBLEBLOCKENGINE);
     else
         return "?";
 }
@@ -277,7 +277,7 @@ const char* get_initpattern_str(initpattern_t initpattern)
 
 
 // Function to detect the end of the simulation
-uint8_t end_detection(void)
+static uint8_t handle_end_detection(void)
 {
     end_det_pos++;
     end_det_pos %= END_DET_CNT;
@@ -303,7 +303,7 @@ uint8_t end_detection(void)
 
 
 // Return if end of simulation has been detected
-uint8_t get_end_detected(void)
+uint8_t grit_end_detected(void)
 {
     return end_detected;
 }

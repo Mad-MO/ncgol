@@ -40,13 +40,13 @@ typedef enum
 
 
 // Set pattern to grid at position
-void set_pattern_to_grid_pos(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16_t y_pos);
+void patterns_set_to_pos(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16_t y_pos);
 
 // Set pattern to grid center
-void set_pattern_to_grid_center(pattern_t, grid_t *grid);
+void patterns_set_to_center(pattern_t, grid_t *grid);
 
 // Return text string for initpattern
-const char * get_pattern_str(pattern_t pattern);
+const char * patterns_get_str(pattern_t pattern);
 
 
 

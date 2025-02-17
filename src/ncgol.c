@@ -94,7 +94,7 @@ static automode_t automode;
 
 
 // Function to initialize the User Interface
-void init_tui(void);
+static void init_tui(void);
 
 // Function to draw a string in a rounded frame for the pattern name
 static void draw_str_in_frame(const char * str);
@@ -103,7 +103,7 @@ static void draw_str_in_frame(const char * str);
 static void draw_grid(void);
 
 // Function to handle input events
-void handle_inputs(void);
+static void handle_inputs(void);
 
 // Function to handle one life cycle of the simulation
 int main(void);
@@ -111,7 +111,7 @@ int main(void);
 
 
 // Function to initialize the User Interface
-void init_tui(void)
+static void init_tui(void)
 {
     // Set locale
     setlocale(LC_ALL, "");
@@ -172,7 +172,7 @@ void init_tui(void)
     }
     if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
     if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
-    set_grid_size(grid_width, grid_height);
+    grid_set_size(grid_width, grid_height);
 }
 
 
@@ -202,7 +202,7 @@ static void draw_grid(void)
 {
     uint16_t x, y;
     char str[16];
-    grid_t * grid = get_grid();
+    grid_t * grid = grid_get();
 
     // Draw grid to canvas
     wattron(w_grid, A_BOLD | COLOR_PAIR(COLORS_LIVE_CELL));
@@ -315,7 +315,7 @@ static void draw_grid(void)
     // Handle pattern info
     if(stage == STAGE_SHOWINFO)
     {
-        draw_str_in_frame(get_initpattern_str(initpattern));
+        draw_str_in_frame(grid_get_initpattern_str(initpattern));
     }
 
     // Handle end message
@@ -346,7 +346,7 @@ static void draw_grid(void)
 
         // Cycles
         strcpy(str_label, " Cycles:");
-        sprintf(str_value, "%3u", get_cycle_counter());
+        sprintf(str_value, "%3u", grid_get_cycle_counter());
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -357,7 +357,7 @@ static void draw_grid(void)
 
         // Cells
         strcpy(str_label, " Cells:");
-        sprintf(str_value, "%3u", get_cells_alive());
+        sprintf(str_value, "%3u", grid_get_cells_alive());
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -379,7 +379,7 @@ static void draw_grid(void)
 
         // Pattern
         strcpy(str_label, " Pattern:");
-        strcpy(str_value, get_initpattern_str(initpattern));
+        strcpy(str_value, grid_get_initpattern_str(initpattern));
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -465,7 +465,7 @@ static void draw_grid(void)
 
 
 // Function to handle input events
-void handle_inputs(void)
+static void handle_inputs(void)
 {
     int key = wgetch(w_grid);
     if(key==KEY_RESIZE)
@@ -598,7 +598,7 @@ int main(void)
         // Handle different patterns and update grid
         if     (stage == STAGE_STARTUP)
         {
-            init_grid(INITPATTERN_CLEAR);
+            grid_init(INITPATTERN_CLEAR);
             stage = STAGE_STARTWAIT;
             timer = 0;
         }
@@ -612,7 +612,7 @@ int main(void)
         }
         else if(stage == STAGE_INIT)
         {
-            init_grid(initpattern);
+            grid_init(initpattern);
             stage = STAGE_SHOWINFO;
             timer = 0;
         }
@@ -626,8 +626,8 @@ int main(void)
         }
         else if(stage == STAGE_RUNNING)
         {
-            update_grid();
-            if(get_end_detected())
+            grid_update();
+            if(grit_end_detected())
             {
                 stage = STAGE_END;
                 timer = 0;
@@ -635,7 +635,7 @@ int main(void)
         }
         else if(stage == STAGE_END)
         {
-            update_grid();
+            grid_update();
             if(timer >= 5000)
             {
                 if(automode == AUTOMODE_NEXT)

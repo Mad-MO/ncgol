@@ -47,33 +47,33 @@ typedef enum
 
 
 // Function to set the grid size
-void set_grid_size(uint16_t width, uint16_t height);
+void grid_set_size(uint16_t width, uint16_t height);
 
 // Function to get grid width
-uint16_t get_grid_width(void);
+uint16_t grid_get_width(void);
 
 // Function to get grid height
-uint16_t get_grid_height(void);
+uint16_t grid_get_height(void);
 
 // Function to initialize the grid
-void init_grid(initpattern_t pattern);
+void grid_init(initpattern_t pattern);
 
 // Function to update the grid based on the game of life rules
-void update_grid(void);
+void grid_update(void);
 
 // Get pointer to grid
-grid_t * get_grid(void);
+grid_t * grid_get(void);
 
 // Get count of cells which are alive
-uint32_t get_cells_alive(void);
+uint32_t grid_get_cells_alive(void);
 
 // Get cycle counter
-uint32_t get_cycle_counter(void);
+uint32_t grid_get_cycle_counter(void);
 
 // Return text string for initpattern
-const char* get_initpattern_str(initpattern_t initpattern);
+const char* grid_get_initpattern_str(initpattern_t initpattern);
 
 // Return if end of simulation has been detected
-uint8_t get_end_detected(void);
+uint8_t grit_end_detected(void);
 
 #endif // __GRID_H
