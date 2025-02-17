@@ -49,4 +49,5 @@ void set_pattern_to_grid_center(pattern_t, grid_t *grid);
 const char * get_pattern_str(pattern_t pattern);
 
 
+
 #endif // __PATTERNS_H

@@ -94,6 +94,23 @@ static automode_t automode;
 
 
 // Function to initialize the User Interface
+void init_tui(void);
+
+// Function to draw a string in a rounded frame for the pattern name
+static void draw_str_in_frame(const char * str);
+
+// Function to draw the grid on the canvas
+static void draw_grid(void);
+
+// Function to handle input events
+void handle_inputs(void);
+
+// Function to handle one life cycle of the simulation
+int main(void);
+
+
+
+// Function to initialize the User Interface
 void init_tui(void)
 {
     // Set locale
