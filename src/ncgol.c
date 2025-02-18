@@ -12,7 +12,6 @@
 
 // TODO: Rename Glider gun to Gosper glider gun
 // TODO: Add Simkin glider gun
-// TODO: Improve the end detection (Large grid with gliders)
 // TODO: Commandline options
 
 #include <curses.h>

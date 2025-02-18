@@ -19,7 +19,7 @@ static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
-#define END_DET_CNT 60
+#define END_DET_CNT 100
 static uint8_t  end_det[END_DET_CNT];
 static uint8_t  end_det_pos;
 static uint16_t grid_width;
@@ -27,7 +27,7 @@ static uint16_t grid_height;
 static uint8_t  end_detected = 0;
 
 // Function to detect the end of the simulation
-static uint8_t handle_end_detection(void);
+static void handle_end_detection(void);
 
 
 
@@ -63,6 +63,7 @@ void grid_init(initpattern_t pattern)
         return;
 
     memset(grid, 0, sizeof(grid));
+    end_detected = 0;
 
     if     (pattern == INITPATTERN_RANDOM)
     {
@@ -181,7 +182,10 @@ void grid_update(void)
 
     memset(new_grid, 0, sizeof(new_grid));
     cells_alive = 0;
-    cycle_counter++;
+    if(!end_detected)
+    {
+        cycle_counter++;
+    }
 
     for(x=0; x<grid_width; x++)
     {
@@ -217,8 +221,7 @@ void grid_update(void)
     }
 
     memcpy(grid, new_grid, sizeof(grid));
-
-    end_detected = handle_end_detection();
+    handle_end_detection();
 }
 
 
@@ -283,14 +286,16 @@ const char* grid_get_initpattern_str(initpattern_t initpattern)
 
 
 // Function to detect the end of the simulation
-static uint8_t handle_end_detection(void)
+static void handle_end_detection(void)
 {
     end_det_pos++;
     end_det_pos %= END_DET_CNT;
     end_det[end_det_pos] = cells_alive;
     if(cells_alive == 0)
-        return 1;
-    if(cycle_counter > END_DET_CNT)                                    // At least END_DET_CNT cycles needed for detection
+    {
+        end_detected = 1;
+    }
+    else if(cycle_counter > END_DET_CNT)                               // At least END_DET_CNT cycles needed for detection
     {
         for(uint8_t sequence=1; sequence<=(END_DET_CNT/2); sequence++) // Test sequence in the length of 1 to half of the buffer
         {
@@ -299,11 +304,16 @@ static uint8_t handle_end_detection(void)
                 if(end_det[testpos] != end_det[testpos % sequence])    // Pattern not found? -> End loop and test next sequence
                     break;
                 if(testpos == END_DET_CNT - 1)                         // End of loop reached? -> Pattern found!
-                    return 1;
+                {
+                    if(!end_detected)
+                    {
+                        cycle_counter -= END_DET_CNT;                  // Reset cycle counter to the point where the pattern was detected
+                    }
+                    end_detected = 1;
+                }
             }
         }
     }
-    return 0;
 }
 
 
