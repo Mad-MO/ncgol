@@ -34,9 +34,8 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - Conway (text string)
   - Still lifes
   - Oscillators
-  - Glider
   - Spaceships
-  - Glider gun
+  - Glider gun (Gosper and Simkin)
   - Pentomino
   - Diehard
   - Acorn

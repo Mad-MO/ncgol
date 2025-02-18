@@ -125,10 +125,15 @@ void grid_init(initpattern_t pattern)
         // Heavyweight spaceship (HWSS)
         patterns_set_to_pos(PATTERN_HWSS, grid, 7, 14);
     }
-    else if(pattern == INITPATTERN_GLIDERGUN)
+    else if(pattern == INITPATTERN_GOSPER_GLIDERGUN)
     {
-        // Glider gun
+        // Gosper Glider gun
         patterns_set_to_pos(PATTERN_GOSPER_GLIDERGUN, grid, 1, 1);
+    }
+    else if(pattern == INITPATTERN_SIMKIN_GLIDERGUN)
+    {
+        // Simkin lider gun
+        patterns_set_to_center(PATTERN_SIMKIN_GLIDERGUN, grid);
     }
     else if(pattern == INITPATTERN_PENTOMINO)
     {
@@ -263,8 +268,10 @@ const char* grid_get_initpattern_str(initpattern_t initpattern)
         return "Oscillators";
     else if(initpattern == INITPATTERN_SPACESHIPS)
         return "Spaceships";
-    else if(initpattern == INITPATTERN_GLIDERGUN)
+    else if(initpattern == INITPATTERN_GOSPER_GLIDERGUN)
         return patterns_get_str(PATTERN_GOSPER_GLIDERGUN);
+    else if(initpattern == INITPATTERN_SIMKIN_GLIDERGUN)
+        return patterns_get_str(PATTERN_SIMKIN_GLIDERGUN);
     else if(initpattern == INITPATTERN_PENTOMINO)
         return patterns_get_str(PATTERN_PENTOMINO);
     else if(initpattern == INITPATTERN_DIEHARD)
