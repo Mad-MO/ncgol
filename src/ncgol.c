@@ -103,7 +103,11 @@ static void draw_grid(void);
 static void handle_inputs(void);
 
 // Function to handle one life cycle of the simulation
-int main(void);
+int main(int argc, char * argv[]);
+
+// Handle the given commandline arguments
+static void handle_args(int argc, char * argv[]);
+
 
 
 
@@ -542,8 +546,11 @@ static void handle_inputs(void)
 
 
 // Function to handle one life cycle of the simulation
-int main(void)
+int main(int argc, char * argv[])
 {
+    // Handle commandline arguments
+    handle_args(argc, argv);
+
     // Initialize variables
     initpattern = INITPATTERN_RANDOM;
     speed       = 3;
@@ -671,4 +678,34 @@ int main(void)
     // End program
     endwin();
     exit(0);
+}
+
+
+
+void handle_args(int argc, char * argv[])
+{
+    // Handle commandline arguments
+    for(int i=1; i<argc; i++)
+    {
+        if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0))
+        {
+            printf("Usage:\n");
+            printf("  %s [options]\n", SW_NAME);
+            printf("\n");
+            printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
+            printf("\n");
+            printf("Options:\n");
+            printf("  -h, --help     This Help\n");
+            printf("\n");
+            printf("Command keys:\n"); // TODO: Get from help screen
+            printf("\n");
+            exit(0);
+        }
+        else
+        {
+            // TODO: Check for single letter combinations
+            printf("Unknown option: %s\n", argv[i]);
+            exit(1);
+        }
+    }
 }
