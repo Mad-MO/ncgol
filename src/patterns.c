@@ -20,6 +20,7 @@ void patterns_set_to_pos(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16
     pattern_desc_t *pattern_desc = pattern_list[pattern];
 
     // TODO: Check boundaries
+    // TODO: Check for null-pointer
 
     for(x=0; x<pattern_desc->width; x++)
     {
@@ -34,6 +35,8 @@ void patterns_set_to_pos(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16
 
 void patterns_set_to_center(pattern_t pattern, grid_t *grid)
 {
+    // TODO: Check for null-pointer
+
     uint16_t x_pos = (grid_get_width()  - pattern_list[pattern]->width)  / 2;
     uint16_t y_pos = (grid_get_height() - pattern_list[pattern]->height) / 2;
 

@@ -10,8 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Commandline options
-
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -717,7 +715,7 @@ void handle_args(int argc, char * argv[])
                 printf("Options:\n");
                 printf("  -h, --help     This Help\n");
                 printf("\n");
-                printf("Command keys:\n"); // TODO: Get from help screen
+                printf("Command keys:\n"); // TODO: Get text from help screen
                 printf("\n");
                 break;
 
