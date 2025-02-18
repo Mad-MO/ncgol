@@ -10,6 +10,8 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
+// TODO: Rename Glider gun to Gosper glider gun
+// TODO: Add Simkin glider gun
 // TODO: Improve the end detection (Large grid with gliders)
 // TODO: Commandline options
 
