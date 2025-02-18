@@ -26,7 +26,7 @@
 // Define SW name and Version
 #define SW_NAME "ncgol"
 #define SW_VERS "v0.5"
-#define AUTHOR  "by domo"
+#define AUTHOR  "domo"
 
 static uint8_t  speed;
 static uint16_t grid_width;
@@ -434,24 +434,25 @@ static void draw_grid(void)
             waddch(w_status, ' ');
 
         // Author
-        if((width-strlen(AUTHOR)-1) > pos)
+        char author[] = "by "AUTHOR;
+        if((width-strlen(author)-1) > pos)
         {
             wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
-            mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1, AUTHOR);
+            mvwaddstr(w_status, 0, width-strlen(author)-1, author);
         }
 
         // SW Version
-        if((width-strlen(AUTHOR)-1-strlen(SW_VERS)-1) > pos)
+        if((width-strlen(author)-1-strlen(SW_VERS)-1) > pos)
         {
             wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1-strlen(SW_VERS)-1, SW_VERS);
+            mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1, SW_VERS);
         }
 
         // SW Name
-        if((width-strlen(AUTHOR)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1) > pos)
+        if((width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1) > pos)
         {
             wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
-            mvwaddstr(w_status, 0, width-strlen(AUTHOR)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
+            mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
         }
     }
 
