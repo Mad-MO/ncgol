@@ -82,16 +82,16 @@ void grid_init(initpattern_t pattern)
         patterns_set_to_pos(PATTERN_BLOCK, grid, 1, 1);
 
         // Beehive
-        patterns_set_to_pos(PATTERN_BEEHIVE, grid, 5, 1);
+        patterns_set_to_pos(PATTERN_BEEHIVE, grid, 6, 1);
 
         // Loaf
-        patterns_set_to_pos(PATTERN_LOAF, grid, 11, 1);
+        patterns_set_to_pos(PATTERN_LOAF, grid, 13, 1);
 
         // Boat
-        patterns_set_to_pos(PATTERN_BOAT, grid, 17, 1);
+        patterns_set_to_pos(PATTERN_BOAT, grid, 20, 1);
 
         // Tub
-        patterns_set_to_pos(PATTERN_TUB, grid, 22, 1);
+        patterns_set_to_pos(PATTERN_TUB, grid, 26, 1);
     }
     else if(pattern == INITPATTERN_OSCILLATORS)
     {
@@ -99,29 +99,30 @@ void grid_init(initpattern_t pattern)
         patterns_set_to_pos(PATTERN_BLINKER, grid, 1, 2);
 
         // Toad
-        patterns_set_to_pos(PATTERN_TOAD, grid, 6, 2);
+        patterns_set_to_pos(PATTERN_TOAD, grid, 7, 2);
 
         // Beacon
-        patterns_set_to_pos(PATTERN_BEACON, grid, 12, 2);
+        patterns_set_to_pos(PATTERN_BEACON, grid, 14, 2);
+
+        // Pulsar
+        patterns_set_to_pos(PATTERN_PULSAR, grid, 22, 1);
 
         // Penta-decathlon
         patterns_set_to_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
     }
-    else if(pattern == INITPATTERN_GLIDER)
+    else if(pattern == INITPATTERN_SPACESHIPS)
     {
         // Glider
         patterns_set_to_pos(PATTERN_GLIDER, grid, 1, 1);
-    }
-    else if(pattern == INITPATTERN_SPACESHIPS)
-    {
+
         // Lightweight spaceship (LWSS)
-        patterns_set_to_pos(PATTERN_LWSS, grid, 1, 1);
+        patterns_set_to_pos(PATTERN_LWSS, grid, 7, 1);
 
         // Middleweight spaceship (MWSS)
-        patterns_set_to_pos(PATTERN_MWSS, grid, 1, 7);
+        patterns_set_to_pos(PATTERN_MWSS, grid, 7, 7);
 
         // Heavyweight spaceship (HWSS)
-        patterns_set_to_pos(PATTERN_HWSS, grid, 1, 14);
+        patterns_set_to_pos(PATTERN_HWSS, grid, 7, 14);
     }
     else if(pattern == INITPATTERN_GLIDERGUN)
     {
@@ -157,6 +158,11 @@ void grid_init(initpattern_t pattern)
     {
         // Double block engine
         patterns_set_to_center(PATTERN_DOUBLEBLOCKENGINE, grid);
+    }
+    else if(pattern == INITPATTERN_ILOVE8BIT)
+    {
+        // I love 8 bit
+        patterns_set_to_center(PATTERN_ILOVE8BIT, grid);
     }
     else            // INITPATTERN_CLEAR
     {
@@ -252,8 +258,6 @@ const char* grid_get_initpattern_str(initpattern_t initpattern)
         return "Still lifes";
     else if(initpattern == INITPATTERN_OSCILLATORS)
         return "Oscillators";
-    else if(initpattern == INITPATTERN_GLIDER)
-        return patterns_get_str(PATTERN_GLIDER);
     else if(initpattern == INITPATTERN_SPACESHIPS)
         return "Spaceships";
     else if(initpattern == INITPATTERN_GLIDERGUN)
@@ -270,6 +274,8 @@ const char* grid_get_initpattern_str(initpattern_t initpattern)
         return patterns_get_str(PATTERN_BLOCKENGINE2);
     else if(initpattern == INITPATTERN_DOUBLEBLOCKENGINE)
         return patterns_get_str(PATTERN_DOUBLEBLOCKENGINE);
+    else if(initpattern == INITPATTERN_ILOVE8BIT)
+        return patterns_get_str(PATTERN_ILOVE8BIT);
     else
         return "?";
 }

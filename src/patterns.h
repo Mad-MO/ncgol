@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "grid.h"
 
+// Has to be with same content as "pattern_list[]" in "patterns_data.h"
 typedef enum
 {
     PATTERN_CONWAY,
@@ -21,6 +22,7 @@ typedef enum
     PATTERN_BLINKER,
     PATTERN_TOAD,
     PATTERN_BEACON,
+    PATTERN_PULSAR,
     PATTERN_PENTA_DECATHLON,
     PATTERN_GLIDER,
     PATTERN_LWSS,
@@ -33,6 +35,7 @@ typedef enum
     PATTERN_BLOCKENGINE1,
     PATTERN_BLOCKENGINE2,
     PATTERN_DOUBLEBLOCKENGINE,
+    PATTERN_ILOVE8BIT,
     // ------------
     PATTERN_MAX
 } pattern_t;

@@ -135,6 +135,29 @@ pattern_desc_t beacon =
     }
 };
 
+pattern_desc_t pulsar =
+{
+    .width  = 13,
+    .height = 13,
+    .name   = "Pulsar",
+    .pattern =
+    {// 1 2 3 4 5 6 7 8 9 0 1 2 3
+        _,_,X,X,X,_,_,_,X,X,X,_,_,
+        _,_,_,_,_,_,_,_,_,_,_,_,_,
+        X,_,_,_,_,X,_,X,_,_,_,_,X,
+        X,_,_,_,_,X,_,X,_,_,_,_,X,
+        X,_,_,_,_,X,_,X,_,_,_,_,X,
+        _,_,X,X,X,_,_,_,X,X,X,_,_,
+        _,_,_,_,_,_,_,_,_,_,_,_,_,
+        _,_,X,X,X,_,_,_,X,X,X,_,_,
+        X,_,_,_,_,X,_,X,_,_,_,_,X,
+        X,_,_,_,_,X,_,X,_,_,_,_,X,
+        X,_,_,_,_,X,_,X,_,_,_,_,X,
+        _,_,_,_,_,_,_,_,_,_,_,_,_,
+        _,_,X,X,X,_,_,_,X,X,X,_,_
+    }
+};
+
 pattern_desc_t penta_decathlon =
 {
     .width  = 10,
@@ -309,8 +332,24 @@ pattern_desc_t doubleblockengine =
     }
 };
 
+pattern_desc_t ilove8bit =
+{
+    .width  = 25,
+    .height = 5,
+    .name   = "I love 8-bit",
+    .pattern =
+    {// 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+        X,_,_,X,_,X,_,_,X,X,X,_,_,_,_,_,X,X,_,_,X,_,X,X,X,
+        X,_,X,X,X,X,X,_,X,_,X,_,_,_,_,_,X,_,X,_,X,_,_,X,_,
+        X,_,X,X,X,X,X,_,X,X,X,_,X,X,X,_,X,X,_,_,X,_,_,X,_,
+        X,_,_,X,X,X,_,_,X,_,X,_,_,_,_,_,X,_,X,_,X,_,_,X,_,
+        X,_,_,_,X,_,_,_,X,X,X,_,_,_,_,_,X,X,_,_,X,_,_,X,_,
+    }
+};
 
 
+
+// Has to be with same content as enum "pattern_t" in "patterns.h"
 pattern_desc_t *pattern_list[] =
 {
     &conway,
@@ -322,6 +361,7 @@ pattern_desc_t *pattern_list[] =
     &blinker,
     &toad,
     &beacon,
+    &pulsar,
     &penta_decathlon,
     &glider,
     &lwss,
@@ -333,5 +373,6 @@ pattern_desc_t *pattern_list[] =
     &acorn,
     &blockengine1,
     &blockengine2,
-    &doubleblockengine
+    &doubleblockengine,
+    &ilove8bit
 };
