@@ -128,7 +128,7 @@ void grid_init(initpattern_t pattern)
     else if(pattern == INITPATTERN_GLIDERGUN)
     {
         // Glider gun
-        patterns_set_to_pos(PATTERN_GLIDERGUN, grid, 1, 1);
+        patterns_set_to_pos(PATTERN_GOSPER_GLIDERGUN, grid, 1, 1);
     }
     else if(pattern == INITPATTERN_PENTOMINO)
     {
@@ -264,7 +264,7 @@ const char* grid_get_initpattern_str(initpattern_t initpattern)
     else if(initpattern == INITPATTERN_SPACESHIPS)
         return "Spaceships";
     else if(initpattern == INITPATTERN_GLIDERGUN)
-        return patterns_get_str(PATTERN_GLIDERGUN);
+        return patterns_get_str(PATTERN_GOSPER_GLIDERGUN);
     else if(initpattern == INITPATTERN_PENTOMINO)
         return patterns_get_str(PATTERN_PENTOMINO);
     else if(initpattern == INITPATTERN_DIEHARD)

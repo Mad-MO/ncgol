@@ -230,11 +230,11 @@ pattern_desc_t hwss =
     }
 };
 
-pattern_desc_t glidergun =
+pattern_desc_t gosperglidergun =
 {
     .width = 36,
     .height = 9,
-    .name = "Glider gun",
+    .name = "Gosper Glider gun",
     .pattern =
     {// 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
         _,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,X,_,_,_,_,_,_,_,_,_,_,_,
@@ -367,7 +367,7 @@ pattern_desc_t *pattern_list[] =
     &lwss,
     &mwss,
     &hwss,
-    &glidergun,
+    &gosperglidergun,
     &pentomino,
     &diehard,
     &acorn,
