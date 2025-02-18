@@ -25,7 +25,7 @@
 
 // Define SW name and Version
 #define SW_NAME "ncgol"
-#define SW_VERS "v0.4"
+#define SW_VERS "v0.5"
 #define AUTHOR  "by domo"
 
 static uint8_t  speed;
