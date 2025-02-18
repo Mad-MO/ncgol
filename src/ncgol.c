@@ -19,6 +19,7 @@
 #include <locale.h>
 #include <ctype.h>
 #include <time.h>
+#include <getopt.h>
 #include "grid.h"
 
 
@@ -548,9 +549,6 @@ static void handle_inputs(void)
 // Function to handle one life cycle of the simulation
 int main(int argc, char * argv[])
 {
-    // Handle commandline arguments
-    handle_args(argc, argv);
-
     // Initialize variables
     initpattern = INITPATTERN_RANDOM;
     speed       = 3;
@@ -562,6 +560,9 @@ int main(int argc, char * argv[])
     #else
         style   = STYLE_HASH;
     #endif
+
+    // Handle commandline arguments
+    handle_args(argc, argv);
 
     // Initialize ncurses and grid
     init_tui();
@@ -685,27 +686,80 @@ int main(int argc, char * argv[])
 void handle_args(int argc, char * argv[])
 {
     // Handle commandline arguments
-    for(int i=1; i<argc; i++)
+    // https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Options.html
+    while (1)
     {
-        if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0))
+        static struct option long_options[] =
         {
-            printf("Usage:\n");
-            printf("  %s [options]\n", SW_NAME);
-            printf("\n");
-            printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
-            printf("\n");
-            printf("Options:\n");
-            printf("  -h, --help     This Help\n");
-            printf("\n");
-            printf("Command keys:\n"); // TODO: Get from help screen
-            printf("\n");
-            exit(0);
-        }
-        else
+            // TODO: charstyle   -c, --charstyle
+            {"help",   no_argument,       0, 'h'},
+            // TODO: initpattern -i, --init
+            // TODO: automode    -m, --mode
+            {"speed",  required_argument, 0, 's'},
+            {"nowait", no_argument,       0, 'n'},
+            {0,        0,                 0,   0}
+        };
+
+        int c = getopt_long(argc, argv, "hns:", long_options, 0);
+
+        // Detect the end of the options
+        if (c == -1)
+            break;
+
+        switch(c)
         {
-            // TODO: Check for single letter combinations
-            printf("Unknown option: %s\n", argv[i]);
-            exit(1);
+            case 'h':
+                printf("Usage:\n");
+                printf("  %s [options]\n", SW_NAME);
+                printf("\n");
+                printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
+                printf("\n");
+                printf("Options:\n");
+                printf("  -h, --help     This Help\n");
+                printf("\n");
+                printf("Command keys:\n"); // TODO: Get from help screen
+                printf("\n");
+                break;
+
+            case 's':
+            {
+                int val = atoi(optarg);
+                if((val >= 1) && (val <= 10))
+                {
+                    speed = val;
+                }
+                else
+                {
+                    printf("Invalid speed value: %s\n", optarg);
+                    printf("Speed must be between 1 and 10\n");
+                    exit(1);
+                }
+                break;
+            }
+
+            case 'n':
+                stage = STAGE_INIT;
+                break;
+
+            case '?':
+                // getopt_long() already printed an error message
+                exit(1);
+                break;
+
+            default:
+                exit(1);
         }
+    }
+
+    // Print any remaining command line arguments (not options)
+    if (optind < argc)
+    {
+        printf ("%s: unrecognized argument ", SW_NAME);
+        while (optind < argc)
+        {
+            printf ("\'%s\' ", argv[optind++]);
+        }
+        printf("\n");
+        exit(1);
     }
 }
