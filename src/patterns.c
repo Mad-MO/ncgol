@@ -67,3 +67,33 @@ const char * patterns_get_str(pattern_t pattern)
         return "?";
     }
 }
+
+
+
+// Get pattern width
+uint16_t patterns_get_width(pattern_t pattern)
+{
+    if(pattern < PATTERN_MAX) // Check boundaries
+    {
+        return pattern_list[pattern]->width;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+
+// Get pattern height
+uint16_t patterns_get_height(pattern_t pattern)
+{
+    if(pattern < PATTERN_MAX) // Check boundaries
+    {
+        return pattern_list[pattern]->height;
+    }
+    else
+    {
+        return 0;
+    }
+}

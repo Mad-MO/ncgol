@@ -14,6 +14,7 @@
 typedef enum
 {
     PATTERN_CONWAY,
+    PATTERN_CONWAY_FULL,
     PATTERN_BLOCK,
     PATTERN_BEEHIVE,
     PATTERN_LOAF,
@@ -51,6 +52,12 @@ void patterns_set_to_center(pattern_t, grid_t *grid);
 
 // Return text string for initpattern
 const char * patterns_get_str(pattern_t pattern);
+
+// Get pattern width
+uint16_t patterns_get_width(pattern_t pattern);
+
+// Get pattern height
+uint16_t patterns_get_height(pattern_t pattern);
 
 
 

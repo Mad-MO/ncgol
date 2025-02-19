@@ -12,7 +12,6 @@
 
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
-// TODO: New pattern "Conway's Game of Life"
 
 #include <curses.h>
 #include <stdlib.h>
