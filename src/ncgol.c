@@ -90,6 +90,16 @@ typedef enum
 } automode_t;
 static automode_t automode;
 
+#define COMMAND_KEYS_STR "Command keys:\n"                                   \
+                         "  \'q\'                 End program\n"             \
+                         "  \'Up\' and \'Down\'     Adjust speed\n"          \
+                         "  \'0\'...\'9\'           Set speed directly\n"    \
+                         "  \'Left\' and \'Right\'  Change pattern\n"        \
+                         "  \'Space\'             Restart current pattern\n" \
+                         "  \'s\'                 Change style\n"            \
+                         "  \'m\'                 Change mode\n"             \
+                         "  \'h\'                 Startupscreen\n"
+
 
 
 // Function to initialize the User Interface
@@ -297,22 +307,14 @@ static void draw_grid(void)
     if((stage == STAGE_STARTUP) || (stage == STAGE_STARTWAIT))
     {
         wmove(w_grid, 0, 0);
-        waddstr(w_grid, " \n");
+        waddstr(w_grid, "\n");
         wattron(w_grid, A_BOLD | A_REVERSE);
         waddstr(w_grid, " A ncurses based Simulation for Conways \"Game of Life\" \n");
         wattroff(w_grid, A_BOLD | A_REVERSE);
-        waddstr(w_grid, " \n");
-        wprintw(w_grid, " Maximum grid size:    %ux%u\n", GRID_WIDTH_MAX, GRID_HEIGHT_MAX);
-        waddstr(w_grid, " \n");
-        waddstr(w_grid, " Command keys:\n");
-        waddstr(w_grid, "   \'q\'                 End program\n");
-        waddstr(w_grid, "   \'Up\' and \'Down\'     Adjust speed\n");
-        waddstr(w_grid, "   \'0\'...\'9\'           Set speed directly\n");
-        waddstr(w_grid, "   \'Left\' and \'Right\'  Change pattern\n");
-        waddstr(w_grid, "   \'Space\'             Restart current pattern\n");
-        waddstr(w_grid, "   \'s\'                 Change style\n");
-        waddstr(w_grid, "   \'m\'                 Change mode\n");
-        waddstr(w_grid, "   \'h\'                 This Help\n");
+        waddstr(w_grid, "\n");
+        wprintw(w_grid, "Maximum grid size:    %ux%u\n", GRID_WIDTH_MAX, GRID_HEIGHT_MAX);
+        waddstr(w_grid, "\n");
+        waddstr(w_grid, COMMAND_KEYS_STR);
     }
 
     // Handle pattern info
@@ -717,10 +719,11 @@ void handle_args(int argc, char * argv[])
                 printf("\n");
                 printf("Options:\n");
                 printf("  -h, --help     This Help\n");
+                printf("  -s, --speed    Set speed (1-10)\n");
+                printf("  -n, --nowait   Start without Startupscreen\n");
                 printf("\n");
-                printf("Command keys:\n"); // TODO: Get text from help screen
-                printf("\n");
-                break;
+                printf(COMMAND_KEYS_STR);
+                exit(0);
 
             case 's':
             {
