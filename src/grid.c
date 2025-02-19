@@ -80,6 +80,8 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_STILLLIFES)
     {
+        // TODO: Pattern dependend on size
+
         // Block
         patterns_set_to_pos(PATTERN_BLOCK, grid, 1, 1);
 
@@ -97,6 +99,8 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_OSCILLATORS)
     {
+        // TODO: Pattern dependend on size
+
         // Blinker
         patterns_set_to_pos(PATTERN_BLINKER, grid, 1, 2);
 
@@ -114,6 +118,8 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_SPACESHIPS)
     {
+        // TODO: Pattern dependend on size
+
         // Glider
         patterns_set_to_pos(PATTERN_GLIDER, grid, 1, 1);
 
@@ -133,7 +139,7 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_SIMKIN_GLIDERGUN)
     {
-        // Simkin lider gun
+        // Simkin Glider gun
         patterns_set_to_center(PATTERN_SIMKIN_GLIDERGUN, grid);
     }
     else if(pattern == INITPATTERN_PENTOMINO)

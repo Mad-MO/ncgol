@@ -10,6 +10,10 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
+// TODO: New pattern "Octagon"
+// TODO: New pattern "Tumbler"
+// TODO: New pattern "Conway's Game of Life"
+
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
