@@ -34,7 +34,10 @@ static void handle_end_detection(void);
 // Function to set the grid size
 void grid_set_size(uint16_t width, uint16_t height)
 {
-    // TODO: Check boundaries
+    // Check boundaries
+    if(width  > GRID_WIDTH_MAX)  width  = GRID_WIDTH_MAX;
+    if(height > GRID_HEIGHT_MAX) height = GRID_HEIGHT_MAX;
+
     grid_width  = width;
     grid_height = height;
 }
