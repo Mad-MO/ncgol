@@ -699,12 +699,13 @@ void handle_args(int argc, char * argv[])
     {
         static struct option long_options[] =
         {
-            // TODO: charstyle   -c, --charstyle
+            // TODO: charstyle    -c, --charstyle
             {"help",   no_argument,       0, 'h'},
-            // TODO: initpattern -i, --init
-            // TODO: automode    -m, --mode
-            {"speed",  required_argument, 0, 's'},
+            // TODO: initpattern  -i, --init
+            // TODO: automode     -m, --mode
             {"nowait", no_argument,       0, 'n'},
+            {"speed",  required_argument, 0, 's'},
+            // TODO: version      -v, --version
             {0,        0,                 0,   0}
         };
 

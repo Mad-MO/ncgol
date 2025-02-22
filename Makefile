@@ -25,7 +25,8 @@ OBJECTS = $(BUILD)/ncgol.o \
 build: ncgol
 
 run: ncgol
-	$(BIN)/ncgol
+	$(BIN)/ncgol --help
+	$(BIN)/ncgol -ns10
 
 distclean: clean
 	@rm -vf $(BIN)/*
