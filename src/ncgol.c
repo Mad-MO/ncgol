@@ -33,6 +33,8 @@
 #define SW_VERS "v0.5"
 #define AUTHOR  "domo"
 
+#define SPEED_MIN  1
+#define SPEED_MAX 10
 static uint8_t  speed;
 static uint16_t grid_width;
 static uint16_t grid_height;
@@ -488,15 +490,15 @@ static void handle_inputs(void)
     }
     else if(key == KEY_UP)
     {
-        if(speed < 10) speed++;
+        if(speed < SPEED_MAX) speed++;
     }
     else if(key == KEY_DOWN)
     {
-        if(speed > 1) speed--;
+        if(speed > SPEED_MIN) speed--;
     }
     else if(key == '0')
     {
-        speed = 10;
+        speed = SPEED_MAX;
     }
     else if((key>='1') && (key<='9'))
     {
@@ -731,7 +733,7 @@ void handle_args(int argc, char * argv[])
             case 's':
             {
                 int val = atoi(optarg);
-                if((val >= 1) && (val <= 10)) // TODO: Eliminate magic numbers
+                if((val >= SPEED_MIN) && (val <= SPEED_MAX))
                 {
                     speed = val;
                 }
