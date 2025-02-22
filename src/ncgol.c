@@ -12,6 +12,9 @@
 
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
+// TODO: Add stopper for Glider guns
+// TODO: Add speed "0" = Stop
+// TODO: ESC during "End of simulation"
 
 #include <curses.h>
 #include <stdlib.h>
@@ -728,7 +731,7 @@ void handle_args(int argc, char * argv[])
             case 's':
             {
                 int val = atoi(optarg);
-                if((val >= 1) && (val <= 10))
+                if((val >= 1) && (val <= 10)) // TODO: Eliminate magic numbers
                 {
                     speed = val;
                 }
