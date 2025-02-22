@@ -14,7 +14,6 @@
 // TODO: New pattern "Tumbler"
 // TODO: Add stopper for Glider guns
 // TODO: Add speed "0" = Stop
-// TODO: ESC during "End of simulation"
 
 #include <curses.h>
 #include <stdlib.h>
@@ -92,6 +91,11 @@ typedef enum
     MODE_MAX
 } automode_t;
 static automode_t automode;
+
+#define TIMEOUT_STARTWAIT 20000
+#define TIMEOUT_SHOWINFO   2000
+#define TIMEOUT_END        5000
+static uint16_t timer;
 
 #define COMMAND_KEYS_STR "Command keys:\n"                                   \
                          "  \'q\'                 End program\n"             \
@@ -544,6 +548,10 @@ static void handle_inputs(void)
         {
             stage = STAGE_RUNNING;
         }
+        else if(stage == STAGE_END)
+        {
+            timer = TIMEOUT_END;
+        }
     }
     else
     {
@@ -578,8 +586,7 @@ int main(int argc, char * argv[])
     // Loop until back key is pressed
     while(1)
     {
-        static uint16_t timer;
-               uint16_t ticks;
+        uint16_t ticks;
 
         // Handle passed time
         clock_gettime(CLOCK_REALTIME, &ts);
@@ -611,7 +618,7 @@ int main(int argc, char * argv[])
         }
         else if(stage == STAGE_STARTWAIT)
         {
-            if(timer >= 20000)
+            if(timer >= TIMEOUT_STARTWAIT)
             {
                 stage = STAGE_INIT;
                 timer = 0;
@@ -625,7 +632,7 @@ int main(int argc, char * argv[])
         }
         else if(stage == STAGE_SHOWINFO)
         {
-            if(timer >= 2000)
+            if(timer >= TIMEOUT_SHOWINFO)
             {
                 stage = STAGE_RUNNING;
                 timer = 0;
@@ -643,7 +650,7 @@ int main(int argc, char * argv[])
         else if(stage == STAGE_END)
         {
             grid_update();
-            if(timer >= 5000)
+            if(timer >= TIMEOUT_END)
             {
                 if(automode == AUTOMODE_NEXT)
                 {
@@ -660,7 +667,7 @@ int main(int argc, char * argv[])
                 else // AUTOMODE_STOP
                 {
                     // Do nothing
-                    timer = 5000;
+                    timer = TIMEOUT_END;
                 }
             }
         }
