@@ -60,13 +60,11 @@ static stage_t stage;
 typedef enum
 {
     // Styles which use two chars per cell
-    STYLE_BLOCK1,
-    STYLE_BLOCK2,
     STYLE_HASH,
+    STYLE_BLOCK,
 
     // Styles which show two cells in one char
-    STYLE_DOUBLEBLOCK,
-    STYLE_DOUBLEDOT,
+    STYLE_DOUBLE,
 
     // Braile style with 8 dots per char
     STYLE_BRAILLE,
@@ -178,7 +176,7 @@ static void init_tui(void)
         grid_width  = getmaxx(w_grid) * 2;
         grid_height = getmaxy(w_grid) * 4;
     }
-    else if(style >= STYLE_DOUBLEBLOCK)
+    else if(style >= STYLE_DOUBLE)
     {
         grid_width  = getmaxx(w_grid);
         grid_height = getmaxy(w_grid)*2;
@@ -228,29 +226,32 @@ static void draw_grid(void)
     {
         for(y=0; y<grid_height; y++)
         {
-            if((style == STYLE_DOUBLEBLOCK) || (style == STYLE_DOUBLEDOT))
+            if(style == STYLE_DOUBLE)
             {
                 // Two dots per character
                 if(grid[x][y] && grid[x][y + 1])
                 {
-                    if     (style == STYLE_DOUBLEBLOCK)
+                    #if(defined __linux__)
                         mvwaddstr(w_grid, y/2, x, "\u2588");
-                    else          // STYLE_DOUBLEDOT
+                    #else
                         mvwaddch(w_grid, y/2, x, ':');
+                    #endif
                 }
                 else if(grid[x][y])
                 {
-                    if     (style == STYLE_DOUBLEBLOCK)
+                    #if(defined __linux__)
                         mvwaddstr(w_grid, y/2, x, "\u2580");
-                    else          // STYLE_DOUBLEDOT
+                    #else
                         mvwaddch(w_grid, y/2, x, '\'');
+                    #endif
                 }
                 else if(grid[x][y + 1])
                 {
-                    if     (style == STYLE_DOUBLEBLOCK)
+                    #if(defined __linux__)
                         mvwaddstr(w_grid, y/2, x, "\u2584");
-                    else          // STYLE_DOUBLEDOT
+                    #else
                         mvwaddch(w_grid, y/2, x, '.');
+                    #endif
                 }
                 else
                 {
@@ -292,12 +293,14 @@ static void draw_grid(void)
                 // A unicode full block uses the foreground color and works better.
                 if(grid[x][y])
                 {
-                    if     (style == STYLE_BLOCK1)
-                        mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
-                    else if(style == STYLE_BLOCK2)
-                        mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
+                    if     (style == STYLE_BLOCK)
+                        #if(defined __linux__)
+                            mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
+                        #else
+                            mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
+                        #endif
                     else          // STYLE_HASH
-                        mvwaddstr(w_grid, y, x*2, "# ");           // #  -> Looks best on a terminal which has problems with unicode characters
+                        mvwaddstr(w_grid, y, x*2, "# ");               // #  -> Looks best on a terminal which has problems with unicode characters
                 }
                 else
                 {
@@ -400,16 +403,12 @@ static void draw_grid(void)
 
         // Style
         strcpy(str_label, " Style:");
-        if     (style == STYLE_BLOCK1)
-            strcpy(str_value, "Block1");
-        else if(style == STYLE_BLOCK2)
-            strcpy(str_value, "Block2");
-        else if(style == STYLE_HASH)
+        if     (style == STYLE_HASH)
             strcpy(str_value, "Hash");
-        else if(style == STYLE_DOUBLEBLOCK)
-            strcpy(str_value, "DoubleBlock");
-        else if(style == STYLE_DOUBLEDOT)
-            strcpy(str_value, "DoubleDot");
+        else if(style == STYLE_BLOCK)
+            strcpy(str_value, "Block");
+        else if(style == STYLE_DOUBLE)
+            strcpy(str_value, "Double");
         else if(style == STYLE_BRAILLE)
             strcpy(str_value, "Braille");
         else
@@ -561,13 +560,7 @@ int main(int argc, char * argv[])
     initpattern = INITPATTERN_RANDOM;
     speed       = 3;
     automode    = AUTOMODE_NEXT;
-    #if  (defined __APPLE__)
-        style   = STYLE_BLOCK2;
-    #elif(defined __linux__)
-        style   = STYLE_BLOCK1;
-    #else
-        style   = STYLE_HASH;
-    #endif
+    style       = STYLE_HASH;
 
     // Handle commandline arguments
     handle_args(argc, argv);
