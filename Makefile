@@ -25,12 +25,12 @@ OBJECTS = $(BUILD)/ncgol.o \
 build: ncgol
 
 run: ncgol
-	if [ "$$TERM_PROGRAM" = "Apple_Terminal" ]; then printf '\e[8;25;80t'; fi
-	if [ "$$TERM_PROGRAM" = "Linux" ];          then resize -s 25 80;      fi # TODO: check if this works
+	@if [ "$$TERM_PROGRAM" = "Apple_Terminal" ]; then printf '\e[8;25;80t'; fi
+	@if [ "$$TERM_PROGRAM" = "Linux" ];          then resize -s 25 80;      fi # TODO: check if this works
 	$(BIN)/ncgol --help
 	$(BIN)/ncgol -ns2
-	if [ "$$TERM_PROGRAM" = "Apple_Terminal" ]; then printf '\e[8;50;160t'; fi
-	if [ "$$TERM_PROGRAM" = "Linux" ];          then resize -s 50 160;      fi # TODO: check if this works
+	@if [ "$$TERM_PROGRAM" = "Apple_Terminal" ]; then printf '\e[8;50;160t'; fi
+	@if [ "$$TERM_PROGRAM" = "Linux" ];          then resize -s 50 160;      fi # TODO: check if this works
 
 distclean: clean
 	@rm -vf $(BIN)/*
