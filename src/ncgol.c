@@ -14,6 +14,7 @@
 // TODO: New pattern "Tumbler"
 // TODO: Add stopper for Glider guns
 // TODO: Add speed "0" = Stop
+// TODO: Check for minimum grid size
 
 #include <curses.h>
 #include <stdlib.h>
