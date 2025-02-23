@@ -202,8 +202,19 @@ static void init_tui(void)
 static void draw_str_in_frame(const char * str)
 {
     uint16_t len=strlen(str);
-    uint16_t x = (getmaxx(w_grid) - len) / 2 - 2;
-    uint16_t y = (getmaxy(w_grid)) / 4;
+
+    // Calculate center position
+    uint16_t x;
+    uint16_t y;
+    if((len+4) > getmaxx(w_grid))
+    {
+        x = 0;
+    }
+    else
+    {
+        x = (getmaxx(w_grid) - len) / 2 - 2;
+    }
+    y = (getmaxy(w_grid)) / 4;
 
     wattron(w_grid, A_BOLD | COLOR_PAIR(COLORS_PATTERN_INFO));
     for(uint16_t i=0; i<len+4; i++)
@@ -339,7 +350,7 @@ static void draw_grid(void)
     // Handle end message
     if(stage == STAGE_END)
     {
-        draw_str_in_frame("End of simulation");
+        draw_str_in_frame("Simulation End");
     }
 
     // Handle status line
