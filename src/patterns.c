@@ -25,6 +25,12 @@ void patterns_set_to_pos(pattern_t pattern, grid_t *grid, uint16_t x_pos, uint16
         return;
     }
 
+    // Check boundaries
+    if(pattern >= PATTERN_MAX)
+    {
+        return;
+    }
+
     // Copy pattern to grid
     for(x=0; x<pattern_desc->width; x++)
     {
@@ -48,8 +54,31 @@ void patterns_set_to_center(pattern_t pattern, grid_t *grid)
         return;
     }
 
-    uint16_t x_pos = (grid_get_width()  - pattern_list[pattern]->width)  / 2;
-    uint16_t y_pos = (grid_get_height() - pattern_list[pattern]->height) / 2;
+    // Check boundaries
+    if(pattern >= PATTERN_MAX)
+    {
+        return;
+    }
+
+    // Calculate center position
+    uint16_t x_pos;
+    uint16_t y_pos;
+    if(pattern_list[pattern]->width >= grid_get_width())
+    {
+        x_pos = 0;
+    }
+    else
+    {
+        x_pos = (grid_get_width()  - pattern_list[pattern]->width)  / 2;
+    }
+    if(pattern_list[pattern]->height >= grid_get_height())
+    {
+        y_pos = 0;
+    }
+    else
+    {
+        y_pos = (grid_get_height() - pattern_list[pattern]->height) / 2;
+    }
 
     // Copy pattern to grid
     patterns_set_to_pos(pattern, grid, x_pos, y_pos);
