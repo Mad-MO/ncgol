@@ -14,7 +14,7 @@
 // TODO: New pattern "Tumbler"
 // TODO: Add stopper for Glider guns
 // TODO: Add speed "0" = Stop
-// TODO: Check for minimum grid size
+// TODO: Check for minimum grid size (8x8 Grid at least...)
 
 #include <curses.h>
 #include <stdlib.h>
@@ -247,6 +247,7 @@ static void draw_grid(void)
                 // Two dots per character
                 if(grid[x][y] && grid[x][y + 1])
                 {
+                    // Both dots
                     #if(defined __linux__)
                         mvwaddstr(w_grid, y/2, x, "\u2588");
                     #else
@@ -255,6 +256,7 @@ static void draw_grid(void)
                 }
                 else if(grid[x][y])
                 {
+                    // Upper dot
                     #if(defined __linux__)
                         mvwaddstr(w_grid, y/2, x, "\u2580");
                     #else
@@ -263,6 +265,7 @@ static void draw_grid(void)
                 }
                 else if(grid[x][y + 1])
                 {
+                    // Lower dot
                     #if(defined __linux__)
                         mvwaddstr(w_grid, y/2, x, "\u2584");
                     #else
