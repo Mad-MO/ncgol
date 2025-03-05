@@ -15,6 +15,7 @@
 // TODO: Add stopper for Glider guns
 // TODO: Add speed "0" = Stop
 // TODO: Check for minimum grid size (8x8 Grid at least...)
+// TODO: Add assert() from assert.h to check struct size from patterns
 
 #include <curses.h>
 #include <stdlib.h>
