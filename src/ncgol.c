@@ -722,6 +722,7 @@ void handle_args(int argc, char * argv[])
             {"nowait", no_argument,       0, 'n'},
             {"speed",  required_argument, 0, 's'},
             // TODO: version      -v, --version
+            // -----------------------------------
             {0,        0,                 0,   0}
         };
 
