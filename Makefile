@@ -27,7 +27,7 @@ build: ncgol
 run: ncgol
 	$(BIN)/ncgol -v
 	$(BIN)/ncgol -h
-	$(BIN)/ncgol -n -s2 -c braille -i ilove8bit -m stop
+	$(BIN)/ncgol -n -s2 -c block -i simkin -m loop
 
 distclean: clean
 	@rm -vf $(BIN)/*
