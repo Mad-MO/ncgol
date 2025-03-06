@@ -717,7 +717,7 @@ void handle_args(int argc, char * argv[])
         {
             {"charstyle", required_argument, 0, 'c'},
             {"help",      no_argument,       0, 'h'},
-            // TODO: initpattern  -i, --init
+            {"init",      required_argument, 0, 'i'},
             // TODO: automode     -m, --mode
             {"nowait",    no_argument,       0, 'n'},
             {"speed",     required_argument, 0, 's'},
@@ -726,7 +726,7 @@ void handle_args(int argc, char * argv[])
             {0,           0,                 0,   0}
         };
 
-        int c = getopt_long(argc, argv, "c:hns:", long_options, 0);
+        int c = getopt_long(argc, argv, "c:hi:ns:", long_options, 0);
 
         // Detect the end of the options
         if (c == -1)
@@ -763,11 +763,54 @@ void handle_args(int argc, char * argv[])
                 printf("Options:\n");
                 printf("  -c, --charstyle  Set character style (hash, block, double, braille)\n");
                 printf("  -h, --help       This Help\n");
+                printf("  -i, --init       Set initial pattern\n"
+                       "                   (random, conway, stilllifes, oscillators, spaceships,\n"
+                       "                   gosper, simkin, pentomino, diehard, acorn, blockengine1,\n"
+                       "                   blockengine2, doubleblockengine, ilove8bit)\n");
                 printf("  -s, --speed      Set speed (1-10)\n");
                 printf("  -n, --nowait     Start without Startupscreen\n");
                 printf("\n");
                 printf(COMMAND_KEYS_STR);
                 exit(0);
+            }
+
+            case 'i':
+            {
+                if     (strcmp(optarg, "random") == 0)
+                    initpattern = INITPATTERN_RANDOM;
+                else if(strcmp(optarg, "conway") == 0)
+                    initpattern = INITPATTERN_CONWAY;
+                else if(strcmp(optarg, "stilllifes") == 0)
+                    initpattern = INITPATTERN_STILLLIFES;
+                else if(strcmp(optarg, "oscillators") == 0)
+                    initpattern = INITPATTERN_OSCILLATORS;
+                else if(strcmp(optarg, "spaceships") == 0)
+                    initpattern = INITPATTERN_SPACESHIPS;
+                else if(strcmp(optarg, "gosper") == 0)
+                    initpattern = INITPATTERN_GOSPER_GLIDERGUN;
+                else if(strcmp(optarg, "simkin") == 0)
+                    initpattern = INITPATTERN_SIMKIN_GLIDERGUN;
+                else if(strcmp(optarg, "pentomino") == 0)
+                    initpattern = INITPATTERN_PENTOMINO;
+                else if(strcmp(optarg, "diehard") == 0)
+                    initpattern = INITPATTERN_DIEHARD;
+                else if(strcmp(optarg, "acorn") == 0)
+                    initpattern = INITPATTERN_ACORN;
+                else if(strcmp(optarg, "blockengine1") == 0)
+                    initpattern = INITPATTERN_BLOCKENGINE1;
+                else if(strcmp(optarg, "blockengine2") == 0)
+                    initpattern = INITPATTERN_BLOCKENGINE2;
+                else if(strcmp(optarg, "doubleblockengine") == 0)
+                    initpattern = INITPATTERN_DOUBLEBLOCKENGINE;
+                else if(strcmp(optarg, "ilove8bit") == 0)
+                    initpattern = INITPATTERN_ILOVE8BIT;
+                else
+                {
+                    printf("Invalid init value: %s\n", optarg);
+                    printf("Init must be one of: random, conway, stilllifes, oscillators, spaceships, gosper, simkin, pentomino, diehard, acorn, blockengine1, blockengine2, doubleblockengine, ilove8bit\n");
+                    exit(1);
+                }
+                break;
             }
 
             case 's':
