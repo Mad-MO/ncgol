@@ -609,16 +609,16 @@ int main(int argc, char * argv[])
         handle_inputs();
 
         // Handle speed
-        if     (speed == 0) usleep(500000);
-        else if(speed == 1) usleep(100000);
-        else if(speed == 2) usleep( 50000);
-        else if(speed == 3) usleep( 10000);
-        else if(speed == 4) usleep(  5000);
-        else if(speed == 5) usleep(  1000);
-        else if(speed == 6) usleep(   500);
-        else if(speed == 7) usleep(   100);
-        else if(speed == 8) usleep(    50);
-        else                usleep(     0);
+        if     (speed == 0) usleep(500000); // Stop
+        else if(speed == 1) usleep(500000); // ~2 Hz
+        else if(speed == 2) usleep(100000);
+        else if(speed == 3) usleep( 50000);
+        else if(speed == 4) usleep( 10000);
+        else if(speed == 5) usleep(  5000);
+        else if(speed == 6) usleep(  1000);
+        else if(speed == 7) usleep(   500);
+        else if(speed == 8) usleep(   100);
+        else                usleep(     0); // As fast as possible
 
         // Handle different patterns and update grid
         if     (stage == STAGE_STARTUP)
