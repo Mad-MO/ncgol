@@ -1,8 +1,6 @@
 
 # Ncurses Game of Life
 
-TODO: Currently in Development. Might still contain a lot of bugs!
-
 Based on Ncurses.
 
 ## Description
