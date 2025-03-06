@@ -26,7 +26,7 @@ build: ncgol
 
 run: ncgol
 	$(BIN)/ncgol --help
-	$(BIN)/ncgol -n -s2 -c braille -i ilove8bit
+	$(BIN)/ncgol -n -s2 -c braille -i ilove8bit -m stop
 
 runsmall: ncgol
 	@if [ "$$TERM_PROGRAM" = "Apple_Terminal" ]; then printf '\e[8;25;80t'; fi

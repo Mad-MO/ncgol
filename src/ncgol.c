@@ -718,7 +718,7 @@ void handle_args(int argc, char * argv[])
             {"charstyle", required_argument, 0, 'c'},
             {"help",      no_argument,       0, 'h'},
             {"init",      required_argument, 0, 'i'},
-            // TODO: automode     -m, --mode
+            {"mode",      required_argument, 0, 'm'},
             {"nowait",    no_argument,       0, 'n'},
             {"speed",     required_argument, 0, 's'},
             // TODO: version      -v, --version
@@ -726,7 +726,7 @@ void handle_args(int argc, char * argv[])
             {0,           0,                 0,   0}
         };
 
-        int c = getopt_long(argc, argv, "c:hi:ns:", long_options, 0);
+        int c = getopt_long(argc, argv, "c:hi:m:ns:", long_options, 0);
 
         // Detect the end of the options
         if (c == -1)
@@ -767,8 +767,9 @@ void handle_args(int argc, char * argv[])
                        "                   (random, conway, stilllifes, oscillators, spaceships,\n"
                        "                   gosper, simkin, pentomino, diehard, acorn, blockengine1,\n"
                        "                   blockengine2, doubleblockengine, ilove8bit)\n");
-                printf("  -s, --speed      Set speed (1-10)\n");
+                printf("  -m, --mode       Set mode (next, loop, stop)\n");
                 printf("  -n, --nowait     Start without Startupscreen\n");
+                printf("  -s, --speed      Set speed (1-10)\n");
                 printf("\n");
                 printf(COMMAND_KEYS_STR);
                 exit(0);
@@ -808,6 +809,23 @@ void handle_args(int argc, char * argv[])
                 {
                     printf("Invalid init value: %s\n", optarg);
                     printf("Init must be one of: random, conway, stilllifes, oscillators, spaceships, gosper, simkin, pentomino, diehard, acorn, blockengine1, blockengine2, doubleblockengine, ilove8bit\n");
+                    exit(1);
+                }
+                break;
+            }
+
+            case 'm':
+            {
+                if     (strcmp(optarg, "next") == 0)
+                    automode = AUTOMODE_NEXT;
+                else if(strcmp(optarg, "loop") == 0)
+                    automode = AUTOMODE_LOOP;
+                else if(strcmp(optarg, "stop") == 0)
+                    automode = AUTOMODE_STOP;
+                else
+                {
+                    printf("Invalid mode value: %s\n", optarg);
+                    printf("Mode must be one of: next, loop, stop\n");
                     exit(1);
                 }
                 break;
