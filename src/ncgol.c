@@ -15,6 +15,8 @@
 // TODO: Add stopper for Glider guns
 // TODO: Check for minimum grid size (8x8 Grid at least...)
 // TODO: Add assert() from assert.h to check struct size from patterns
+// TODO: Show speed in Hz
+// TODO: Update grid with multiple threads
 
 #include <curses.h>
 #include <stdlib.h>
