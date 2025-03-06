@@ -539,7 +539,7 @@ static void handle_inputs(void)
     {
         stage   = STAGE_INIT;
     }
-    else if(tolower(key) == 's')
+    else if(tolower(key) == 'c')
     {
         style++;
         style %= STYLE_MAX;
@@ -715,18 +715,18 @@ void handle_args(int argc, char * argv[])
     {
         static struct option long_options[] =
         {
-            // TODO: charstyle    -c, --charstyle
-            {"help",   no_argument,       0, 'h'},
+            {"charstyle", required_argument, 0, 'c'},
+            {"help",      no_argument,       0, 'h'},
             // TODO: initpattern  -i, --init
             // TODO: automode     -m, --mode
-            {"nowait", no_argument,       0, 'n'},
-            {"speed",  required_argument, 0, 's'},
+            {"nowait",    no_argument,       0, 'n'},
+            {"speed",     required_argument, 0, 's'},
             // TODO: version      -v, --version
             // -----------------------------------
-            {0,        0,                 0,   0}
+            {0,           0,                 0,   0}
         };
 
-        int c = getopt_long(argc, argv, "hns:", long_options, 0);
+        int c = getopt_long(argc, argv, "c:hns:", long_options, 0);
 
         // Detect the end of the options
         if (c == -1)
@@ -734,19 +734,41 @@ void handle_args(int argc, char * argv[])
 
         switch(c)
         {
+            case 'c':
+            {
+                if     (strcmp(optarg, "hash") == 0)
+                    style = STYLE_HASH;
+                else if(strcmp(optarg, "block") == 0)
+                    style = STYLE_BLOCK;
+                else if(strcmp(optarg, "double") == 0)
+                    style = STYLE_DOUBLE;
+                else if(strcmp(optarg, "braille") == 0)
+                    style = STYLE_BRAILLE;
+                else
+                {
+                    printf("Invalid charstyle value: %s\n", optarg);
+                    printf("Character style must be one of: hash, block, double, braille\n");
+                    exit(1);
+                }
+                break;
+            }
+
             case 'h':
+            {
                 printf("Usage:\n");
                 printf("  %s [options]\n", SW_NAME);
                 printf("\n");
                 printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
                 printf("\n");
                 printf("Options:\n");
-                printf("  -h, --help     This Help\n");
-                printf("  -s, --speed    Set speed (1-10)\n");
-                printf("  -n, --nowait   Start without Startupscreen\n");
+                printf("  -c, --charstyle  Set character style (hash, block, double, braille)\n");
+                printf("  -h, --help       This Help\n");
+                printf("  -s, --speed      Set speed (1-10)\n");
+                printf("  -n, --nowait     Start without Startupscreen\n");
                 printf("\n");
                 printf(COMMAND_KEYS_STR);
                 exit(0);
+            }
 
             case 's':
             {
@@ -765,16 +787,17 @@ void handle_args(int argc, char * argv[])
             }
 
             case 'n':
+            {
                 stage = STAGE_INIT;
                 break;
+            }
 
-            case '?':
-                // getopt_long() already printed an error message
-                exit(1);
-                break;
-
+            case '?': // getopt_long() already printed an error message
             default:
+            {
+
                 exit(1);
+            }
         }
     }
 

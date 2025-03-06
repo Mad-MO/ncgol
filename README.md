@@ -42,7 +42,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - Block engine 1/2
   - Double block engine
 - "Space" key restarts the current pattern
-- "s" key changes the style
+- "c" key changes the character style
   - 2 terminal characters representing 1 cell (Unicode blocks / "#")
   - 1 terminal character represents 2 cells (Unicode half blocks / ASCII)
   - 1 terminal character represents 8 cells (Unicode braille dots)
