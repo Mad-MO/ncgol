@@ -721,12 +721,12 @@ void handle_args(int argc, char * argv[])
             {"mode",      required_argument, 0, 'm'},
             {"nowait",    no_argument,       0, 'n'},
             {"speed",     required_argument, 0, 's'},
-            // TODO: version      -v, --version
+            {"version",   no_argument,       0, 'v'},
             // -----------------------------------
             {0,           0,                 0,   0}
         };
 
-        int c = getopt_long(argc, argv, "c:hi:m:ns:", long_options, 0);
+        int c = getopt_long(argc, argv, "c:hi:m:ns:v", long_options, 0);
 
         // Detect the end of the options
         if (c == -1)
@@ -831,6 +831,12 @@ void handle_args(int argc, char * argv[])
                 break;
             }
 
+            case 'n':
+            {
+                stage = STAGE_INIT;
+                break;
+            }
+
             case 's':
             {
                 int val = atoi(optarg);
@@ -847,10 +853,10 @@ void handle_args(int argc, char * argv[])
                 break;
             }
 
-            case 'n':
+            case 'v':
             {
-                stage = STAGE_INIT;
-                break;
+                printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
+                exit(0);
             }
 
             case '?': // getopt_long() already printed an error message
