@@ -13,7 +13,6 @@
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
 // TODO: Add stopper for Glider guns
-// TODO: Add speed "0" = Stop
 // TODO: Check for minimum grid size (8x8 Grid at least...)
 // TODO: Add assert() from assert.h to check struct size from patterns
 
@@ -34,9 +33,9 @@
 #define SW_VERS "v0.6"
 #define AUTHOR  "domo"
 
-#define SPEED_MIN  1
-#define SPEED_MAX 10
+#define SPEED_MAX  9
 static uint8_t  speed;
+
 static uint16_t grid_width;
 static uint16_t grid_height;
 
@@ -513,13 +512,9 @@ static void handle_inputs(void)
     }
     else if(key == KEY_DOWN)
     {
-        if(speed > SPEED_MIN) speed--;
+        if(speed > 0) speed--;
     }
-    else if(key == '0')
-    {
-        speed = SPEED_MAX;
-    }
-    else if((key>='1') && (key<='9'))
+    else if((key>='0') && (key<='9'))
     {
         speed = key - '0';
     }
@@ -614,15 +609,15 @@ int main(int argc, char * argv[])
         handle_inputs();
 
         // Handle speed
-        if     (speed == 1) usleep(500000);
-        else if(speed == 2) usleep(100000);
-        else if(speed == 3) usleep( 50000);
-        else if(speed == 4) usleep( 10000);
-        else if(speed == 5) usleep(  5000);
-        else if(speed == 6) usleep(  1000);
-        else if(speed == 7) usleep(   500);
-        else if(speed == 8) usleep(   100);
-        else if(speed == 9) usleep(    50);
+        if     (speed == 0) usleep(500000);
+        else if(speed == 1) usleep(100000);
+        else if(speed == 2) usleep( 50000);
+        else if(speed == 3) usleep( 10000);
+        else if(speed == 4) usleep(  5000);
+        else if(speed == 5) usleep(  1000);
+        else if(speed == 6) usleep(   500);
+        else if(speed == 7) usleep(   100);
+        else if(speed == 8) usleep(    50);
         else                usleep(     0);
 
         // Handle different patterns and update grid
@@ -656,7 +651,10 @@ int main(int argc, char * argv[])
         }
         else if(stage == STAGE_RUNNING)
         {
-            grid_update();
+            if(speed > 0)
+            {
+                grid_update();
+            }
             if(grit_end_detected())
             {
                 stage = STAGE_END;
@@ -665,7 +663,10 @@ int main(int argc, char * argv[])
         }
         else if(stage == STAGE_END)
         {
-            grid_update();
+            if(speed > 0)
+            {
+              grid_update();
+            }
             if(timer >= TIMEOUT_END)
             {
                 if(automode == AUTOMODE_NEXT)
@@ -769,7 +770,7 @@ void handle_args(int argc, char * argv[])
                        "                   blockengine2, doubleblockengine, ilove8bit)\n");
                 printf("  -m, --mode       Set mode (next, loop, stop)\n");
                 printf("  -n, --nowait     Start without Startupscreen\n");
-                printf("  -s, --speed      Set speed (1-10)\n");
+                printf("  -s, --speed      Set speed (0-9)\n");
                 printf("\n");
                 printf(COMMAND_KEYS_STR);
                 exit(0);
@@ -840,14 +841,14 @@ void handle_args(int argc, char * argv[])
             case 's':
             {
                 int val = atoi(optarg);
-                if((val >= SPEED_MIN) && (val <= SPEED_MAX))
+                if(val <= SPEED_MAX)
                 {
                     speed = val;
                 }
                 else
                 {
                     printf("Invalid speed value: %s\n", optarg);
-                    printf("Speed must be between 1 and 10\n");
+                    printf("Speed must be between 0 and 9\n");
                     exit(1);
                 }
                 break;
