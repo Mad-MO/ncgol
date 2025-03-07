@@ -17,6 +17,8 @@
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Show speed in Hz
 // TODO: Update grid with multiple threads
+// TODO: Add man page
+// TODO: Prepare for linux package
 
 #include <curses.h>
 #include <stdlib.h>
