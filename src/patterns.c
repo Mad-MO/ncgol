@@ -84,6 +84,8 @@ void patterns_set_to_center(pattern_t pattern, grid_t *grid)
     patterns_set_to_pos(pattern, grid, x_pos, y_pos);
 }
 
+
+
 // Return text string for initpattern
 const char * patterns_get_str(pattern_t pattern)
 {

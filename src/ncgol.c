@@ -16,6 +16,7 @@
 // TODO: Function to get names for init modes
 
 // TODO: Check for minimum grid size (8x8 Grid at least...)
+// TODO: Reinit on resize of window
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Show speed in Hz
 // TODO: Update grid with multiple threads
