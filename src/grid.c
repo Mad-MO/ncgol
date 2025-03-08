@@ -19,7 +19,7 @@ static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
-#define END_DET_CNT 100
+#define END_DET_CNT 250
 static uint8_t  end_det[END_DET_CNT];
 static uint8_t  end_det_pos;
 static uint16_t grid_width;
@@ -141,11 +141,105 @@ void grid_init(initpattern_t pattern)
     {
         // Gosper Glider gun
         patterns_set_to_pos(PATTERN_GOSPER_GLIDERGUN, grid, 1, 1);
+
+        // Glider stopper below (move it to the lower right corner)
+        if((grid_width >= 38) && (grid_height >= 18))
+        {
+            #define X_OFFSET 13
+            #define Y_OFFSET 0
+            uint8_t w=patterns_get_width(PATTERN_GLIDER_STOPPER_BELOW);
+            uint8_t h=patterns_get_height(PATTERN_GLIDER_STOPPER_BELOW);
+            uint16_t imax=(grid_width>grid_height ? grid_width : grid_height);
+
+            // Search for the best (most distant) position for the stopper
+            // -> This is not an efficient solution, but it is the easiest to implement and understand
+            for(int i=0; i<imax; i++)
+            {
+                uint16_t x, y;
+                uint8_t w=patterns_get_width(PATTERN_GLIDER_STOPPER_BELOW);
+                uint8_t h=patterns_get_height(PATTERN_GLIDER_STOPPER_BELOW);
+                uint16_t imax=(grid_width>grid_height ? grid_width : grid_height);
+                if((X_OFFSET+w+i <= grid_width) && (Y_OFFSET+h+i <= grid_height))
+                {
+                    x=X_OFFSET+i;
+                    y=Y_OFFSET+i;
+                }
+                else
+                {
+                    patterns_set_to_pos(PATTERN_GLIDER_STOPPER_BELOW, grid, x, y);
+                    break;
+                }
+            }
+            #undef X_OFFSET
+            #undef Y_OFFSET
+        }
     }
     else if(pattern == INITPATTERN_SIMKIN_GLIDERGUN)
     {
         // Simkin Glider gun
         patterns_set_to_center(PATTERN_SIMKIN_GLIDERGUN, grid);
+
+        // Glider stopper below (move it to the lower right corner)
+        if((grid_width >= 33) && (grid_height >= 27))
+        {
+            #define X_OFFSET 3
+            #define Y_OFFSET 0
+            uint8_t ws=patterns_get_width(PATTERN_GLIDER_STOPPER_BELOW);
+            uint8_t hs=patterns_get_height(PATTERN_GLIDER_STOPPER_BELOW);
+            uint8_t wp=patterns_get_width(PATTERN_SIMKIN_GLIDERGUN);
+            uint8_t hp=patterns_get_height(PATTERN_SIMKIN_GLIDERGUN);
+            uint16_t imax=(grid_width>grid_height ? grid_width : grid_height);
+
+            // Search for the best (most distant) position for the stopper
+            // -> This is not an efficient solution, but it is the easiest to implement and understand
+            for(uint16_t i=0; i<imax; i++)
+            {
+                uint16_t x, y;
+                if((((grid_width-wp)/2)+X_OFFSET+ws+i <= grid_width) && (((grid_height-hp)/2)+Y_OFFSET+hs+i <= grid_height))
+                {
+                    x=((grid_width-wp)/2)+X_OFFSET+i;
+                    y=((grid_height-hp)/2)+Y_OFFSET+i;
+                }
+                else
+                {
+                    patterns_set_to_pos(PATTERN_GLIDER_STOPPER_BELOW, grid, x, y);
+                    break;
+                }
+            }
+            #undef X_OFFSET
+            #undef Y_OFFSET
+        }
+
+        // Glider stopper above
+        if((grid_width >= 33) && (grid_height >= 30))
+        {
+            #define X_OFFSET 17
+            #define Y_OFFSET 0
+            uint8_t ws=patterns_get_width(PATTERN_GLIDER_STOPPER_ABOVE);
+            uint8_t hs=patterns_get_height(PATTERN_GLIDER_STOPPER_ABOVE);
+            uint8_t wp=patterns_get_width(PATTERN_SIMKIN_GLIDERGUN);
+            uint8_t hp=patterns_get_height(PATTERN_SIMKIN_GLIDERGUN);
+            uint16_t imax=(grid_width>grid_height ? grid_width : grid_height);
+
+            // Search for the best (most distant) position for the stopper
+            // -> This is not an efficient solution, but it is the easiest to implement and understand
+            for(uint16_t i=0; i<imax; i++)
+            {
+                uint16_t x, y;
+                if((((grid_width-wp)/2)+X_OFFSET-i >= 0) && (((grid_height-hp)/2)+Y_OFFSET-i >= 0))
+                {
+                    x=((grid_width-wp)/2)+X_OFFSET-i;
+                    y=((grid_height-hp)/2)+Y_OFFSET-i;
+                }
+                else
+                {
+                    patterns_set_to_pos(PATTERN_GLIDER_STOPPER_ABOVE, grid, x, y);
+                    break;
+                }
+            }
+            #undef X_OFFSET
+            #undef Y_OFFSET
+        }
     }
     else if(pattern == INITPATTERN_PENTOMINO)
     {

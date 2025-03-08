@@ -12,7 +12,6 @@
 
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
-// TODO: Add stopper for Glider guns
 // TODO: Function to get names for init modes
 
 // TODO: Check for minimum grid size (8x8 Grid at least...)
