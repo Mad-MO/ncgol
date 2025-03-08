@@ -10,16 +10,15 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
+// TODO: Reinit on resize of window
+// TODO: Function to get names for init modes (short names)
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
-// TODO: Function to get names for init modes
-
 // TODO: Check for minimum grid size (8x8 Grid at least...)
-// TODO: Reinit on resize of window
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Show speed in Hz
+// TODO: Split up end detection so that cpu intensive part can be run less often
 // TODO: Update grid with multiple threads
-
 // TODO: Add man page
 // TODO: Prepare for linux package
 
