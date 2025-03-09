@@ -461,7 +461,7 @@ static void handle_end_detection(void)
 
 
 // Return if end of simulation has been detected
-uint8_t grit_end_detected(void)
+uint8_t grid_end_detected(void)
 {
     return end_detected;
 }

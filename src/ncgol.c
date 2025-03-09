@@ -11,7 +11,6 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: New pattern "Tumbler"
-// TODO: Check for minimum grid size (8x8 Grid at least...)
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Split up end detection so that cpu intensive part can be run less often
 // TODO: Update grid with multiple threads
@@ -83,7 +82,8 @@ typedef enum
     COLORS_VALUE,
     COLORS_LIVE_CELL,
     COLORS_TITLE,
-    COLORS_PATTERN_INFO
+    COLORS_PATTERN_INFO,
+    COLORS_ERROR
 } colors_t;
 
 typedef enum
@@ -115,6 +115,9 @@ static uint16_t timer;
 
 // Function to initialize the User Interface
 static void init_tui(void);
+
+// Function to determine if grid is too small
+static uint8_t grid_too_small(void);
 
 // Function to draw a string in a rounded frame for the pattern name
 static void draw_str_in_frame(const char * str);
@@ -155,6 +158,7 @@ static void init_tui(void)
     init_pair(COLORS_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
     init_pair(COLORS_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
     init_pair(COLORS_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
+    init_pair(COLORS_ERROR,        COLOR_WHITE,   COLOR_RED);     // Error
     ESCDELAY = 1; // Set the delay for escape sequences
 
     // Create status window
@@ -197,6 +201,14 @@ static void init_tui(void)
     if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
     if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
     grid_set_size(grid_width, grid_height);
+}
+
+
+
+// Function to determine if grid is too small
+static uint8_t grid_too_small(void)
+{
+    return ((grid_width < 16) || (grid_height < 8));
 }
 
 
@@ -333,9 +345,10 @@ static void draw_grid(void)
     }
     wattroff(w_grid, A_BOLD);
 
-    // Handle startup screen
+    // Handle grid screen messages
     if((stage == STAGE_STARTUP) || (stage == STAGE_STARTWAIT))
     {
+        // Handle startup screen
         wmove(w_grid, 0, 0);
         waddstr(w_grid, "\n");
         wattron(w_grid, A_BOLD | A_REVERSE);
@@ -346,16 +359,14 @@ static void draw_grid(void)
         waddstr(w_grid, "\n");
         waddstr(w_grid, COMMAND_KEYS_STR);
     }
-
-    // Handle pattern info
-    if(stage == STAGE_SHOWINFO)
+    else if(stage == STAGE_SHOWINFO)
     {
+        // Handle pattern info
         draw_str_in_frame(grid_get_initpattern_long_str(initpattern));
     }
-
-    // Handle end message
-    if(stage == STAGE_END)
+    else if(stage == STAGE_END)
     {
+        // Handle end message
         draw_str_in_frame("Simulation End");
     }
 
@@ -373,134 +384,146 @@ static void draw_grid(void)
         sprintf(str_value, "%ux%u", grid_width, grid_height);
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
+            if(grid_too_small())
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_ERROR));
+                waddstr(w_status, str_value);
+                waddstr(w_status, " is too small");
+            }
+            else
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
         }
 
-        // Cycles
-        strcpy(str_label, " Cycles:");
-        sprintf(str_value, "%3u", grid_get_cycle_counter());
-        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+        if(!grid_too_small())
         {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
-        }
+            // Cycles
+            strcpy(str_label, " Cycles:");
+            sprintf(str_value, "%3u", grid_get_cycle_counter());
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
 
-        // Cells
-        strcpy(str_label, " Cells:");
-        sprintf(str_value, "%3u", grid_get_cells_alive());
-        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
-        }
+            // Cells
+            strcpy(str_label, " Cells:");
+            sprintf(str_value, "%3u", grid_get_cells_alive());
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
 
-        // Speed
-        strcpy(str_label, " Speed:");
-        if(hz <= 9.9)
-        {
-            sprintf(str_value, "%u (%0.1f Hz)", speed, hz);
-        }
-        else
-        {
-            sprintf(str_value, "%u (%0.0f Hz)", speed, hz);
-        }
-        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
-        }
+            // Speed
+            strcpy(str_label, " Speed:");
+            if(hz <= 9.9)
+            {
+                sprintf(str_value, "%u (%0.1f Hz)", speed, hz);
+            }
+            else
+            {
+                sprintf(str_value, "%u (%0.0f Hz)", speed, hz);
+            }
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
 
-        // Pattern
-        strcpy(str_label, " Pattern:");
-        if(strlen(grid_get_initpattern_long_str(initpattern)) < sizeof(str_value))
-        {
-            strcpy(str_value, grid_get_initpattern_long_str(initpattern));
-        }
-        else
-        {
-            strcpy(str_value, "?");
-        }
-        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
-        }
+            // Pattern
+            strcpy(str_label, " Pattern:");
+            if(strlen(grid_get_initpattern_long_str(initpattern)) < sizeof(str_value))
+            {
+                strcpy(str_value, grid_get_initpattern_long_str(initpattern));
+            }
+            else
+            {
+                strcpy(str_value, "?");
+            }
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
 
-        // Style
-        strcpy(str_label, " Style:");
-        if     (style == STYLE_HASH)
-            strcpy(str_value, "Hash");
-        else if(style == STYLE_BLOCK)
-            strcpy(str_value, "Block");
-        else if(style == STYLE_DOUBLE)
-            strcpy(str_value, "Double");
-        else if(style == STYLE_BRAILLE)
-            strcpy(str_value, "Braille");
-        else
-            strcpy(str_value, "?");
-        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
-        }
+            // Style
+            strcpy(str_label, " Style:");
+            if     (style == STYLE_HASH)
+                strcpy(str_value, "Hash");
+            else if(style == STYLE_BLOCK)
+                strcpy(str_value, "Block");
+            else if(style == STYLE_DOUBLE)
+                strcpy(str_value, "Double");
+            else if(style == STYLE_BRAILLE)
+                strcpy(str_value, "Braille");
+            else
+                strcpy(str_value, "?");
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
 
-        // Mode
-        strcpy(str_label, " Mode:");
-        if     (automode == AUTOMODE_NEXT)
-            strcpy(str_value, "Next");
-        else if(automode == AUTOMODE_LOOP)
-            strcpy(str_value, "Loop");
-        else if(automode == AUTOMODE_STOP)
-            strcpy(str_value, "Stop");
-        else
-            strcpy(str_value, "?");
-        if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_LABEL));
-            waddstr(w_status, str_label);
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            waddstr(w_status, str_value);
-        }
+            // Mode
+            strcpy(str_label, " Mode:");
+            if     (automode == AUTOMODE_NEXT)
+                strcpy(str_value, "Next");
+            else if(automode == AUTOMODE_LOOP)
+                strcpy(str_value, "Loop");
+            else if(automode == AUTOMODE_STOP)
+                strcpy(str_value, "Stop");
+            else
+                strcpy(str_value, "?");
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+            }
 
-        // Remember position and clear rest of line
-        waddstr(w_status, "   ");
-        pos = getcurx(w_status);
-        for(uint16_t i=pos; i<width; i++)
-            waddch(w_status, ' ');
+            // Remember position and clear rest of line
+            waddstr(w_status, "   ");
+            pos = getcurx(w_status);
+            for(uint16_t i=pos; i<width; i++)
+                waddch(w_status, ' ');
 
-        // Author
-        char author[] = "by "AUTHOR;
-        if((width-strlen(author)-1) > pos)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
-            mvwaddstr(w_status, 0, width-strlen(author)-1, author);
-        }
+            // Author
+            char author[] = "by "AUTHOR;
+            if((width-strlen(author)-1) > pos)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
+                mvwaddstr(w_status, 0, width-strlen(author)-1, author);
+            }
 
-        // SW Version
-        if((width-strlen(author)-1-strlen(SW_VERS)-1) > pos)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_VALUE));
-            mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1, SW_VERS);
-        }
+            // SW Version
+            if((width-strlen(author)-1-strlen(SW_VERS)-1) > pos)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1, SW_VERS);
+            }
 
-        // SW Name
-        if((width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1) > pos)
-        {
-            wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
-            mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
+            // SW Name
+            if((width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1) > pos)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
+                mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
+            }
         }
     }
 
@@ -655,9 +678,16 @@ int main(int argc, char * argv[])
         }
         else if(stage == STAGE_INIT)
         {
+            if(grid_too_small())
+            {
+                grid_init(INITPATTERN_CLEAR);
+            }
+            else
+            {
+                grid_init(initpattern);
+                stage = STAGE_SHOWINFO;
+            }
             hz = 0;
-            grid_init(initpattern);
-            stage = STAGE_SHOWINFO;
             timer = 0;
         }
         else if(stage == STAGE_SHOWINFO)
@@ -675,7 +705,7 @@ int main(int argc, char * argv[])
                 hz = (float)(grid_get_cycle_counter() * 1000) / (float)timer;
                 grid_update();
             }
-            if(grit_end_detected())
+            if(grid_end_detected())
             {
                 stage = STAGE_END;
                 timer = 0;
