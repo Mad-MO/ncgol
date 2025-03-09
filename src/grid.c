@@ -113,7 +113,6 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_STILLLIFES)
     {
-        // TODO: Add size conditions
         // Block
         patterns_set_to_pos(PATTERN_BLOCK, grid, 1, 1);
 
@@ -121,17 +120,19 @@ void grid_init(initpattern_t pattern)
         patterns_set_to_pos(PATTERN_BEEHIVE, grid, 6, 1);
 
         // Loaf
-        patterns_set_to_pos(PATTERN_LOAF, grid, 13, 1);
+        if(grid_width >= 18)
+            patterns_set_to_pos(PATTERN_LOAF, grid, 13, 1);
 
         // Boat
-        patterns_set_to_pos(PATTERN_BOAT, grid, 20, 1);
+        if(grid_width >= 24)
+            patterns_set_to_pos(PATTERN_BOAT, grid, 20, 1);
 
         // Tub
-        patterns_set_to_pos(PATTERN_TUB, grid, 26, 1);
+        if(grid_width >= 30)
+            patterns_set_to_pos(PATTERN_TUB, grid, 26, 1);
     }
     else if(pattern == INITPATTERN_OSCILLATORS)
     {
-        // TODO: Add size conditions
         // Blinker
         patterns_set_to_pos(PATTERN_BLINKER, grid, 1, 2);
 
@@ -139,16 +140,20 @@ void grid_init(initpattern_t pattern)
         patterns_set_to_pos(PATTERN_TOAD, grid, 7, 2);
 
         // Beacon
-        patterns_set_to_pos(PATTERN_BEACON, grid, 14, 2);
+        if(grid_width >= 18)
+            patterns_set_to_pos(PATTERN_BEACON, grid, 14, 2);
 
         // Pulsar
-        patterns_set_to_pos(PATTERN_PULSAR, grid, 22, 1);
+        if((grid_width >= 36) && (grid_height >= 16))
+            patterns_set_to_pos(PATTERN_PULSAR, grid, 22, 1);
 
         // Penta-decathlon
-        patterns_set_to_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
+        if((grid_width >= 17) && (grid_height >= 17))
+            patterns_set_to_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
 
         // Octagon
-        patterns_set_to_pos(PATTERN_OCTAGON, grid, 2, 18);
+        if(grid_height >= 25)
+            patterns_set_to_pos(PATTERN_OCTAGON, grid, 2, 18);
     }
     else if(pattern == INITPATTERN_SPACESHIPS)
     {
@@ -159,10 +164,12 @@ void grid_init(initpattern_t pattern)
         patterns_set_to_pos(PATTERN_LWSS, grid, 7, 1);
 
         // Middleweight spaceship (MWSS)
-        patterns_set_to_pos(PATTERN_MWSS, grid, 7, 7);
+        if(grid_height >= 14)
+            patterns_set_to_pos(PATTERN_MWSS, grid, 7, 7);
 
         // Heavyweight spaceship (HWSS)
-        patterns_set_to_pos(PATTERN_HWSS, grid, 7, 14);
+        if(grid_height >= 21)
+            patterns_set_to_pos(PATTERN_HWSS, grid, 7, 14);
     }
     else if(pattern == INITPATTERN_GOSPER_GLIDERGUN)
     {
