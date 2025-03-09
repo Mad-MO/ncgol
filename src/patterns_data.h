@@ -178,6 +178,22 @@ pattern_desc_t pulsar =
     }
 };
 
+pattern_desc_t octagon =
+{
+    // Octagon
+    .width  = 6,
+    .height = 6,
+    .pattern =
+    {// 1 2 3 4 5 6
+        _,X,_,_,X,_,
+        X,_,X,X,_,X,
+        _,X,_,_,X,_,
+        _,X,_,_,X,_,
+        X,_,X,X,_,X,
+        _,X,_,_,X,_
+    }
+};
+
 pattern_desc_t penta_decathlon =
 {
     // Penta-decathlon
@@ -435,6 +451,7 @@ pattern_desc_t *pattern_list[] =
     &toad,
     &beacon,
     &pulsar,
+    &octagon,
     &penta_decathlon,
     &glider,
     &glider_stopper_below,

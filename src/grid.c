@@ -113,6 +113,7 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_STILLLIFES)
     {
+        // TODO: Add size conditions
         // Block
         patterns_set_to_pos(PATTERN_BLOCK, grid, 1, 1);
 
@@ -130,6 +131,7 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_OSCILLATORS)
     {
+        // TODO: Add size conditions
         // Blinker
         patterns_set_to_pos(PATTERN_BLINKER, grid, 1, 2);
 
@@ -144,6 +146,9 @@ void grid_init(initpattern_t pattern)
 
         // Penta-decathlon
         patterns_set_to_pos(PATTERN_PENTA_DECATHLON, grid, 4, 10);
+
+        // Octagon
+        patterns_set_to_pos(PATTERN_OCTAGON, grid, 2, 18);
     }
     else if(pattern == INITPATTERN_SPACESHIPS)
     {

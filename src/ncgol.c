@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
 // TODO: Check for minimum grid size (8x8 Grid at least...)
 // TODO: Add assert() from assert.h to check struct size from patterns
