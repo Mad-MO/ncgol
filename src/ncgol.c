@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Reinit on resize of window
 // TODO: Function to get names for init modes (short names)
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
@@ -506,6 +505,7 @@ static void handle_inputs(void)
     if(key==KEY_RESIZE)
     {
         init_tui();
+        stage = STAGE_INIT;
     }
     else if(tolower(key) == 'q')
     {
@@ -538,7 +538,7 @@ static void handle_inputs(void)
     }
     else if(key == ' ')
     {
-        stage   = STAGE_INIT;
+        stage = STAGE_INIT;
     }
     else if(tolower(key) == 'c')
     {
@@ -553,7 +553,7 @@ static void handle_inputs(void)
     }
     else if(tolower(key) == 'h')
     {
-        stage       = STAGE_STARTUP;
+        stage = STAGE_STARTUP;
     }
     if(key==27) // ESC
     {
