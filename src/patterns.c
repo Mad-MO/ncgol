@@ -86,21 +86,6 @@ void patterns_set_to_center(pattern_t pattern, grid_t *grid)
 
 
 
-// Return text string for initpattern
-const char * patterns_get_str(pattern_t pattern)
-{
-    if(pattern < PATTERN_MAX) // Check boundaries
-    {
-        return pattern_list[pattern]->name;
-    }
-    else
-    {
-        return "?";
-    }
-}
-
-
-
 // Get pattern width
 uint16_t patterns_get_width(pattern_t pattern)
 {

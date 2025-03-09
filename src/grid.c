@@ -60,6 +60,27 @@ uint16_t grid_get_height(void)
 
 
 
+// Text  strings for the initpattern_t enum
+static const char *init_str[][2] =
+{
+    {"random",    "Random (fire)"},
+    {"conway",    "Conway's Game of Life"},
+    {"still",     "Still lifes"},
+    {"osc",       "Oscillators"},
+    {"ships",     "Spaceships"},
+    {"gosper",    "Gosper Glider gun"},
+    {"simkin",    "Simkin Glider gun"},
+    {"pentomino", "Pentomino"},
+    {"diehard",   "Die hard"},
+    {"acorn",     "Acorn"},
+    {"block1",    "Block engine 1"},
+    {"block2",    "Block engine 2"},
+    {"block3",    "Double block engine"},
+    {"8bit",      "I love 8-bit"}
+};
+
+
+
 // Function to initialize the grid
 void grid_init(initpattern_t pattern)
 {
@@ -361,39 +382,32 @@ uint32_t grid_get_cycle_counter(void)
 
 
 
-// Return text string for pattern
-const char* grid_get_initpattern_str(initpattern_t initpattern)
+// Return short text string for pattern
+const char* grid_get_initpattern_short_str(initpattern_t initpattern)
 {
-    if     (initpattern == INITPATTERN_RANDOM)
-        return "Random";
-    else if(initpattern == INITPATTERN_CONWAY)
-        return patterns_get_str(PATTERN_CONWAY);
-    else if(initpattern == INITPATTERN_STILLLIFES)
-        return "Still lifes";
-    else if(initpattern == INITPATTERN_OSCILLATORS)
-        return "Oscillators";
-    else if(initpattern == INITPATTERN_SPACESHIPS)
-        return "Spaceships";
-    else if(initpattern == INITPATTERN_GOSPER_GLIDERGUN)
-        return patterns_get_str(PATTERN_GOSPER_GLIDERGUN);
-    else if(initpattern == INITPATTERN_SIMKIN_GLIDERGUN)
-        return patterns_get_str(PATTERN_SIMKIN_GLIDERGUN);
-    else if(initpattern == INITPATTERN_PENTOMINO)
-        return patterns_get_str(PATTERN_PENTOMINO);
-    else if(initpattern == INITPATTERN_DIEHARD)
-        return patterns_get_str(PATTERN_DIEHARD);
-    else if(initpattern == INITPATTERN_ACORN)
-        return patterns_get_str(PATTERN_ACORN);
-    else if(initpattern == INITPATTERN_BLOCKENGINE1)
-        return patterns_get_str(PATTERN_BLOCKENGINE1);
-    else if(initpattern == INITPATTERN_BLOCKENGINE2)
-        return patterns_get_str(PATTERN_BLOCKENGINE2);
-    else if(initpattern == INITPATTERN_DOUBLEBLOCKENGINE)
-        return patterns_get_str(PATTERN_DOUBLEBLOCKENGINE);
-    else if(initpattern == INITPATTERN_ILOVE8BIT)
-        return patterns_get_str(PATTERN_ILOVE8BIT);
+    if(initpattern < INITPATTERN_MAX)
+    {
+        return init_str[initpattern][0];
+    }
     else
+    {
         return "?";
+    }
+}
+
+
+
+// Return long text string for pattern
+const char* grid_get_initpattern_long_str(initpattern_t initpattern)
+{
+    if(initpattern < INITPATTERN_MAX)
+    {
+        return init_str[initpattern][1];
+    }
+    else
+    {
+        return "?";
+    }
 }
 
 

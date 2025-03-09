@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Function to get names for init modes (short names)
 // TODO: New pattern "Octagon"
 // TODO: New pattern "Tumbler"
 // TODO: Check for minimum grid size (8x8 Grid at least...)
@@ -352,7 +351,7 @@ static void draw_grid(void)
     // Handle pattern info
     if(stage == STAGE_SHOWINFO)
     {
-        draw_str_in_frame(grid_get_initpattern_str(initpattern));
+        draw_str_in_frame(grid_get_initpattern_long_str(initpattern));
     }
 
     // Handle end message
@@ -365,7 +364,7 @@ static void draw_grid(void)
     {
         // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Pattern:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
         char str_label[20];
-        char str_value[20];
+        char str_value[30];
         uint16_t pos   = 0;
         uint16_t width = getmaxx(w_status);
         wmove(w_status, 0, 0);
@@ -416,7 +415,14 @@ static void draw_grid(void)
 
         // Pattern
         strcpy(str_label, " Pattern:");
-        strcpy(str_value, grid_get_initpattern_str(initpattern));
+        if(strlen(grid_get_initpattern_long_str(initpattern)) < sizeof(str_value))
+        {
+            strcpy(str_value, grid_get_initpattern_long_str(initpattern));
+        }
+        else
+        {
+            strcpy(str_value, "?");
+        }
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -770,10 +776,9 @@ void handle_args(int argc, char * argv[])
                 printf("Options:\n");
                 printf("  -c, --charstyle  Set character style (hash, block, double, braille)\n");
                 printf("  -h, --help       This Help\n");
-                printf("  -i, --init       Set initial pattern\n"
-                       "                   (random, conway, stilllifes, oscillators, spaceships,\n"
-                       "                   gosper, simkin, pentomino, diehard, acorn, blockengine1,\n"
-                       "                   blockengine2, doubleblockengine, ilove8bit)\n");
+                printf("  -i, --init       Set initial pattern:\n");
+                for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
+                    printf("                   %-9s -> %s\n", grid_get_initpattern_short_str(i), grid_get_initpattern_long_str(i));
                 printf("  -m, --mode       Set mode (next, loop, stop)\n");
                 printf("  -n, --nowait     Start without Startupscreen\n");
                 printf("  -s, --speed      Set speed (0-9)\n");
@@ -784,38 +789,21 @@ void handle_args(int argc, char * argv[])
 
             case 'i':
             {
-                if     (strcmp(optarg, "random") == 0)
-                    initpattern = INITPATTERN_RANDOM;
-                else if(strcmp(optarg, "conway") == 0)
-                    initpattern = INITPATTERN_CONWAY;
-                else if(strcmp(optarg, "stilllifes") == 0)
-                    initpattern = INITPATTERN_STILLLIFES;
-                else if(strcmp(optarg, "oscillators") == 0)
-                    initpattern = INITPATTERN_OSCILLATORS;
-                else if(strcmp(optarg, "spaceships") == 0)
-                    initpattern = INITPATTERN_SPACESHIPS;
-                else if(strcmp(optarg, "gosper") == 0)
-                    initpattern = INITPATTERN_GOSPER_GLIDERGUN;
-                else if(strcmp(optarg, "simkin") == 0)
-                    initpattern = INITPATTERN_SIMKIN_GLIDERGUN;
-                else if(strcmp(optarg, "pentomino") == 0)
-                    initpattern = INITPATTERN_PENTOMINO;
-                else if(strcmp(optarg, "diehard") == 0)
-                    initpattern = INITPATTERN_DIEHARD;
-                else if(strcmp(optarg, "acorn") == 0)
-                    initpattern = INITPATTERN_ACORN;
-                else if(strcmp(optarg, "blockengine1") == 0)
-                    initpattern = INITPATTERN_BLOCKENGINE1;
-                else if(strcmp(optarg, "blockengine2") == 0)
-                    initpattern = INITPATTERN_BLOCKENGINE2;
-                else if(strcmp(optarg, "doubleblockengine") == 0)
-                    initpattern = INITPATTERN_DOUBLEBLOCKENGINE;
-                else if(strcmp(optarg, "ilove8bit") == 0)
-                    initpattern = INITPATTERN_ILOVE8BIT;
-                else
+                initpattern = INITPATTERN_MAX;
+                for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
+                {
+                    if(strcmp(optarg, grid_get_initpattern_short_str(i)) == 0)
+                    {
+                        initpattern = i;
+                    }
+                }
+                if(initpattern == INITPATTERN_MAX) // No valid value found?
                 {
                     printf("Invalid init value: %s\n", optarg);
-                    printf("Init must be one of: random, conway, stilllifes, oscillators, spaceships, gosper, simkin, pentomino, diehard, acorn, blockengine1, blockengine2, doubleblockengine, ilove8bit\n");
+                    printf("Init must be one of:");
+                    for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
+                        printf(" %s", grid_get_initpattern_short_str(i));
+                    printf("\n");
                     exit(1);
                 }
                 break;
