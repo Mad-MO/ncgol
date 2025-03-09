@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: New pattern "Tumbler"
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Split up end detection so that cpu intensive part can be run less often
 // TODO: Update grid with multiple threads

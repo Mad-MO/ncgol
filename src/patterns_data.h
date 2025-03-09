@@ -194,6 +194,21 @@ pattern_desc_t octagon =
     }
 };
 
+pattern_desc_t tumbler =
+{
+    // Tumbler
+    .width  = 9,
+    .height = 5,
+    .pattern =
+    {// 1 2 3 4 5 6 7 8 9
+        _,X,_,_,_,_,_,X,_,
+        X,_,X,_,_,_,X,_,X,
+        X,_,_,X,_,X,_,_,X,
+        _,_,X,_,_,_,X,_,_,
+        _,_,X,X,_,X,X,_,_
+    }
+};
+
 pattern_desc_t penta_decathlon =
 {
     // Penta-decathlon
@@ -452,6 +467,7 @@ pattern_desc_t *pattern_list[] =
     &beacon,
     &pulsar,
     &octagon,
+    &tumbler,
     &penta_decathlon,
     &glider,
     &glider_stopper_below,

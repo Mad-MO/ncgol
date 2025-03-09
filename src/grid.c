@@ -154,6 +154,10 @@ void grid_init(initpattern_t pattern)
         // Octagon
         if(grid_height >= 25)
             patterns_set_to_pos(PATTERN_OCTAGON, grid, 2, 18);
+
+        // Tumbler
+        if((grid_width >= 21) && (grid_height >= 25))
+            patterns_set_to_pos(PATTERN_TUMBLER, grid, 11, 18);
     }
     else if(pattern == INITPATTERN_SPACESHIPS)
     {
