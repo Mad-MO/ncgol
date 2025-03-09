@@ -14,7 +14,6 @@
 // TODO: New pattern "Tumbler"
 // TODO: Check for minimum grid size (8x8 Grid at least...)
 // TODO: Add assert() from assert.h to check struct size from patterns
-// TODO: Show speed in Hz
 // TODO: Split up end detection so that cpu intensive part can be run less often
 // TODO: Update grid with multiple threads
 // TODO: Add man page
@@ -39,6 +38,7 @@
 
 #define SPEED_MAX  9
 static uint8_t  speed;
+static uint32_t hz;
 
 static uint16_t grid_width;
 static uint16_t grid_height;
@@ -404,7 +404,7 @@ static void draw_grid(void)
 
         // Speed
         strcpy(str_label, " Speed:");
-        sprintf(str_value, "%u", speed);
+        sprintf(str_value, "%u (%u Hz)", speed, hz);
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -649,6 +649,7 @@ int main(int argc, char * argv[])
         }
         else if(stage == STAGE_INIT)
         {
+            hz = 0;
             grid_init(initpattern);
             stage = STAGE_SHOWINFO;
             timer = 0;
@@ -665,6 +666,7 @@ int main(int argc, char * argv[])
         {
             if(speed > 0)
             {
+                hz = grid_get_cycle_counter() * 1000 / timer;
                 grid_update();
             }
             if(grit_end_detected())
