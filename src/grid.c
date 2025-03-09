@@ -88,6 +88,7 @@ void grid_init(initpattern_t pattern)
         return;
 
     memset(grid, 0, sizeof(grid));
+    memset(new_grid, 0, sizeof(new_grid));
     end_detected = 0;
 
     if     (pattern == INITPATTERN_RANDOM)
@@ -312,7 +313,6 @@ void grid_update(void)
 {
     uint16_t x, y;
 
-    memset(new_grid, 0, sizeof(new_grid));
     cells_alive = 0;
     if(!end_detected)
     {
@@ -323,6 +323,7 @@ void grid_update(void)
     {
         for(y=0; y<grid_height; y++)
         {
+            // Count neighbors
             uint8_t neighbors = 0;
             for(int8_t dx=-1; dx<=1; dx++)
             {
@@ -337,16 +338,25 @@ void grid_update(void)
                     neighbors += grid[nx][ny];
                 }
             }
-
-            if     ((grid[x][y] == 1) && (neighbors  < 2)) // Underpopulation
-                new_grid[x][y] = 0;
-            else if((grid[x][y] == 1) && (neighbors  > 3)) // Overpopulation
-                new_grid[x][y] = 0;
-            else if((grid[x][y] == 0) && (neighbors == 3)) // Reproduction
-                new_grid[x][y] = 1;
-            else                                           // Stasis
-                new_grid[x][y] = grid[x][y];
-
+            // Calculate new state
+            // -> This way seems redundant (2 times the same else case), but it is more cpu efficient!
+            if(grid[x][y] == 0)
+            {
+                if(neighbors == 3)      // Reproduction
+                    new_grid[x][y] = 1;
+                else                    // Stasis
+                    new_grid[x][y] = grid[x][y];
+            }
+            else
+            {
+                if     (neighbors  < 2) // Underpopulation
+                    new_grid[x][y] = 0;
+                else if(neighbors  > 3) // Overpopulation
+                    new_grid[x][y] = 0;
+                else                    // Stasis
+                    new_grid[x][y] = grid[x][y];
+            }
+            // Count living cells
             if(new_grid[x][y])
                 cells_alive++;
         }
