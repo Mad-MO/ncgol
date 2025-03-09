@@ -78,7 +78,7 @@ void grid_init(initpattern_t pattern)
     }
     else if(pattern == INITPATTERN_CONWAY)
     {
-        if(grid_get_width() >= patterns_get_width(PATTERN_CONWAY_FULL))
+        if((grid_get_width() >= patterns_get_width(PATTERN_CONWAY_FULL)) && (grid_get_height() >= patterns_get_height(PATTERN_CONWAY_FULL)))
         {
             // Conway's Game of Life
             patterns_set_to_center(PATTERN_CONWAY_FULL, grid);
