@@ -38,7 +38,7 @@
 
 #define SPEED_MAX  9
 static uint8_t  speed;
-static uint32_t hz;
+static float hz;
 
 static uint16_t grid_width;
 static uint16_t grid_height;
@@ -404,7 +404,14 @@ static void draw_grid(void)
 
         // Speed
         strcpy(str_label, " Speed:");
-        sprintf(str_value, "%u (%u Hz)", speed, hz);
+        if(hz <= 9.9)
+        {
+            sprintf(str_value, "%u (%0.1f Hz)", speed, hz);
+        }
+        else
+        {
+            sprintf(str_value, "%u (%0.0f Hz)", speed, hz);
+        }
         if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
         {
             wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -666,7 +673,7 @@ int main(int argc, char * argv[])
         {
             if(speed > 0)
             {
-                hz = grid_get_cycle_counter() * 1000 / timer;
+                hz = (float)(grid_get_cycle_counter() * 1000) / (float)timer;
                 grid_update();
             }
             if(grit_end_detected())
