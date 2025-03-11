@@ -11,9 +11,12 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: Add assert() from assert.h to check struct size from patterns
-// TODO: Update grid with multiple threads
+// TODO: Run grid calculation with multiple threads
+// TODO: Update grid in terminal not every time
+// TODO: Update grid in terminal in own thread
 // TODO: Add man page
 // TODO: Prepare for linux package
+// TODO: Output of author name / city / country
 
 #include <curses.h>
 #include <stdlib.h>
