@@ -17,6 +17,11 @@
 // TODO: Add man page
 // TODO: Prepare for linux package
 // TODO: Output of author name / city / country
+// TODO: Improve Hz calculation (when changing speed or speed is 0)
+// TODO: Mode to run forever (without end detection)
+// TODO: Textlist for charstyles
+// TODO: Textlist for modes
+// TODO: Improve end detection (oscillators) 100/200/300/400/500?
 
 #include <curses.h>
 #include <stdlib.h>
