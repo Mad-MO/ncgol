@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "grid.h"
 #include "patterns.h"
 
@@ -324,18 +326,20 @@ void grid_init(initpattern_t pattern)
 
 
 
-// Function to update the grid based on the game of life rules
-void grid_update(void)
+// Function to update the grid based on the game of life rules (multi-threaded with a subset of given columns for each thread)
+typedef struct
+{
+    uint16_t x_beg;
+    uint16_t x_cnt;
+} calc_thread_arg_t;
+
+void * grid_calc(void * args)
 {
     uint16_t x, y;
+    uint16_t x_beg = ((calc_thread_arg_t*)args)->x_beg;
+    uint16_t x_cnt = ((calc_thread_arg_t*)args)->x_cnt;
 
-    cells_alive = 0;
-    if(!end_detected)
-    {
-        cycle_counter++;
-    }
-
-    for(x=0; x<grid_width; x++)
+    for(x=x_beg; x<(x_beg+x_cnt); x++)
     {
         for(y=0; y<grid_height; y++)
         {
@@ -372,7 +376,49 @@ void grid_update(void)
                 else                    // Stasis
                     new_grid[x][y] = grid[x][y];
             }
-            // Count living cells
+        }
+    }
+    pthread_exit(NULL);
+}
+
+
+
+// Function to update the grid based on the game of life rules (start multi-threaded calculation)
+void grid_update(void)
+{
+    uint16_t thread_cnt = (sysconf(_SC_NPROCESSORS_ONLN) * 4); // Number of active Cores * 2
+    if(thread_cnt > grid_width) thread_cnt = grid_width;
+    pthread_t threads[thread_cnt];
+    calc_thread_arg_t args[thread_cnt];
+
+    cells_alive = 0;
+    if(!end_detected)
+    {
+        cycle_counter++;
+    }
+
+    for(int i=0; i<thread_cnt; i++)
+    {
+        uint16_t x_beg = ((int)grid_width * i) / thread_cnt;
+        uint16_t x_end = ((int)grid_width * (i+1)) / thread_cnt;
+        uint16_t x_cnt = x_end - x_beg;
+        args[i].x_beg = x_beg;
+        args[i].x_cnt = x_cnt;
+        if(pthread_create(&threads[i], NULL, grid_calc, (void *)&args[i]))
+        {
+            exit(1);
+        }
+    }
+    for(int i=0; i<thread_cnt; i++)
+    {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Count living cells
+    for(uint16_t x=0; x<grid_width; x++)
+    {
+        for(uint16_t y=0; y<grid_height; y++)
+        {
             if(new_grid[x][y])
                 cells_alive++;
         }
