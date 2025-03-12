@@ -18,7 +18,6 @@
 // TODO: Prepare for linux package
 // TODO: Output of author name / city / country
 // TODO: Improve Hz calculation (when changing speed or speed is 0)
-// TODO: Mode to run forever (without end detection)
 // TODO: Textlist for charstyles
 // TODO: Textlist for modes
 // TODO: Improve end detection (oscillators) 100/200/300/400/500?
@@ -67,15 +66,10 @@ static stage_t stage;
 
 typedef enum
 {
-    // Styles which use two chars per cell
-    STYLE_HASH,
-    STYLE_BLOCK,
-
-    // Styles which show two cells in one char
-    STYLE_DOUBLE,
-
-    // Braile style with 8 dots per char
-    STYLE_BRAILLE,
+    STYLE_HASH,    // Style which uses '#' and two chars per cell
+    STYLE_BLOCK,   // Style which use unicode blocks in two chars per cell
+    STYLE_DOUBLE,  // Style which shows two cells in one char
+    STYLE_BRAILLE, // Braile style with 8 cells per char
     // ----------------
     STYLE_MAX
 } style_t;
