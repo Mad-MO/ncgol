@@ -641,7 +641,7 @@ int main(int argc, char * argv[])
     clock_gettime(CLOCK_REALTIME, &ts);
     last_ticks = ts.tv_nsec / 1000000;
 
-    // Loop until back key is pressed
+    // Mainloop
     while(1)
     {
         uint16_t ticks;
@@ -749,13 +749,6 @@ int main(int argc, char * argv[])
         draw_grid();
         wrefresh(w_grid);
     }
-
-    // Ask to end program
-    wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
-    mvwaddstr(w_status, 0, 0, " Press any key to quit");
-    wattroff(w_status, COLOR_PAIR(COLORS_STANDARD));
-    wrefresh(w_status);
-    wgetch(w_status);
 
     // End program
     endwin();
