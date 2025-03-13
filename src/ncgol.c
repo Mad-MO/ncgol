@@ -826,7 +826,7 @@ void handle_args(int argc, char * argv[])
                 printf("Usage:\n");
                 printf("  %s [options]\n", SW_NAME);
                 printf("\n");
-                printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
+                printf("%s - ncurses Game of Life %s (compiled %s %s) by %s\n", SW_NAME, SW_VERS, __DATE__, __TIME__, AUTHOR_LONG);
                 printf("\n");
                 printf("Options:\n");
                 printf("  -c, --charstyle  Set character style (hash, block, double, braille)\n");
@@ -905,7 +905,7 @@ void handle_args(int argc, char * argv[])
 
             case 'v':
             {
-                printf("%s - ncurses Game of Life %s by %s\n", SW_NAME, SW_VERS, AUTHOR);
+                printf("%s - ncurses Game of Life %s (compiled %s %s) by %s\n", SW_NAME, SW_VERS, __DATE__, __TIME__, AUTHOR_LONG);
                 exit(0);
             }
 
