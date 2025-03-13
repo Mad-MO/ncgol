@@ -31,12 +31,11 @@
 #include <getopt.h>
 #include "grid.h"
 
-
-
 // Define SW name and Version
-#define SW_NAME "ncgol"
-#define SW_VERS "v0.6"
-#define AUTHOR  "domo"
+#define SW_NAME       "ncgol"
+#define SW_VERS       "v0.6"
+#define AUTHOR_SHORT  "M. Ochs"
+#define AUTHOR_LONG   "Martin Ochs"
 
 #define SPEED_MAX  9
 static uint8_t  speed;
@@ -76,9 +75,11 @@ static style_t style;
 
 typedef enum
 {
-    COLORS_STANDARD = 1,
+    COLORS_DEFAULT = 0, // Already defined by ncurses with shell colors
+    COLORS_STANDARD,
     COLORS_LABEL,
     COLORS_VALUE,
+    COLORS_INFO,
     COLORS_LIVE_CELL,
     COLORS_TITLE,
     COLORS_PATTERN_INFO,
@@ -151,11 +152,15 @@ static void init_tui(void)
 
     // Prepare coloring
     start_color();
-    init_pair(COLORS_STANDARD,     COLOR_WHITE,   COLOR_BLACK);   // Standard
-    init_pair(COLORS_LABEL,        COLOR_GREEN,   COLOR_BLACK);   // Label
-    init_pair(COLORS_VALUE,        COLOR_YELLOW,  COLOR_BLACK);   // Value
-    init_pair(COLORS_LIVE_CELL,    COLOR_WHITE,   COLOR_BLACK);   // Live cell
-    init_pair(COLORS_TITLE,        COLOR_CYAN,    COLOR_BLACK);   // Title
+    use_default_colors();                   // Use shell colors
+    NCURSES_COLOR_T fg, bg;
+    pair_content(COLORS_DEFAULT, &fg, &bg); // Get default colors from shell
+    init_pair(COLORS_STANDARD,     fg,            bg);            // Standard
+    init_pair(COLORS_LABEL,        fg,            bg);            // Label
+    init_pair(COLORS_VALUE,        COLOR_YELLOW,  bg);            // Value
+    init_pair(COLORS_INFO,         COLOR_CYAN,    bg);            // Info
+    init_pair(COLORS_LIVE_CELL,    fg,            bg);            // Live cell
+    init_pair(COLORS_TITLE,        COLOR_CYAN,    bg);            // Title
     init_pair(COLORS_PATTERN_INFO, COLOR_WHITE,   COLOR_MAGENTA); // Pattern info
     init_pair(COLORS_ERROR,        COLOR_WHITE,   COLOR_RED);     // Error
     ESCDELAY = 1; // Set the delay for escape sequences
@@ -342,7 +347,7 @@ static void draw_grid(void)
             }
         }
     }
-    wattroff(w_grid, A_BOLD);
+    wattroff(w_grid, A_BOLD | COLOR_PAIR(COLORS_LIVE_CELL));
 
     // Handle grid screen messages
     if((stage == STAGE_STARTUP) || (stage == STAGE_STARTWAIT))
@@ -409,6 +414,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Cells
@@ -420,6 +426,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Speed
@@ -438,6 +445,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Pattern
@@ -456,6 +464,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Style
@@ -476,6 +485,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Mode
@@ -494,6 +504,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Remember position and clear rest of line
@@ -503,18 +514,30 @@ static void draw_grid(void)
                 waddch(w_status, ' ');
 
             // Author
-            char author[] = "by "AUTHOR;
+            char author[] = "by "AUTHOR_LONG;
             if((width-strlen(author)-1) > pos)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
                 mvwaddstr(w_status, 0, width-strlen(author)-1, author);
+                wattroff(w_status, COLOR_PAIR(COLORS_STANDARD));
+            }
+            else
+            {
+                strcpy(author, "by "AUTHOR_SHORT);
+                if((width-strlen(author)-1) > pos)
+                {
+                    wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
+                    mvwaddstr(w_status, 0, width-strlen(author)-1, author);
+                    wattroff(w_status, COLOR_PAIR(COLORS_STANDARD));
+                }
             }
 
             // SW Version
             if((width-strlen(author)-1-strlen(SW_VERS)-1) > pos)
             {
-                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                wattron(w_status, COLOR_PAIR(COLORS_INFO));
                 mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1, SW_VERS);
+                wattroff(w_status, COLOR_PAIR(COLORS_INFO));
             }
 
             // SW Name
@@ -522,6 +545,7 @@ static void draw_grid(void)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_STANDARD));
                 mvwaddstr(w_status, 0, width-strlen(author)-1-strlen(SW_VERS)-1-strlen(SW_NAME)-1, SW_NAME);
+                wattroff(w_status, COLOR_PAIR(COLORS_STANDARD));
             }
         }
     }
