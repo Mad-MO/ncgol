@@ -31,11 +31,17 @@
 #include <getopt.h>
 #include "grid.h"
 
+#define WITH_DEBUG_STRING  1
+
 // Define SW name and Version
 #define SW_NAME       "ncgol"
 #define SW_VERS       "v0.6"
 #define AUTHOR_SHORT  "M. Ochs"
 #define AUTHOR_LONG   "Martin Ochs"
+
+#if(WITH_DEBUG_STRING)
+    char debug_str[256];
+#endif
 
 #define SPEED_MAX  9
 static uint8_t  speed;
@@ -376,12 +382,23 @@ static void draw_grid(void)
 
     // Handle status line
     {
-        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:10 Pattern:Glider gun Style:DoubleBlock   ncgol v0.x by domo"
+        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:9 (100 Hz) Pattern:Glider gun Style:Block   ncgol v0.1 by Martin Ochs"
         char str_label[20];
         char str_value[30];
         uint16_t pos   = 0;
         uint16_t width = getmaxx(w_status);
         wmove(w_status, 0, 0);
+
+        // Debug string
+        #if(WITH_DEBUG_STRING)
+            if(strlen(debug_str))
+            {
+                waddch(w_status, ' ');
+                wattron(w_status, A_BOLD | COLOR_PAIR(COLORS_ERROR));
+                waddstr(w_status, debug_str);
+                wattroff(w_status, A_BOLD | COLOR_PAIR(COLORS_ERROR));
+            }
+        #endif
 
         // Grid
         strcpy(str_label, " Grid:");
@@ -390,9 +407,12 @@ static void draw_grid(void)
         {
             if(grid_too_small())
             {
-                wattron(w_status, COLOR_PAIR(COLORS_ERROR));
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | COLOR_PAIR(COLORS_ERROR));
                 waddstr(w_status, str_value);
                 waddstr(w_status, " is too small");
+                wattroff(w_status, A_BOLD | COLOR_PAIR(COLORS_ERROR));
             }
             else
             {
@@ -400,6 +420,7 @@ static void draw_grid(void)
                 waddstr(w_status, str_label);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
         }
 
@@ -653,21 +674,23 @@ int main(int argc, char * argv[])
     wrefresh(w_grid);
 
     // Init
-    static uint16_t last_ticks;
+    static uint16_t last_systime_ms;
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
-    last_ticks = ts.tv_nsec / 1000000;
+    last_systime_ms = ts.tv_nsec / 1000000;
 
     // Mainloop
     while(1)
     {
-        uint16_t ticks;
+        uint16_t systime_ms;
+        uint16_t ticks; // Passed time in milliseconds for last cycle
 
         // Handle passed time
         clock_gettime(CLOCK_REALTIME, &ts);
-        ticks = ts.tv_nsec / 1000000; // ticks = 0...999
-        timer += (ticks - last_ticks + 1000) % 1000;
-        last_ticks = ticks;
+        systime_ms = ts.tv_nsec / 1000000;
+        ticks = (systime_ms - last_systime_ms + 1000) % 1000;
+        timer += ticks;
+        last_systime_ms = systime_ms;
 
         // Handle input
         handle_inputs();
@@ -763,6 +786,27 @@ int main(int argc, char * argv[])
             }
         }
 
+        // Show cycletime min/avg/max
+        #if(WITH_DEBUG_STRING)
+            static uint16_t t_min;
+            static uint16_t t_max;
+            static uint16_t t_loops;
+            static uint16_t time;
+            if(ticks < t_min) t_min = ticks;
+            if(ticks > t_max) t_max = ticks;
+            t_loops++;
+            time+=ticks;
+            if(time >= 1000)
+            {
+                uint16_t t_avg = time / t_loops;
+                sprintf(debug_str, "Cycle:%u/%u/%u ms", t_min, t_avg, t_max);
+                time -= 1000;
+                t_loops = 0;
+                t_max = 0;
+                t_min = 1000;
+            }
+        #endif
+
         // Draw grid
         draw_grid();
         wrefresh(w_grid);
@@ -790,7 +834,7 @@ void handle_args(int argc, char * argv[])
             {"nowait",    no_argument,       0, 'n'},
             {"speed",     required_argument, 0, 's'},
             {"version",   no_argument,       0, 'v'},
-            // -----------------------------------
+            // --------------------------------------
             {0,           0,                 0,   0}
         };
 
