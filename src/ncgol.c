@@ -138,8 +138,57 @@ int main(int argc, char * argv[]);
 // Handle the given commandline arguments
 static void handle_args(int argc, char * argv[]);
 
+// Functions for debug time measurement
+#if(WITH_DEBUG_STRING)
+    enum
+    {
+        DEBUG_TIME1 = 0,
+        DEBUG_TIME2,
+        DEBUG_TIME3,
+        DEBUG_TIME_MAX
+    };
+    uint32_t debug_time[DEBUG_TIME_MAX][2] = {{0,0}};
+    void debug_time_start(uint8_t num);
+    void debug_time_stop(uint8_t num);
+    uint32_t debug_time_get(uint8_t num);
+#endif
 
 
+
+// Functions for debug time measurement
+#if(WITH_DEBUG_STRING)
+    void debug_time_start(uint8_t num)
+    {
+        if(num < DEBUG_TIME_MAX)
+        {
+            struct timespec ts;
+            clock_gettime(CLOCK_REALTIME, &ts);
+            debug_time[num][0] = ts.tv_nsec / 1000;
+        }
+    }
+
+    void debug_time_stop(uint8_t num)
+    {
+        if(num < DEBUG_TIME_MAX)
+        {
+            struct timespec ts;
+            clock_gettime(CLOCK_REALTIME, &ts);
+            debug_time[num][1] = ts.tv_nsec / 1000;
+        }
+    }
+
+    uint32_t debug_time_get(uint8_t num)
+    {
+        if(num < DEBUG_TIME_MAX)
+        {
+            return ((debug_time[num][1] - debug_time[num][0] + 1000000) % 1000000);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+#endif
 
 // Function to initialize the User Interface
 static void init_tui(void)
@@ -748,7 +797,13 @@ int main(int argc, char * argv[])
             if(speed > 0)
             {
                 hz = (float)(grid_get_cycle_counter() * 1000) / (float)timer;
+                #if(WITH_DEBUG_STRING)
+                    debug_time_start(DEBUG_TIME1);
+                #endif
                 grid_update();
+                #if(WITH_DEBUG_STRING)
+                    debug_time_stop(DEBUG_TIME1);
+                #endif
             }
             if(grid_end_detected())
             {
@@ -784,25 +839,11 @@ int main(int argc, char * argv[])
             }
         }
 
-        // Show cycletime min/avg/max
+        // Show debug time measurement
         #if(WITH_DEBUG_STRING)
-            static uint16_t t_min;
-            static uint16_t t_max;
-            static uint16_t t_loops;
-            static uint16_t time;
-            if(ticks < t_min) t_min = ticks;
-            if(ticks > t_max) t_max = ticks;
-            t_loops++;
-            time+=ticks;
-            if(time >= 1000)
-            {
-                uint16_t t_avg = time / t_loops;
-                sprintf(debug_str, "Cycle:%u/%u/%u ms", t_min, t_avg, t_max);
-                time -= 1000;
-                t_loops = 0;
-                t_max = 0;
-                t_min = 1000;
-            }
+            debug_time_stop(DEBUG_TIME3);
+            sprintf(debug_str, " T1:%0.1f T2:%0.1f T3:%0.1f", (float)debug_time_get(DEBUG_TIME1)/1000, (float)debug_time_get(DEBUG_TIME2)/1000, (float)debug_time_get(DEBUG_TIME3)/1000);
+            debug_time_start(DEBUG_TIME3);
         #endif
 
         // Draw grid -> Reduce drawing to given Hz, because it is not necessary to draw the grid faster than the display can handle
@@ -812,8 +853,14 @@ int main(int argc, char * argv[])
         if(draw_timer >= (1000 / DRAW_GRID_HZ))
         {
             draw_timer -= (1000 / DRAW_GRID_HZ);
+            #if(WITH_DEBUG_STRING)
+                debug_time_start(DEBUG_TIME2);
+            #endif
             draw_grid();
             wrefresh(w_grid);
+            #if(WITH_DEBUG_STRING)
+                debug_time_stop(DEBUG_TIME2);
+            #endif
         }
     }
 
