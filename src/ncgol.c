@@ -11,11 +11,9 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: Add assert() from assert.h to check struct size from patterns
-// TODO: Update grid in terminal not every time (if above ~60 Hz?!)
 // TODO: Update grid in terminal in own thread
 // TODO: Add man page
 // TODO: Prepare for linux package
-// TODO: Output of author name / city / country
 // TODO: Improve Hz calculation (when changing speed or speed is 0)
 // TODO: Textlist for charstyles
 // TODO: Textlist for modes
@@ -807,9 +805,16 @@ int main(int argc, char * argv[])
             }
         #endif
 
-        // Draw grid
-        draw_grid();
-        wrefresh(w_grid);
+        // Draw grid -> Reduce drawing to given Hz, because it is not necessary to draw the grid faster than the display can handle
+        #define DRAW_GRID_HZ 60
+        static uint16_t draw_timer = 0;
+        draw_timer += ticks;
+        if(draw_timer >= (1000 / DRAW_GRID_HZ))
+        {
+            draw_timer -= (1000 / DRAW_GRID_HZ);
+            draw_grid();
+            wrefresh(w_grid);
+        }
     }
 
     // End program
