@@ -386,7 +386,7 @@ void * grid_calc(void * args)
 // Function to update the grid based on the game of life rules (start multi-threaded calculation)
 void grid_update(void)
 {
-    uint16_t thread_cnt = (sysconf(_SC_NPROCESSORS_ONLN) * 4); // Number of active Cores * 2
+    uint16_t thread_cnt = sysconf(_SC_NPROCESSORS_ONLN); // Number of active Cores
     if(thread_cnt > grid_width) thread_cnt = grid_width;
     pthread_t threads[thread_cnt];
     calc_thread_arg_t args[thread_cnt];
