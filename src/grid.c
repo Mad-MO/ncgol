@@ -18,7 +18,7 @@
 
 // Create the grid to represent the cells
 static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
-static uint8_t  new_grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
+static uint8_t  grid_new[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
 #define END_DET_CNT 250
@@ -90,7 +90,7 @@ void grid_init(initpattern_t pattern)
         return;
 
     memset(grid, 0, sizeof(grid));
-    memset(new_grid, 0, sizeof(new_grid));
+    memset(grid_new, 0, sizeof(grid_new));
     end_detected = 0;
 
     if     (pattern == INITPATTERN_RANDOM)
@@ -363,18 +363,18 @@ void * grid_calc(void * args)
             if(grid[x][y] == 0)
             {
                 if(neighbors == 3)      // Reproduction
-                    new_grid[x][y] = 1;
+                    grid_new[x][y] = 1;
                 else                    // Stasis
-                    new_grid[x][y] = grid[x][y];
+                    grid_new[x][y] = grid[x][y];
             }
             else
             {
                 if     (neighbors  < 2) // Underpopulation
-                    new_grid[x][y] = 0;
+                    grid_new[x][y] = 0;
                 else if(neighbors  > 3) // Overpopulation
-                    new_grid[x][y] = 0;
+                    grid_new[x][y] = 0;
                 else                    // Stasis
-                    new_grid[x][y] = grid[x][y];
+                    grid_new[x][y] = grid[x][y];
             }
         }
     }
@@ -419,12 +419,12 @@ void grid_update(void)
     {
         for(uint16_t y=0; y<grid_height; y++)
         {
-            if(new_grid[x][y])
+            if(grid_new[x][y])
                 cells_alive++;
         }
     }
 
-    memcpy(grid, new_grid, sizeof(grid));
+    memcpy(grid, grid_new, sizeof(grid));
     handle_end_detection();
 }
 
