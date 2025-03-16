@@ -95,10 +95,10 @@ uint32_t grid_get_cells_alive(void);
 uint32_t grid_get_cycle_counter(void);
 
 // Return short text string for pattern
-const char* grid_get_initpattern_short_str(initpattern_t initpattern);
+const char * grid_get_initpattern_short_str(initpattern_t initpattern);
 
 // Return long text string for initpattern
-const char* grid_get_initpattern_long_str(initpattern_t initpattern);
+const char * grid_get_initpattern_long_str(initpattern_t initpattern);
 
 // Return if end of simulation has been detected
 uint8_t grid_end_detected(void);
