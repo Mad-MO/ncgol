@@ -51,6 +51,24 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - STOP: Stop when pattern is finished
 - "h" show help
 
+## Roadmap
+
+| Item                                                                | Status |
+|---------------------------------------------------------------------|--------|
+| Basic GoL implementation with shortcut control                      | ✅      |
+| Status window with values (cycles, cellcount, ...)                  | ✅      |
+| Different visual modes                                              | ✅      |
+| Braille visual mode with 2x4 cells per character                    | ✅      |
+| End detection                                                       | ✅      |
+| Different init patterns                                             | ✅      |
+| Auto mode with jumping to next init pattern                         | ✅      |
+| CLI parameters                                                      | ✅      |
+| Optimize for speed (with multithreading)                            | ✅      |
+| Manpage                                                             | ❌      |
+| Prepare for distribution                                            | ❌      |
+| Editor for init patterns (with import and export)                   | ❌      |
+| Engine to find interesting small init patterns with long lifecycles | ❌      |
+
 ## Background
 
 <https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life>
