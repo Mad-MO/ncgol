@@ -31,7 +31,7 @@
 #include <getopt.h>
 #include "grid.h"
 
-#define WITH_DEBUG_STRING  1
+#define WITH_DEBUG_STRING  0
 
 // Define SW name and Version
 #define SW_NAME       "ncgol"
