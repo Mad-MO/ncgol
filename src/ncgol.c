@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <getopt.h>
+#include <pthread.h>
 #include "grid.h"
 
 #define WITH_DEBUG_STRING  0
@@ -42,6 +43,8 @@
 #if(WITH_DEBUG_STRING)
     char debug_str[256];
 #endif
+
+static uint8_t grid_draw[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 
 #define SPEED_MAX  9
 static uint8_t  speed;
@@ -120,7 +123,7 @@ static uint16_t timer;
 
 
 // Function to initialize the User Interface
-static void init_tui(void);
+static void tui_init(void);
 
 // Function to determine if grid is too small
 static uint8_t grid_too_small(void);
@@ -128,8 +131,11 @@ static uint8_t grid_too_small(void);
 // Function to draw a string in a rounded frame for the pattern name
 static void draw_str_in_frame(const char * str);
 
+// Function to update the grid on the canvas (starts thread with tui_draw)
+static void tui_update(void);
+
 // Function to draw the grid on the canvas
-static void draw_grid(void);
+static void * tui_draw(void * args);
 
 // Function to handle input events
 static void handle_inputs(void);
@@ -193,7 +199,7 @@ static void handle_args(int argc, char * argv[]);
 #endif
 
 // Function to initialize the User Interface
-static void init_tui(void)
+static void tui_init(void)
 {
     // Set locale
     setlocale(LC_ALL, "");
@@ -228,7 +234,9 @@ static void init_tui(void)
     wattroff(w_status_box, COLOR_PAIR(0));
     wrefresh(w_status_box);
     w_status = newwin(1, COLS-2, LINES-2, 1);
+    nodelay(w_status, TRUE); // Non-blocking input
     keypad(w_status, TRUE); // Enable special keys
+    wrefresh(w_status);
 
     // Create grid window
     w_grid_box = newwin(LINES-3, COLS, 0, 0);
@@ -240,6 +248,7 @@ static void init_tui(void)
     w_grid = newwin(LINES-5, COLS-2, 1, 1);
     nodelay(w_grid, TRUE); // Non-blocking input
     keypad(w_grid, TRUE); // Enable special keys
+    wrefresh(w_grid);
 
     // Init
     if     (style == STYLE_BRAILLE)
@@ -260,6 +269,7 @@ static void init_tui(void)
     if(grid_width  > GRID_WIDTH_MAX)  grid_width  = GRID_WIDTH_MAX;
     if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
     grid_set_size(grid_width, grid_height);
+    memset(grid_draw, 0, sizeof(grid_draw));
 }
 
 
@@ -304,11 +314,10 @@ static void draw_str_in_frame(const char * str)
 
 
 // Function to draw the grid on the canvas
-static void draw_grid(void)
+static void * tui_draw(void * args)
 {
     uint16_t x, y;
     char str[16];
-    grid_t * grid = grid_get();
 
     // Draw grid to canvas
     wattron(w_grid, A_BOLD | COLOR_PAIR(COLORS_LIVE_CELL));
@@ -319,7 +328,7 @@ static void draw_grid(void)
             if(style == STYLE_DOUBLE)
             {
                 // Two dots per character
-                if(grid[x][y] && grid[x][y + 1])
+                if(grid_draw[x][y] && grid_draw[x][y + 1])
                 {
                     // Both dots
                     #if(defined __linux__)
@@ -328,7 +337,7 @@ static void draw_grid(void)
                         mvwaddch(w_grid, y/2, x, ':');
                     #endif
                 }
-                else if(grid[x][y])
+                else if(grid_draw[x][y])
                 {
                     // Upper dot
                     #if(defined __linux__)
@@ -337,7 +346,7 @@ static void draw_grid(void)
                         mvwaddch(w_grid, y/2, x, '\'');
                     #endif
                 }
-                else if(grid[x][y + 1])
+                else if(grid_draw[x][y + 1])
                 {
                     // Lower dot
                     #if(defined __linux__)
@@ -360,14 +369,14 @@ static void draw_grid(void)
                 char braille_str[4] = {0};
 
                 // Convert grid to braille unicode character
-                if(grid[x+0][y+0]) {braille |= 0x01;}
-                if(grid[x+0][y+1]) {braille |= 0x02;}
-                if(grid[x+0][y+2]) {braille |= 0x04;}
-                if(grid[x+0][y+3]) {braille |= 0x40;}
-                if(grid[x+1][y+0]) {braille |= 0x08;}
-                if(grid[x+1][y+1]) {braille |= 0x10;}
-                if(grid[x+1][y+2]) {braille |= 0x20;}
-                if(grid[x+1][y+3]) {braille |= 0x80;}
+                if(grid_draw[x+0][y+0]) {braille |= 0x01;}
+                if(grid_draw[x+0][y+1]) {braille |= 0x02;}
+                if(grid_draw[x+0][y+2]) {braille |= 0x04;}
+                if(grid_draw[x+0][y+3]) {braille |= 0x40;}
+                if(grid_draw[x+1][y+0]) {braille |= 0x08;}
+                if(grid_draw[x+1][y+1]) {braille |= 0x10;}
+                if(grid_draw[x+1][y+2]) {braille |= 0x20;}
+                if(grid_draw[x+1][y+3]) {braille |= 0x80;}
                 braille |= 0x2800;
                 braille_char = braille;
                 wcstombs(braille_str, &braille_char, 4);
@@ -384,7 +393,7 @@ static void draw_grid(void)
                 // Using background color with an empy space works not very well in ncurses,
                 // because the background color is only dimmed and not bright.
                 // A unicode full block uses the foreground color and works better.
-                if(grid[x][y])
+                if(grid_draw[x][y])
                 {
                     if     (style == STYLE_BLOCK)
                         #if(defined __linux__)
@@ -621,7 +630,33 @@ static void draw_grid(void)
     }
 
     wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
+
+    return NULL;
+}
+
+
+
+// Function to update the grid on the canvas (starts thread with tui_draw)
+static void tui_update(void)
+{
+    static pthread_t thread;
+
+    #if(WITH_DEBUG_STRING)
+        debug_time_start(DEBUG_TIME2);
+    #endif
+
+    pthread_join(thread, NULL); // Wait for last thread to finish -> Should be done by now, but just in case
+    wrefresh(w_grid);           // Refresh window -> This has to be done outside of the thread!
     wrefresh(w_status);
+    memcpy(grid_draw, grid_get(), sizeof(grid_draw));
+    if(pthread_create(&thread, NULL, tui_draw, NULL)) // During this drawing no wrefresh() on w_grid should be called (Caution: getch() in handle_inputs() is also a wrefresh()!)
+    {
+        exit(1);
+    }
+
+    #if(WITH_DEBUG_STRING)
+        debug_time_stop(DEBUG_TIME2);
+    #endif
 }
 
 
@@ -629,10 +664,10 @@ static void draw_grid(void)
 // Function to handle input events
 static void handle_inputs(void)
 {
-    int key = wgetch(w_grid);
+    int key = wgetch(w_status);
     if(key==KEY_RESIZE)
     {
-        init_tui();
+        tui_init();
         stage = STAGE_INIT;
     }
     else if(tolower(key) == 'q')
@@ -672,7 +707,7 @@ static void handle_inputs(void)
     {
         style++;
         style %= STYLE_MAX;
-        init_tui();
+        tui_init();
     }
     else if(tolower(key) == 'm')
     {
@@ -719,8 +754,7 @@ int main(int argc, char * argv[])
     handle_args(argc, argv);
 
     // Initialize ncurses and grid
-    init_tui();
-    wrefresh(w_grid);
+    tui_init();
 
     // Init
     static uint16_t last_systime_ms;
@@ -849,20 +883,13 @@ int main(int argc, char * argv[])
         #endif
 
         // Draw grid -> Reduce drawing to given Hz, because it is not necessary to draw the grid faster than the display can handle
-        #define DRAW_GRID_HZ 60
+        #define DRAW_GRID_HZ 30
         static uint16_t draw_timer = 0;
         draw_timer += ticks;
         if(draw_timer >= (1000 / DRAW_GRID_HZ))
         {
             draw_timer -= (1000 / DRAW_GRID_HZ);
-            #if(WITH_DEBUG_STRING)
-                debug_time_start(DEBUG_TIME2);
-            #endif
-            draw_grid();
-            wrefresh(w_grid);
-            #if(WITH_DEBUG_STRING)
-                debug_time_stop(DEBUG_TIME2);
-            #endif
+            tui_update();
         }
     }
 
