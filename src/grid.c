@@ -391,7 +391,6 @@ void grid_update(void)
     pthread_t threads[thread_cnt];
     calc_thread_arg_t args[thread_cnt];
 
-    cells_alive = 0;
     if(!end_detected)
     {
         cycle_counter++;
@@ -415,14 +414,16 @@ void grid_update(void)
     }
 
     // Count living cells
+    uint32_t l_cells_alive = 0;
     for(uint16_t x=0; x<grid_width; x++)
     {
         for(uint16_t y=0; y<grid_height; y++)
         {
             if(grid_new[x][y])
-                cells_alive++;
+                l_cells_alive++;
         }
     }
+    cells_alive = l_cells_alive;
 
     memcpy(grid, grid_new, sizeof(grid));
     handle_end_detection();
