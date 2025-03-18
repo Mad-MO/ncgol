@@ -638,10 +638,6 @@ static void tui_update(void)
 {
     static pthread_t thread;
 
-    #if(WITH_DEBUG_STRING)
-        debug_time_start(DEBUG_TIME2);
-    #endif
-
     pthread_join(thread, NULL); // Wait for last thread to finish -> Should be done by now, but just in case
     wrefresh(w_grid);           // Refresh window -> This has to be done outside of the thread!
     wrefresh(w_status);
@@ -651,10 +647,6 @@ static void tui_update(void)
         endwin();
         exit(1);
     }
-
-    #if(WITH_DEBUG_STRING)
-        debug_time_stop(DEBUG_TIME2);
-    #endif
 }
 
 
@@ -831,13 +823,7 @@ int main(int argc, char * argv[])
             if(speed > 0)
             {
                 hz = (float)(grid_get_cycle_counter() * 1000) / (float)timer;
-                #if(WITH_DEBUG_STRING)
-                    debug_time_start(DEBUG_TIME1);
-                #endif
                 grid_update();
-                #if(WITH_DEBUG_STRING)
-                    debug_time_stop(DEBUG_TIME1);
-                #endif
             }
             if(grid_end_detected())
             {
@@ -875,9 +861,9 @@ int main(int argc, char * argv[])
 
         // Show debug time measurement
         #if(WITH_DEBUG_STRING)
-            debug_time_stop(DEBUG_TIME3);
+            debug_time_stop(DEBUG_TIME1);
             sprintf(debug_str, " T1:%0.1f T2:%0.1f T3:%0.1f", (float)debug_time_get(DEBUG_TIME1)/1000, (float)debug_time_get(DEBUG_TIME2)/1000, (float)debug_time_get(DEBUG_TIME3)/1000);
-            debug_time_start(DEBUG_TIME3);
+            debug_time_start(DEBUG_TIME1);
         #endif
 
         // Draw grid -> Reduce drawing to given Hz, because it is not necessary to draw the grid faster than the display can handle
