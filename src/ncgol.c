@@ -867,13 +867,15 @@ int main(int argc, char * argv[])
         #endif
 
         // Draw grid -> Reduce drawing to given Hz, because it is not necessary to draw the grid faster than the display can handle
-        #define DRAW_GRID_HZ 30
-        static uint16_t draw_timer = 0;
-        draw_timer += ticks;
-        if(draw_timer >= (1000 / DRAW_GRID_HZ))
         {
-            draw_timer -= (1000 / DRAW_GRID_HZ);
-            tui_update();
+            #define DRAW_GRID_HZ 30
+            static uint16_t draw_timer = 0;
+            draw_timer += ticks;
+            if(draw_timer >= (1000 / DRAW_GRID_HZ))
+            {
+                draw_timer -= (1000 / DRAW_GRID_HZ);
+                tui_update();
+            }
         }
     }
 
