@@ -10,8 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Textlist for charstyles
-// TODO: Textlist for modes
 // TODO: Improve end detection (oscillators) 100/200/300/400/500?
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Add man page
@@ -78,6 +76,15 @@ typedef enum
 } style_t;
 static style_t style;
 
+// Text strings for the style_t enum
+static const char * style_str[][2] =
+{
+    {"hash",    "Hash char"},
+    {"block",   "Blocks"},
+    {"double",  "Double 1x2"},
+    {"braille", "Braille 2x4"}
+};
+
 typedef enum
 {
     COLORS_DEFAULT = 0, // Already defined by ncurses with shell colors
@@ -100,6 +107,14 @@ typedef enum
     MODE_MAX
 } automode_t;
 static automode_t automode;
+
+// Text strings for the automode_t enum
+static const char * automode_str[][2] =
+{
+    {"next", "Next pattern"},
+    {"loop", "Loop current"},
+    {"stop", "Stop after"}
+};
 
 #define TIMEOUT_STARTWAIT 20000
 #define TIMEOUT_SHOWINFO   2000
@@ -544,16 +559,14 @@ static void * tui_draw(void * args)
 
             // Style
             strcpy(str_label, " Style:");
-            if     (style == STYLE_HASH)
-                strcpy(str_value, "Hash");
-            else if(style == STYLE_BLOCK)
-                strcpy(str_value, "Block");
-            else if(style == STYLE_DOUBLE)
-                strcpy(str_value, "Double");
-            else if(style == STYLE_BRAILLE)
-                strcpy(str_value, "Braille");
+            if(style < STYLE_MAX)
+            {
+                strcpy(str_value, style_str[style][1]);
+            }
             else
+            {
                 strcpy(str_value, "?");
+            }
             if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -565,14 +578,14 @@ static void * tui_draw(void * args)
 
             // Mode
             strcpy(str_label, " Mode:");
-            if     (automode == AUTOMODE_NEXT)
-                strcpy(str_value, "Next");
-            else if(automode == AUTOMODE_LOOP)
-                strcpy(str_value, "Loop");
-            else if(automode == AUTOMODE_STOP)
-                strcpy(str_value, "Stop");
+            if(automode < MODE_MAX)
+            {
+                strcpy(str_value, automode_str[automode][1]);
+            }
             else
+            {
                 strcpy(str_value, "?");
+            }
             if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));
@@ -937,18 +950,21 @@ void handle_args(int argc, char * argv[])
         {
             case 'c':
             {
-                if     (strcmp(optarg, "hash") == 0)
-                    style = STYLE_HASH;
-                else if(strcmp(optarg, "block") == 0)
-                    style = STYLE_BLOCK;
-                else if(strcmp(optarg, "double") == 0)
-                    style = STYLE_DOUBLE;
-                else if(strcmp(optarg, "braille") == 0)
-                    style = STYLE_BRAILLE;
-                else
+                style = STYLE_MAX;
+                for(int i=0; i<STYLE_MAX; i++)
+                {
+                    if(strcmp(optarg, style_str[i][0]) == 0)
+                    {
+                        style = i;
+                    }
+                }
+                if(style == STYLE_MAX) // No valid value found?
                 {
                     printf("Invalid charstyle value: %s\n", optarg);
-                    printf("Character style must be one of: hash, block, double, braille\n");
+                    printf("Character style must be one of:");
+                    for(int i=0; i<STYLE_MAX; i++)
+                        printf(" %s", style_str[i][0]);
+                    printf("\n");
                     exit(1);
                 }
                 break;
@@ -962,12 +978,16 @@ void handle_args(int argc, char * argv[])
                 printf("%s - ncurses Game of Life %s (compiled %s %s) by %s\n", SW_NAME, SW_VERS, __DATE__, __TIME__, AUTHOR_LONG);
                 printf("\n");
                 printf("Options:\n");
-                printf("  -c, --charstyle  Set character style (hash, block, double, braille)\n");
+                printf("  -c, --charstyle  Set character style:\n");
+                for(int i=0; i<STYLE_MAX; i++)
+                    printf("                   - %-7s -> %s\n", style_str[i][0], style_str[i][1]);
                 printf("  -h, --help       This Help\n");
                 printf("  -i, --init       Set initial pattern:\n");
                 for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
-                    printf("                   %-9s -> %s\n", grid_get_initpattern_short_str(i), grid_get_initpattern_long_str(i));
-                printf("  -m, --mode       Set mode (next, loop, stop)\n");
+                    printf("                   - %-9s -> %s\n", grid_get_initpattern_short_str(i), grid_get_initpattern_long_str(i));
+                printf("  -m, --mode       Set mode:\n");
+                for(int i=0; i<MODE_MAX; i++)
+                    printf("                   - %-4s -> %s\n", automode_str[i][0], automode_str[i][1]);
                 printf("  -n, --nowait     Start without Startupscreen\n");
                 printf("  -s, --speed      Set speed (0-9)\n");
                 printf("\n");
@@ -999,16 +1019,21 @@ void handle_args(int argc, char * argv[])
 
             case 'm':
             {
-                if     (strcmp(optarg, "next") == 0)
-                    automode = AUTOMODE_NEXT;
-                else if(strcmp(optarg, "loop") == 0)
-                    automode = AUTOMODE_LOOP;
-                else if(strcmp(optarg, "stop") == 0)
-                    automode = AUTOMODE_STOP;
-                else
+                automode = MODE_MAX;
+                for(int i=0; i<MODE_MAX; i++)
+                {
+                    if(strcmp(optarg, automode_str[i][0]) == 0)
+                    {
+                        automode = i;
+                    }
+                }
+                if(automode == MODE_MAX) // No valid value found?
                 {
                     printf("Invalid mode value: %s\n", optarg);
-                    printf("Mode must be one of: next, loop, stop\n");
+                    printf("Mode must be one of:");
+                    for(int i=0; i<MODE_MAX; i++)
+                        printf(" %s", automode_str[i][0]);
+                    printf("\n");
                     exit(1);
                 }
                 break;
