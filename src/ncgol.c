@@ -10,9 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Roadmap Document
-// TODO: Alle exit() with endwin()
-// TODO: Update grid in terminal in own thread (with own double buffered grid)
 // TODO: Improve Hz calculation (when changing speed or speed is 0)
 // TODO: Textlist for charstyles
 // TODO: Textlist for modes
@@ -651,6 +648,7 @@ static void tui_update(void)
     memcpy(grid_draw, grid_get(), sizeof(grid_draw));
     if(pthread_create(&thread, NULL, tui_draw, NULL)) // During this drawing no wrefresh() on w_grid should be called (Caution: getch() in handle_inputs() is also a wrefresh()!)
     {
+        endwin();
         exit(1);
     }
 
