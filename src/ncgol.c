@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Improve Hz calculation (when changing speed or speed is 0)
 // TODO: Textlist for charstyles
 // TODO: Textlist for modes
 // TODO: Improve end detection (oscillators) 100/200/300/400/500?
@@ -807,7 +806,6 @@ int main(int argc, char * argv[])
                 grid_init(initpattern);
                 stage = STAGE_SHOWINFO;
             }
-            hz = 0;
             timer = 0;
         }
         else if(stage == STAGE_SHOWINFO)
@@ -822,7 +820,6 @@ int main(int argc, char * argv[])
         {
             if(speed > 0)
             {
-                hz = (float)(grid_get_cycle_counter() * 1000) / (float)timer;
                 grid_update();
             }
             if(grid_end_detected())
@@ -856,6 +853,31 @@ int main(int argc, char * argv[])
                     // Do nothing
                     timer = TIMEOUT_END;
                 }
+            }
+        }
+
+        // Measure Hz
+        {
+            static uint16_t hz_timer = 0;
+            static uint16_t last_cycle_counter = 0;
+            uint16_t cycles = grid_get_cycle_counter() - last_cycle_counter;
+            hz_timer += ticks;
+            if(    ((hz_timer >=  250) && (cycles >= 50)) // Above 200 Hz 4 measurements per second
+                || ((hz_timer >=  500) && (cycles >= 10)) // Above  20 Hz 2 measurements per second
+                || ((hz_timer >= 1000) && (cycles >=  3)) // Below  20 Hz 1 measurement per second
+                ||  (hz_timer >= 2000)
+              )
+            {
+                if(last_cycle_counter > grid_get_cycle_counter())
+                {
+                    hz = 0;
+                }
+                else
+                {
+                    hz = (float)(cycles * 1000) / (float)hz_timer;
+                }
+                last_cycle_counter = grid_get_cycle_counter();
+                hz_timer = 0;
             }
         }
 
