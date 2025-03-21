@@ -10,6 +10,7 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
+// TODO: Add number of cpu cores in status line
 // TODO: Improve end detection (oscillators) 100/200/300/400/500?
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Add man page
