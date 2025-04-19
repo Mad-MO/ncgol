@@ -785,8 +785,7 @@ int main(int argc, char * argv[])
         handle_inputs();
 
         // Handle speed
-        if     (stage == STAGE_END) usleep(500000); // When simulation ends, show remaining oscillators with slow speed
-        else if(speed == 0)         usleep(500000); // Stop
+        if     (speed == 0)         usleep(500000); // Stop
         else if(speed == 1)         usleep(500000); // ~2 Hz
         else if(speed == 2)         usleep(100000);
         else if(speed == 3)         usleep( 50000);
