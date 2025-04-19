@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include "grid.h"
 #include "patterns.h"
+#include "end_det.h"
 
 
 
@@ -21,17 +22,8 @@ static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  grid_new[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
-#define END_DET_CNT 250
-static uint8_t  end_det[END_DET_CNT];
-static uint8_t  end_det_pos;
 static uint16_t grid_width;
 static uint16_t grid_height;
-static uint8_t  end_detected = 0;
-
-// Function to detect the end of the simulation
-static void handle_end_detection(void);
-
-
 
 // Function to set the grid size
 void grid_set_size(uint16_t width, uint16_t height)
@@ -91,7 +83,6 @@ void grid_init(initpattern_t pattern)
 
     memset(grid, 0, sizeof(grid));
     memset(grid_new, 0, sizeof(grid_new));
-    end_detected = 0;
 
     if     (pattern == INITPATTERN_RANDOM)
     {
@@ -322,6 +313,7 @@ void grid_init(initpattern_t pattern)
     }
 
     cycle_counter = 0;
+    end_det_reset();
 }
 
 
@@ -391,7 +383,7 @@ void grid_update(void)
     pthread_t threads[thread_cnt];
     calc_thread_arg_t args[thread_cnt];
 
-    if(!end_detected)
+    if(!end_det_detected())
     {
         cycle_counter++;
     }
@@ -426,7 +418,7 @@ void grid_update(void)
     cells_alive = l_cells_alive;
 
     memcpy(grid, grid_new, sizeof(grid));
-    handle_end_detection();
+    end_det_handle(cells_alive);
 }
 
 
@@ -485,41 +477,8 @@ const char * grid_get_initpattern_long_str(initpattern_t initpattern)
 
 
 
-// Function to detect the end of the simulation
-static void handle_end_detection(void)
-{
-    end_det_pos++;
-    end_det_pos %= END_DET_CNT;
-    end_det[end_det_pos] = cells_alive;
-    if(cells_alive == 0)
-    {
-        end_detected = 1;
-    }
-    else if(cycle_counter > END_DET_CNT)                               // At least END_DET_CNT cycles needed for detection
-    {
-        for(uint8_t sequence=1; sequence<=(END_DET_CNT/2); sequence++) // Test sequence in the length of 1 to half of the buffer
-        {
-            for(uint8_t testpos=sequence; testpos<END_DET_CNT; testpos++)
-            {
-                if(end_det[testpos] != end_det[testpos % sequence])    // Pattern not found? -> End loop and test next sequence
-                    break;
-                if(testpos == END_DET_CNT - 1)                         // End of loop reached? -> Pattern found!
-                {
-                    if(!end_detected)
-                    {
-                        cycle_counter -= END_DET_CNT;                  // Reset cycle counter to the point where the pattern was detected
-                    }
-                    end_detected = 1;
-                }
-            }
-        }
-    }
-}
-
-
-
 // Return if end of simulation has been detected
 uint8_t grid_end_detected(void)
 {
-    return end_detected;
+    return end_det_detected();
 }

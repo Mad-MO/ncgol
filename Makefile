@@ -16,8 +16,9 @@ ifeq ($(shell uname -s), Linux)
   LDLIBS = -lncursesw
 endif
 
-OBJECTS = $(BUILD)/ncgol.o \
-          $(BUILD)/grid.o \
+OBJECTS = $(BUILD)/ncgol.o   \
+          $(BUILD)/end_det.o \
+          $(BUILD)/grid.o    \
 		  $(BUILD)/patterns.o
 
 
