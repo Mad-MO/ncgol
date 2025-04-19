@@ -55,7 +55,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 | Item                                                                | Status |
 |---------------------------------------------------------------------|--------|
-| Basic GoL implementation with shortcut control                      | ✅      |
+| Basic "Game of Life" implementation with shortcut control           | ✅      |
 | Status window with values (cycles, cellcount, ...)                  | ✅      |
 | Different visual modes                                              | ✅      |
 | Braille visual mode with 2x4 cells per character                    | ✅      |
