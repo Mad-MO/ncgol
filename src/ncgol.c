@@ -11,7 +11,10 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: Add number of cpu cores in status line
+// TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
 // TODO: Improve end detection (oscillators) 100/200/300/400/500?
+// TODO: Improve key reaction time on lowest speeds or during end detected
+// TODO: Benchmark (calc without drawing of very large grid) --benchmark / -b
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Add man page
 // TODO: Prepare for linux package
