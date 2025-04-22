@@ -2,15 +2,20 @@
 // File:    patterns.c
 // Author:  Martin Ochs
 // License: MIT
-// Brief:   Implementation of the patterns functions for the Game of Life
+// Brief:   Implementation of the end detection functions for the Game of Life.
+//          For every cycle the number of alive cells is stored in a ring buffer.
+//          The simulation is finished, in a stale or looping state under the following conditions:
+//          - The number of alive cells is zero
+//          - The number of alive cells is constant
+//          - There is a repeating pattern of variable length 'sequence' in the ring buffer
 
 #include <stdint.h>
 #include <string.h>
 #include "end_det.h"
 
 #define END_DET_CNT_MAX 500
-#define END_DET_CNT_MIN  20
-static uint16_t end_det[END_DET_CNT_MAX];
+#define END_DET_CNT_MIN  50
+static uint16_t end_det[END_DET_CNT_MAX]; // Ring-buffer for storing the alive count for every cycle
 static uint16_t end_det_pos  = 0;
 static uint8_t  end_detected = 0;
 static uint32_t end_det_cycles = 0;
@@ -43,18 +48,18 @@ void end_det_handle(uint32_t alive)
     {
         end_detected = 1;
     }
-    else if(end_det_cycles > END_DET_CNT_MIN)                               // At least END_DET_CNT_MIN cycles needed for detection
+    else if(end_det_cycles >= END_DET_CNT_MIN)                                                 // At least END_DET_CNT_MIN cycles needed for detection
     {
-        for(uint16_t sequence=1; sequence<=(END_DET_CNT_MAX/2); sequence++) // Test sequence in the length of 1 to half of the buffer
+        #define RING_LEN() (end_det_cycles<END_DET_CNT_MAX ? end_det_cycles : END_DET_CNT_MAX) // Current length of the ring buffer
+        for(uint16_t sequence=1; sequence<=(RING_LEN()/2); sequence++)                         // Test sequence in the length of 1 to half of the buffer
         {
-            for(uint16_t testpos=sequence; testpos<END_DET_CNT_MAX; testpos++)
+            for(uint16_t testpos=sequence; testpos<RING_LEN(); testpos++)
             {
-                if(end_det[testpos] != end_det[testpos % sequence])         // Pattern not found? -> End loop and test next sequence
+                #define RING_POS(pos) ((end_det_pos + pos) % RING_LEN())
+                if(end_det[RING_POS(testpos)] != end_det[RING_POS(testpos % sequence)])        // Pattern not found? -> End loop and test next sequence
                     break;
-                if(testpos == END_DET_CNT_MAX - 1)                          // End of loop reached? -> Pattern found!
-                {
+                if(testpos == RING_LEN() - 1)                                                  // End of loop reached? -> Pattern found!
                     end_detected = 1;
-                }
             }
         }
     }
