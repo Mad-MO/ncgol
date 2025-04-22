@@ -29,18 +29,13 @@
 #include <getopt.h>
 #include <pthread.h>
 #include "grid.h"
-
-#define WITH_DEBUG_STRING  0
+#include "debug_output.h"
 
 // Define SW name and Version
 #define SW_NAME       "ncgol"
 #define SW_VERS       "v0.6"
 #define AUTHOR_SHORT  "M. Ochs"
 #define AUTHOR_LONG   "Martin Ochs"
-
-#if(WITH_DEBUG_STRING)
-    char debug_str[256];
-#endif
 
 static uint8_t grid_draw[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 
@@ -161,61 +156,14 @@ int main(int argc, char * argv[]);
 // Handle the given commandline arguments
 static void handle_args(int argc, char * argv[]);
 
-// Functions for debug time measurement
-#if(WITH_DEBUG_STRING)
-    enum
-    {
-        DEBUG_TIME1 = 0,
-        DEBUG_TIME2,
-        DEBUG_TIME3,
-        DEBUG_TIME_MAX
-    };
-    uint32_t debug_time[DEBUG_TIME_MAX][2] = {{0,0}};
-    void debug_time_start(uint8_t num);
-    void debug_time_stop(uint8_t num);
-    uint32_t debug_time_get(uint8_t num);
-#endif
-
-
-
-// Functions for debug time measurement
-#if(WITH_DEBUG_STRING)
-    void debug_time_start(uint8_t num)
-    {
-        if(num < DEBUG_TIME_MAX)
-        {
-            struct timespec ts;
-            clock_gettime(CLOCK_REALTIME, &ts);
-            debug_time[num][0] = ts.tv_nsec / 1000;
-        }
-    }
-
-    void debug_time_stop(uint8_t num)
-    {
-        if(num < DEBUG_TIME_MAX)
-        {
-            struct timespec ts;
-            clock_gettime(CLOCK_REALTIME, &ts);
-            debug_time[num][1] = ts.tv_nsec / 1000;
-        }
-    }
-
-    uint32_t debug_time_get(uint8_t num)
-    {
-        if(num < DEBUG_TIME_MAX)
-        {
-            return ((debug_time[num][1] - debug_time[num][0] + 1000000) % 1000000);
-        }
-        else
-        {
-            return 0;
-        }
-    }
-#endif
-
 // Function to initialize the User Interface
 static void tui_init(void)
 {
+    // Init debug output
+    #ifdef WITH_DEBUG_OUTPUT
+        debug_init();
+    #endif
+
     // Set locale
     setlocale(LC_ALL, "");
 
@@ -285,6 +233,10 @@ static void tui_init(void)
     if(grid_height > GRID_HEIGHT_MAX) grid_height = GRID_HEIGHT_MAX;
     grid_set_size(grid_width, grid_height);
     memset(grid_draw, 0, sizeof(grid_draw));
+
+    #ifdef WITH_DEBUG_OUTPUT
+        debug_printf("Grid size: %ux%u\n", grid_width, grid_height);
+    #endif
 }
 
 
@@ -461,17 +413,6 @@ static void * tui_draw(void * args)
         uint16_t pos   = 0;
         uint16_t width = getmaxx(w_status);
         wmove(w_status, 0, 0);
-
-        // Debug string
-        #if(WITH_DEBUG_STRING)
-            if(strlen(debug_str))
-            {
-                waddch(w_status, ' ');
-                wattron(w_status, A_BOLD | COLOR_PAIR(COLORS_ERROR));
-                waddstr(w_status, debug_str);
-                wattroff(w_status, A_BOLD | COLOR_PAIR(COLORS_ERROR));
-            }
-        #endif
 
         // Grid
         strcpy(str_label, " Grid:");
@@ -898,10 +839,10 @@ int main(int argc, char * argv[])
         }
 
         // Show debug time measurement
-        #if(WITH_DEBUG_STRING)
-            debug_time_stop(DEBUG_TIME1);
-            sprintf(debug_str, " T1:%0.1f T2:%0.1f T3:%0.1f", (float)debug_time_get(DEBUG_TIME1)/1000, (float)debug_time_get(DEBUG_TIME2)/1000, (float)debug_time_get(DEBUG_TIME3)/1000);
-            debug_time_start(DEBUG_TIME1);
+        #ifdef WITH_DEBUG_OUTPUT
+            //debug_time_stop(DEBUG_TIME1);
+            //debug_printf(" T1:%0.1f T2:%0.1f T3:%0.1f\n", (float)debug_time_get(DEBUG_TIME1)/1000, (float)debug_time_get(DEBUG_TIME2)/1000, (float)debug_time_get(DEBUG_TIME3)/1000);
+            //debug_time_start(DEBUG_TIME1);
         #endif
 
         // Draw grid -> Reduce drawing to given Hz, because it is not necessary to draw the grid faster than the display can handle

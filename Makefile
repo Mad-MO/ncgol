@@ -16,9 +16,10 @@ ifeq ($(shell uname -s), Linux)
   LDLIBS = -lncursesw
 endif
 
-OBJECTS = $(BUILD)/ncgol.o   \
+OBJECTS = $(BUILD)/ncgol.o \
+		  $(BUILD)/debug_output.o \
           $(BUILD)/end_det.o \
-          $(BUILD)/grid.o    \
+          $(BUILD)/grid.o \
 		  $(BUILD)/patterns.o
 
 
@@ -51,4 +52,4 @@ $(BIN)/ncgol: $(OBJECTS)
 
 $(BUILD)/%.o: $(SRC)/%.c $(SRC)/*.h Makefile
 	@mkdir -vp $(BUILD)
-	$(CC) -o $@ -c $<
+	$(CC) -o $@ -c $< -D WITH_DEBUG_OUTPUT
