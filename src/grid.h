@@ -9,8 +9,6 @@
 
 #include <stdint.h>
 
-
-
 // Define the size of the grid
 // Example: Fullscreen Terminal on Ultrawidescreen Monitor
 //          -> ~569x110 characters
@@ -43,8 +41,6 @@ typedef uint8_t grid_t[GRID_HEIGHT_MAX];
 //     V
 //     --- (GRID_HEIGHT_MAX)
 //    (y)   reserved memory
-
-
 
 typedef enum
 {
@@ -102,5 +98,7 @@ const char * grid_get_initpattern_long_str(initpattern_t initpattern);
 
 // Return if end of simulation has been detected
 uint8_t grid_end_detected(void);
+
+
 
 #endif // __GRID_H

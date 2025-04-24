@@ -30,6 +30,8 @@ void debug_init()
     }
 }
 
+
+
 // Print debug output (to file)
 void debug_printf(const char * format, ...)
 {
@@ -41,6 +43,8 @@ void debug_printf(const char * format, ...)
         va_end(args);
     }
 }
+
+
 
 // Start debug time measurement
 void debug_time_start(uint8_t num)

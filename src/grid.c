@@ -16,8 +16,6 @@
 #include "patterns.h"
 #include "end_det.h"
 
-
-
 // Create the grid to represent the cells
 static uint8_t  grid[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 static uint8_t  grid_new[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
@@ -25,6 +23,8 @@ static uint32_t cells_alive = 0;
 static uint32_t cycle_counter = 0;
 static uint16_t grid_width;
 static uint16_t grid_height;
+
+
 
 // Function to set the grid size
 void grid_set_size(uint16_t width, uint16_t height)
