@@ -52,4 +52,4 @@ $(BIN)/ncgol: $(OBJECTS)
 
 $(BUILD)/%.o: $(SRC)/%.c $(SRC)/*.h Makefile
 	@mkdir -vp $(BUILD)
-	$(CC) -o $@ -c $< -D WITH_DEBUG_OUTPUT
+	$(CC) -o $@ -c $<

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include "config.h"
 #include "grid.h"
 #include "patterns.h"
 #include "end_det.h"

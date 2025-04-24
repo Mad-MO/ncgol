@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "config.h"
 #include "end_det.h"
 #include "debug_output.h"
 
@@ -69,7 +70,7 @@ void end_det_handle(uint32_t alive)
                 if(testpos == RING_LEN() - 1)                                                  // End of loop reached? -> Pattern found!
                 {
                     end_detected = 1;
-                    #ifdef WITH_DEBUG_OUTPUT
+                    #if (WITH_DEBUG_OUTPUT)
                         debug_printf("End detected after %u cycles with sequence length %u\n", end_det_cycles, sequence);
                     #endif
                 }

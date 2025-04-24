@@ -4,13 +4,14 @@
 // License: MIT
 // Brief:   Implementation of debug output functions into logfile
 
-#ifdef WITH_DEBUG_OUTPUT
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
+#include "config.h"
 #include "debug_output.h"
+
+#if (WITH_DEBUG_OUTPUT)
 
 static FILE *debug_file;
 static uint32_t debug_time[DEBUG_TIME_MAX][2] = {{0,0}};
@@ -78,4 +79,4 @@ uint32_t debug_time_get(uint8_t num)
 
 
 
-#endif// WITH_DEBUG_OUTPUT
+#endif // (WITH_DEBUG_OUTPUT)

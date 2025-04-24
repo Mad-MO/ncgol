@@ -27,6 +27,7 @@
 #include <time.h>
 #include <getopt.h>
 #include <pthread.h>
+#include "config.h"
 #include "grid.h"
 #include "debug_output.h"
 
@@ -159,7 +160,7 @@ static void handle_args(int argc, char * argv[]);
 static void tui_init(void)
 {
     // Init debug output
-    #ifdef WITH_DEBUG_OUTPUT
+    #if (WITH_DEBUG_OUTPUT)
         debug_init();
     #endif
 
@@ -233,7 +234,7 @@ static void tui_init(void)
     grid_set_size(grid_width, grid_height);
     memset(grid_draw, 0, sizeof(grid_draw));
 
-    #ifdef WITH_DEBUG_OUTPUT
+    #if (WITH_DEBUG_OUTPUT)
         debug_printf("Grid size: %ux%u\n", grid_width, grid_height);
     #endif
 }
@@ -838,7 +839,7 @@ int main(int argc, char * argv[])
         }
 
         // Show debug time measurement
-        #ifdef WITH_DEBUG_OUTPUT
+        #if (WITH_DEBUG_OUTPUT)
             //debug_time_stop(DEBUG_TIME1);
             //debug_printf(" T1:%0.1f T2:%0.1f T3:%0.1f\n", (float)debug_time_get(DEBUG_TIME1)/1000, (float)debug_time_get(DEBUG_TIME2)/1000, (float)debug_time_get(DEBUG_TIME3)/1000);
             //debug_time_start(DEBUG_TIME1);

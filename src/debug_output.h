@@ -4,13 +4,13 @@
 // License: MIT
 // Brief:   Implementation of debug output functions into logfile
 
-#ifdef WITH_DEBUG_OUTPUT
-
-
 #ifndef __DEBUG_OUTPUT_H
 #define __DEBUG_OUTPUT_H
 
 #include <stdint.h>
+#include "config.h"
+
+#if (WITH_DEBUG_OUTPUT)
 
 enum
 {
@@ -39,5 +39,6 @@ uint32_t debug_time_get(uint8_t num);
 
 
 
+#endif // (WITH_DEBUG_OUTPUT)
+
 #endif // __DEBUG_OUTPUT_H
-#endif // WITH_DEBUG_OUTPUT
