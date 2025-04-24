@@ -26,7 +26,10 @@ OBJECTS = $(BUILD)/ncgol.o \
 
 build: ncgol
 
-runtest: clear distclean ncgol
+run: ncgol
+	$(BIN)/ncgol
+
+runtest: distclean ncgol
 	@echo "--- Version ---"
 	$(BIN)/ncgol -v
 	@echo "--- Help ---"
@@ -34,9 +37,6 @@ runtest: clear distclean ncgol
 	@echo "--- Run ---"
 	$(BIN)/ncgol --nowait --speed 9 --init random --charstyle braille --mode next
 	@echo "--- End ---"
-
-clear:
-	@clear
 
 distclean: clean
 	@rm -vf $(BIN)/*
