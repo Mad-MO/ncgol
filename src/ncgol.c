@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Add number of cpu cores in status line
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
 // TODO: Improve key reaction time on lowest speeds or during end detected
 // TODO: Benchmark (calc without drawing of very large grid) --benchmark / -b
@@ -409,7 +408,7 @@ static void * tui_draw(void * args)
 
     // Handle status line
     {
-        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:9 (100 Hz) Pattern:Glider gun Style:Block   ncgol v0.1 by Martin Ochs"
+        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:9 (100 Hz) Pattern:Random (fire) Style:Braille 2x4 Mode:Next pattern Cores:8  ncgol v0.1 by Martin Ochs"
         char str_label[20];
         char str_value[30];
         uint16_t pos   = 0;
@@ -533,6 +532,18 @@ static void * tui_draw(void * args)
             {
                 strcpy(str_value, "?");
             }
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, COLOR_PAIR(COLORS_VALUE));
+                waddstr(w_status, str_value);
+                wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
+            }
+
+            // Cores
+            strcpy(str_label, " Cores:");
+            sprintf(str_value, "%i", grid_get_cpu_cores());
             if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));

@@ -376,10 +376,18 @@ void * grid_calc(void * args)
 
 
 
+// Return number of usable cpu cores
+uint16_t grid_get_cpu_cores(void)
+{
+    return sysconf(_SC_NPROCESSORS_ONLN); // Number of active Cores
+}
+
+
+
 // Function to update the grid based on the game of life rules (start multi-threaded calculation)
 void grid_update(void)
 {
-    uint16_t thread_cnt = sysconf(_SC_NPROCESSORS_ONLN); // Number of active Cores
+    uint16_t thread_cnt = grid_get_cpu_cores();
     if(thread_cnt > grid_width) thread_cnt = grid_width;
     pthread_t threads[thread_cnt];
     calc_thread_arg_t args[thread_cnt];

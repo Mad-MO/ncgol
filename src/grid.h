@@ -78,6 +78,9 @@ uint16_t grid_get_height(void);
 // Function to initialize the grid
 void grid_init(initpattern_t pattern);
 
+// Return number of usable cpu cores
+uint16_t grid_get_cpu_cores(void);
+
 // Function to update the grid based on the game of life rules
 void grid_update(void);
 
