@@ -17,7 +17,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 - Multi-threaded calculation
 - Adjustable speed
-- Different sart patterns
+- Different start patterns
 - Show count of living cells
 - Show number of cycles
 - Detection for end of simulation
