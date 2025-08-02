@@ -387,7 +387,7 @@ uint16_t grid_get_cpu_cores(void)
 // Function to update the grid based on the game of life rules (start multi-threaded calculation)
 void grid_update(void)
 {
-    uint16_t thread_cnt = grid_get_cpu_cores();
+    uint16_t thread_cnt = grid_get_cpu_cores()*2;
     if(thread_cnt > grid_width) thread_cnt = grid_width;
     pthread_t threads[thread_cnt];
     calc_thread_arg_t args[thread_cnt];
