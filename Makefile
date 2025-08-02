@@ -35,7 +35,7 @@ runtest: distclean ncgol
 	@echo "--- Help ---"
 	$(BIN)/ncgol -h
 	@echo "--- Run ---"
-	$(BIN)/ncgol --nowait --speed 9 --init random --charstyle braille --mode next
+	$(BIN)/ncgol --nowait --speed 9 --init random --charstyle braille --mode loop
 	@echo "--- End ---"
 
 distclean: clean
