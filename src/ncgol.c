@@ -10,6 +10,11 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
+// TODO: "ESC" and "q" to quit
+// TODO: "s" to inc through speeds
+// TODO: "-p" and "--patern" to set initial pattern
+// TODO: "p" to inc through patterns
+// TODO: "Highlight" Command keys in bottom line
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
 // TODO: Improve key reaction time on lowest speeds or during end detected
 // TODO: Benchmark (calc without drawing of very large grid) --benchmark / -b
