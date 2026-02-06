@@ -125,7 +125,7 @@ static uint16_t timer;
                          "  \'0\'...\'9\'           Set speed directly\n"    \
                          "  \'Left\' and \'Right\'  Change pattern\n"        \
                          "  \'Space\'             Restart current pattern\n" \
-                         "  \'s\'                 Change style\n"            \
+                         "  \'c\'                 Change Charstyle\n"        \
                          "  \'m\'                 Change mode\n"             \
                          "  \'h\'                 Startupscreen\n"
 
@@ -408,7 +408,7 @@ static void * tui_draw(void * args)
 
     // Handle status line
     {
-        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:9 (100 Hz) Pattern:Random (fire) Style:Braille 2x4 Mode:Next pattern Cores:8  ncgol v0.1 by Martin Ochs"
+        // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:9 (100 Hz) Pattern:Random (fire) Charstyle:Braille 2x4 Mode:Next pattern Cores:8  ncgol v0.1 by Martin Ochs"
         char str_label[20];
         char str_value[30];
         uint16_t pos   = 0;
@@ -504,7 +504,7 @@ static void * tui_draw(void * args)
             }
 
             // Style
-            strcpy(str_label, " Style:");
+            strcpy(str_label, " Charstyle:");
             if(style < STYLE_MAX)
             {
                 strcpy(str_value, style_str[style][1]);
