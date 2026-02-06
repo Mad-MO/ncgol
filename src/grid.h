@@ -12,7 +12,7 @@
 // Define the size of the grid
 // Example: Fullscreen Terminal on Ultrawidescreen Monitor
 //          -> ~569x110 characters
-//          -> 1134x420 cells (when using braille style)
+//          -> 1134x420 cells (when using braille charstyle)
 #define GRID_WIDTH_MAX  2500 // 2500*1000*2 = ~5 MB
 #define GRID_HEIGHT_MAX 1000
 

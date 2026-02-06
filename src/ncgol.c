@@ -65,17 +65,17 @@ static stage_t stage;
 
 typedef enum
 {
-    STYLE_HASH,    // Style which uses '#' and two chars per cell
-    STYLE_BLOCK,   // Style which use unicode blocks in two chars per cell
-    STYLE_DOUBLE,  // Style which shows two cells in one char
-    STYLE_BRAILLE, // Braile style with 8 cells per char
+    CHARSTYLE_HASH,    // Charstyle which uses '#' and two chars per cell
+    CHARSTYLE_BLOCK,   // Charstyle which use unicode blocks in two chars per cell
+    CHARSTYLE_DOUBLE,  // Charstyle which shows two cells in one char
+    CHARSTYLE_BRAILLE, // Braile charstyle with 8 cells per char
     // ----------------
-    STYLE_MAX
-} style_t;
-static style_t style;
+    CHARSTYLE_MAX
+} charstyle_t;
+static charstyle_t charstyle;
 
-// Text strings for the style_t enum
-static const char * style_str[][2] =
+// Text strings for the charstyle_t enum
+static const char * charstyle_str[][2] =
 {
     {"hash",    "Hash char"},
     {"block",   "Blocks"},
@@ -215,12 +215,12 @@ static void tui_init(void)
     wrefresh(w_grid);
 
     // Init
-    if     (style == STYLE_BRAILLE)
+    if     (charstyle == CHARSTYLE_BRAILLE)
     {
         grid_width  = getmaxx(w_grid) * 2;
         grid_height = getmaxy(w_grid) * 4;
     }
-    else if(style >= STYLE_DOUBLE)
+    else if(charstyle >= CHARSTYLE_DOUBLE)
     {
         grid_width  = getmaxx(w_grid);
         grid_height = getmaxy(w_grid)*2;
@@ -293,7 +293,7 @@ static void * tui_draw(void * args)
     {
         for(y=0; y<grid_height; y++)
         {
-            if(style == STYLE_DOUBLE)
+            if(charstyle == CHARSTYLE_DOUBLE)
             {
                 // Two dots per character
                 if(grid_draw[x][y] && grid_draw[x][y + 1])
@@ -329,7 +329,7 @@ static void * tui_draw(void * args)
                 }
                 y++;
             }
-            else if(style == STYLE_BRAILLE)
+            else if(charstyle == CHARSTYLE_BRAILLE)
             {
                 // The braille characters allows the usage of 8 dots per character
                 uint16_t braille = 0;
@@ -363,13 +363,13 @@ static void * tui_draw(void * args)
                 // A unicode full block uses the foreground color and works better.
                 if(grid_draw[x][y])
                 {
-                    if     (style == STYLE_BLOCK)
+                    if     (charstyle == CHARSTYLE_BLOCK)
                         #if(defined __linux__)
                             mvwaddstr(w_grid, y, x*2, "\u2588\u2588"); // Two full blocks -> Looks best on a linux terminal which leaves no horizontal space between the blocks
                         #else
                             mvwaddstr(w_grid, y, x*2, "\u2588\u258a"); // Full block and 3/4 block -> Looks best on a mac terminal which leaves a little horizontal space between the blocks
                         #endif
-                    else          // STYLE_HASH
+                    else          // CHARSTYLE_HASH
                         mvwaddstr(w_grid, y, x*2, "# ");               // #  -> Looks best on a terminal which has problems with unicode characters
                 }
                 else
@@ -505,9 +505,9 @@ static void * tui_draw(void * args)
 
             // Style
             strcpy(str_label, " Charstyle:");
-            if(style < STYLE_MAX)
+            if(charstyle < CHARSTYLE_MAX)
             {
-                strcpy(str_value, style_str[style][1]);
+                strcpy(str_value, charstyle_str[charstyle][1]);
             }
             else
             {
@@ -665,8 +665,8 @@ static void handle_inputs(void)
     }
     else if(tolower(key) == 'c')
     {
-        style++;
-        style %= STYLE_MAX;
+        charstyle++;
+        charstyle %= CHARSTYLE_MAX;
         tui_init();
     }
     else if(tolower(key) == 'm')
@@ -708,7 +708,7 @@ int main(int argc, char * argv[])
     initpattern = INITPATTERN_RANDOM;
     speed       = 3;
     automode    = AUTOMODE_NEXT;
-    style       = STYLE_HASH;
+    charstyle       = CHARSTYLE_HASH;
 
     // Handle commandline arguments
     handle_args(argc, argv);
@@ -907,20 +907,20 @@ void handle_args(int argc, char * argv[])
         {
             case 'c':
             {
-                style = STYLE_MAX;
-                for(int i=0; i<STYLE_MAX; i++)
+                charstyle = CHARSTYLE_MAX;
+                for(int i=0; i<CHARSTYLE_MAX; i++)
                 {
-                    if(strcmp(optarg, style_str[i][0]) == 0)
+                    if(strcmp(optarg, charstyle_str[i][0]) == 0)
                     {
-                        style = i;
+                        charstyle = i;
                     }
                 }
-                if(style == STYLE_MAX) // No valid value found?
+                if(charstyle == CHARSTYLE_MAX) // No valid value found?
                 {
                     printf("Invalid charstyle value: %s\n", optarg);
-                    printf("Character style must be one of:");
-                    for(int i=0; i<STYLE_MAX; i++)
-                        printf(" %s", style_str[i][0]);
+                    printf("Charstyle must be one of:");
+                    for(int i=0; i<CHARSTYLE_MAX; i++)
+                        printf(" %s", charstyle_str[i][0]);
                     printf("\n");
                     exit(1);
                 }
@@ -936,8 +936,8 @@ void handle_args(int argc, char * argv[])
                 printf("\n");
                 printf("Options:\n");
                 printf("  -c, --charstyle  Set character style:\n");
-                for(int i=0; i<STYLE_MAX; i++)
-                    printf("                   - %-7s -> %s\n", style_str[i][0], style_str[i][1]);
+                for(int i=0; i<CHARSTYLE_MAX; i++)
+                    printf("                   - %-7s -> %s\n", charstyle_str[i][0], charstyle_str[i][1]);
                 printf("  -h, --help       This Help\n");
                 printf("  -i, --init       Set initial pattern:\n");
                 for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
