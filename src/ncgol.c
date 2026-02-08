@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Add "Quit" to status line
 // TODO: Improve random pattern (less cells / run engine a couple of times before showing it)
 // TODO: Show number of cells and cycles in popup for end detection
 // TODO: Make speed more stable 0:Stop, 1:0,3 Hz, 2:1Hz, 3:3Hz, 4:10Hz, 5:30Hz, 6:100Hz, 7:300Hz, 8:1kHz, 9:As fast as possible
@@ -588,6 +587,34 @@ static void * tui_draw(void * args)
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
                 wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
+            }
+
+            // Help
+            strcpy(str_label,  " ");
+            strcpy(str_label2, "H");
+            strcpy(str_label3, "elp");
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_label2)+strlen(str_label3)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label2);
+                wattroff(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label3);
+            }
+
+            // Quit
+            strcpy(str_label,  " ");
+            strcpy(str_label2, "Q");
+            strcpy(str_label3, "uit");
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_label2)+strlen(str_label3)+strlen(str_value)) < width)
+            {
+                wattron(w_status, COLOR_PAIR(COLORS_LABEL));
+                waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label2);
+                wattroff(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label3);
             }
 
             // Remember position and clear rest of line
