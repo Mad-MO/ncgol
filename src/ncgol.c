@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: "ESC" and "q" to quit
 // TODO: "s" to inc through speeds
 // TODO: "-p" and "--patern" to set initial pattern
 // TODO: "p" to inc through patterns
@@ -124,14 +123,15 @@ static const char * automode_str[][2] =
 #define TIMEOUT_END        5000
 static uint16_t timer;
 
-#define COMMAND_KEYS_STR "Command keys:\n"                                   \
-                         "  \'q\'                 End program\n"             \
-                         "  \'Up\' and \'Down\'     Adjust speed\n"          \
-                         "  \'0\'...\'9\'           Set speed directly\n"    \
-                         "  \'Left\' and \'Right\'  Change pattern\n"        \
-                         "  \'Space\'             Restart current pattern\n" \
-                         "  \'c\'                 Change Charstyle\n"        \
-                         "  \'m\'                 Change mode\n"             \
+#define COMMAND_KEYS_STR "Command keys:\n"                                     \
+                         "  \'q\'                 End program\n"               \
+                         "  \'ESC\'               Close dialogs or timeouts\n" \
+                         "  \'Up\' and \'Down\'     Adjust speed\n"            \
+                         "  \'0\'...\'9\'           Set speed directly\n"      \
+                         "  \'Left\' and \'Right\'  Change pattern\n"          \
+                         "  \'Space\'             Restart current pattern\n"   \
+                         "  \'c\'                 Change Charstyle\n"          \
+                         "  \'m\'                 Change mode\n"               \
                          "  \'h\'                 Startupscreen\n"
 
 
@@ -696,6 +696,10 @@ static void handle_inputs(void)
         else if(stage == STAGE_END)
         {
             timer = TIMEOUT_END;
+        }
+        else
+        {
+            // Do nothing
         }
     }
     else
