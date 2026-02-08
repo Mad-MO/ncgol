@@ -633,64 +633,22 @@ static void tui_update(void)
 static void handle_inputs(void)
 {
     int key = wgetch(w_status);
+
+    // Ncurses resize of Terminal
     if(key==KEY_RESIZE)
     {
         tui_init();
         stage = STAGE_INIT;
     }
+
+    // "q" to end program
     else if(tolower(key) == 'q')
     {
         endwin();
         exit(0);
     }
-    else if(tolower(key) == 's')
-    {
-        speed++;
-        speed %= (SPEED_MAX+1);
-    }
-    else if(key == KEY_UP)
-    {
-        if(speed < SPEED_MAX) speed++;
-    }
-    else if(key == KEY_DOWN)
-    {
-        if(speed > 0) speed--;
-    }
-    else if((key>='0') && (key<='9'))
-    {
-        speed = key - '0';
-    }
-    else if(key == KEY_LEFT)
-    {
-        if(initpattern == 0) initpattern = INITPATTERN_CYCLEMAX - 1;
-        else                 initpattern--;
-        stage = STAGE_INIT;
-    }
-    else if((tolower(key) == 'p' || key == KEY_RIGHT))
-    {
-        initpattern++;
-        initpattern %= INITPATTERN_CYCLEMAX;
-        stage = STAGE_INIT;
-    }
-    else if(key == ' ')
-    {
-        stage = STAGE_INIT;
-    }
-    else if(tolower(key) == 'c')
-    {
-        charstyle++;
-        charstyle %= CHARSTYLE_MAX;
-        tui_init();
-    }
-    else if(tolower(key) == 'm')
-    {
-        automode++;
-        automode %= MODE_MAX;
-    }
-    else if(tolower(key) == 'h')
-    {
-        stage = STAGE_STARTUP;
-    }
+
+    // "ESC" to close dialogs or timeouts
     if(key==27) // ESC
     {
         if     (stage == STAGE_STARTWAIT)
@@ -710,6 +668,67 @@ static void handle_inputs(void)
             // Do nothing
         }
     }
+
+    // "Up" and "Down" to adjust speed, "s" to cycle through speed values, "0"..."9" to set speed directly
+    else if(key == KEY_UP)
+    {
+        if(speed < SPEED_MAX) speed++;
+    }
+    else if(key == KEY_DOWN)
+    {
+        if(speed > 0) speed--;
+    }
+    else if(tolower(key) == 's')
+    {
+        speed++;
+        speed %= (SPEED_MAX+1);
+    }
+    else if((key>='0') && (key<='9'))
+    {
+        speed = key - '0';
+    }
+
+    // "Left" and "Right" to change pattern, "p" to cycle through patterns
+    else if(key == KEY_LEFT)
+    {
+        if(initpattern == 0) initpattern = INITPATTERN_CYCLEMAX - 1;
+        else                 initpattern--;
+        stage = STAGE_INIT;
+    }
+    else if((tolower(key) == 'p' || key == KEY_RIGHT))
+    {
+        initpattern++;
+        initpattern %= INITPATTERN_CYCLEMAX;
+        stage = STAGE_INIT;
+    }
+
+    // "Space" to restart current pattern
+    else if(key == ' ')
+    {
+        stage = STAGE_INIT;
+    }
+
+    // "c" to change charstyle
+    else if(tolower(key) == 'c')
+    {
+        charstyle++;
+        charstyle %= CHARSTYLE_MAX;
+        tui_init();
+    }
+
+    // "m" to change mode
+    else if(tolower(key) == 'm')
+    {
+        automode++;
+        automode %= MODE_MAX;
+    }
+
+    // "h" to show help
+    else if(tolower(key) == 'h')
+    {
+        stage = STAGE_STARTUP;
+    }
+
     else
     {
         // Do nothing
