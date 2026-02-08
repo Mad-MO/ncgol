@@ -11,6 +11,8 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: "Highlight" Command keys in bottom line
+// TODO: Improve random pattern (less cells / run engine a couple of times before showing it)
+// TODO: Show number of cells and cycles in popup for end detection
 // TODO: Make max grid size dynamical (get more memory as needed)
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
 // TODO: Improve key reaction time on lowest speeds or during end detected
