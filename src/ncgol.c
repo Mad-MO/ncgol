@@ -14,6 +14,7 @@
 // TODO: "-p" and "--patern" to set initial pattern
 // TODO: "p" to inc through patterns
 // TODO: "Highlight" Command keys in bottom line
+// TODO: Make max grid size dynamical (get more memory as needed)
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
 // TODO: Improve key reaction time on lowest speeds or during end detected
 // TODO: Benchmark (calc without drawing of very large grid) --benchmark / -b
