@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: "s" to inc through speeds
 // TODO: "-p" and "--patern" to set initial pattern
 // TODO: "p" to inc through patterns
 // TODO: "Highlight" Command keys in bottom line
@@ -43,7 +42,7 @@
 
 static uint8_t grid_draw[GRID_WIDTH_MAX][GRID_HEIGHT_MAX];
 
-#define SPEED_MAX  9
+#define SPEED_MAX  9 // 0-9 allowed
 static uint8_t  speed;
 static float hz;
 
@@ -124,15 +123,16 @@ static const char * automode_str[][2] =
 #define TIMEOUT_END        5000
 static uint16_t timer;
 
-#define COMMAND_KEYS_STR "Command keys:\n"                                     \
-                         "  \'q\'                 End program\n"               \
-                         "  \'ESC\'               Close dialogs or timeouts\n" \
-                         "  \'Up\' and \'Down\'     Adjust speed\n"            \
-                         "  \'0\'...\'9\'           Set speed directly\n"      \
-                         "  \'Left\' and \'Right\'  Change pattern\n"          \
-                         "  \'Space\'             Restart current pattern\n"   \
-                         "  \'c\'                 Change Charstyle\n"          \
-                         "  \'m\'                 Change mode\n"               \
+#define COMMAND_KEYS_STR "Command keys:\n"                                      \
+                         "  \'q\'                 End program\n"                \
+                         "  \'ESC\'               Close dialogs or timeouts\n"  \
+                         "  \'Up\' and \'Down\'     Adjust speed\n"             \
+                         "  \'s\'                 Cycle through speed values\n" \
+                         "  \'0\'...\'9\'           Set speed directly\n"       \
+                         "  \'Left\' and \'Right\'  Change pattern\n"           \
+                         "  \'Space\'             Restart current pattern\n"    \
+                         "  \'c\'                 Change Charstyle\n"           \
+                         "  \'m\'                 Change mode\n"                \
                          "  \'h\'                 Startupscreen\n"
 
 
@@ -640,6 +640,11 @@ static void handle_inputs(void)
     {
         endwin();
         exit(0);
+    }
+    else if(tolower(key) == 's')
+    {
+        speed++;
+        speed %= (SPEED_MAX+1);
     }
     else if(key == KEY_UP)
     {
