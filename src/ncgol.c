@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: "Highlight" Command keys in bottom line
 // TODO: Improve random pattern (less cells / run engine a couple of times before showing it)
 // TODO: Show number of cells and cycles in popup for end detection
 // TODO: Make max grid size dynamical (get more memory as needed)
@@ -419,7 +418,9 @@ static void * tui_draw(void * args)
     // Handle status line
     {
         // Full line ==> "Grid:2500x1000 Cycles:123456 Cells:1500000 Speed:9 (100 Hz) Pattern:Random (fire) Charstyle:Braille 2x4 Mode:Next pattern Cores:8  ncgol v0.1 by Martin Ochs"
-        char str_label[20];
+        char str_label[20]; // Either for complete label or split up into: (Empty char | Highlighted char | Rest of label)
+        char str_label2[20];
+        char str_label3[20];
         char str_value[30];
         uint16_t pos   = 0;
         uint16_t width = getmaxx(w_status);
@@ -476,7 +477,9 @@ static void * tui_draw(void * args)
             }
 
             // Speed
-            strcpy(str_label, " Speed:");
+            strcpy(str_label,  " ");
+            strcpy(str_label2, "S");
+            strcpy(str_label3, "peed:");
             if(hz <= 9.9)
             {
                 sprintf(str_value, "%u (%0.1f Hz)", speed, hz);
@@ -485,18 +488,24 @@ static void * tui_draw(void * args)
             {
                 sprintf(str_value, "%u (%0.0f Hz)", speed, hz);
             }
-            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_label2)+strlen(str_label3)+strlen(str_value)) < width)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));
                 waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label2);
+                wattroff(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label3);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
                 wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Pattern
-            strcpy(str_label, " Pattern:");
-            if(strlen(grid_get_initpattern_long_str(initpattern)) < sizeof(str_value))
+            strcpy(str_label,  " ");
+            strcpy(str_label2, "P");
+            strcpy(str_label3, "attern:");
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_label2)+strlen(str_label3)+strlen(str_value)) < width)
             {
                 strcpy(str_value, grid_get_initpattern_long_str(initpattern));
             }
@@ -508,13 +517,19 @@ static void * tui_draw(void * args)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));
                 waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label2);
+                wattroff(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label3);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
                 wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Style
-            strcpy(str_label, " Charstyle:");
+            strcpy(str_label,  " ");
+            strcpy(str_label2, "C");
+            strcpy(str_label3, "harstyle:");
             if(charstyle < CHARSTYLE_MAX)
             {
                 strcpy(str_value, charstyle_str[charstyle][1]);
@@ -523,17 +538,23 @@ static void * tui_draw(void * args)
             {
                 strcpy(str_value, "?");
             }
-            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_label2)+strlen(str_label3)+strlen(str_value)) < width)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));
                 waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label2);
+                wattroff(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label3);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
                 wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
             }
 
             // Mode
-            strcpy(str_label, " Mode:");
+            strcpy(str_label,  " ");
+            strcpy(str_label2, "M");
+            strcpy(str_label3, "ode:");
             if(automode < MODE_MAX)
             {
                 strcpy(str_value, automode_str[automode][1]);
@@ -542,10 +563,14 @@ static void * tui_draw(void * args)
             {
                 strcpy(str_value, "?");
             }
-            if((getcurx(w_status)+strlen(str_label)+strlen(str_value)) < width)
+            if((getcurx(w_status)+strlen(str_label)+strlen(str_label2)+strlen(str_label3)+strlen(str_value)) < width)
             {
                 wattron(w_status, COLOR_PAIR(COLORS_LABEL));
                 waddstr(w_status, str_label);
+                wattron(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label2);
+                wattroff(w_status, A_BOLD | A_UNDERLINE);
+                waddstr(w_status, str_label3);
                 wattron(w_status, COLOR_PAIR(COLORS_VALUE));
                 waddstr(w_status, str_value);
                 wattroff(w_status, COLOR_PAIR(COLORS_VALUE));
