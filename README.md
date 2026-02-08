@@ -1,11 +1,11 @@
 
-# Ncurses Game of Life
+# ncgol
 
-Based on Ncurses.
+Ncurses Game of Life
 
 ## Description
 
-A basic implementation for Conway's "Game of Life" in Ncurses.
+A basic implementation for Conway's "Game of Life" based on Ncurses.
 
 ## Screenshot
 
