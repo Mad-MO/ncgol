@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: "-p" and "--patern" to set initial pattern
 // TODO: "p" to inc through patterns
 // TODO: "Highlight" Command keys in bottom line
 // TODO: Make max grid size dynamical (get more memory as needed)
@@ -903,16 +902,16 @@ void handle_args(int argc, char * argv[])
         {
             {"charstyle", required_argument, 0, 'c'},
             {"help",      no_argument,       0, 'h'},
-            {"init",      required_argument, 0, 'i'},
             {"mode",      required_argument, 0, 'm'},
             {"nowait",    no_argument,       0, 'n'},
+            {"pattern",   required_argument, 0, 'p'},
             {"speed",     required_argument, 0, 's'},
             {"version",   no_argument,       0, 'v'},
             // --------------------------------------
             {0,           0,                 0,   0}
         };
 
-        int c = getopt_long(argc, argv, "c:hi:m:ns:v", long_options, 0);
+        int c = getopt_long(argc, argv, "c:hm:np:s:v", long_options, 0);
 
         // Detect the end of the options
         if (c == -1)
@@ -954,39 +953,17 @@ void handle_args(int argc, char * argv[])
                 for(int i=0; i<CHARSTYLE_MAX; i++)
                     printf("                   - %-7s -> %s\n", charstyle_str[i][0], charstyle_str[i][1]);
                 printf("  -h, --help       This Help\n");
-                printf("  -i, --init       Set initial pattern:\n");
                 for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
                     printf("                   - %-9s -> %s\n", grid_get_initpattern_short_str(i), grid_get_initpattern_long_str(i));
                 printf("  -m, --mode       Set mode:\n");
                 for(int i=0; i<MODE_MAX; i++)
                     printf("                   - %-4s -> %s\n", automode_str[i][0], automode_str[i][1]);
                 printf("  -n, --nowait     Start without Startupscreen\n");
+                printf("  -p, --pattern    Set initial pattern:\n");
                 printf("  -s, --speed      Set speed (0-9)\n");
                 printf("\n");
                 printf(COMMAND_KEYS_STR);
                 exit(0);
-            }
-
-            case 'i':
-            {
-                initpattern = INITPATTERN_MAX;
-                for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
-                {
-                    if(strcmp(optarg, grid_get_initpattern_short_str(i)) == 0)
-                    {
-                        initpattern = i;
-                    }
-                }
-                if(initpattern == INITPATTERN_MAX) // No valid value found?
-                {
-                    printf("Invalid init value: %s\n", optarg);
-                    printf("Init must be one of:");
-                    for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
-                        printf(" %s", grid_get_initpattern_short_str(i));
-                    printf("\n");
-                    exit(1);
-                }
-                break;
             }
 
             case 'm':
@@ -1014,6 +991,28 @@ void handle_args(int argc, char * argv[])
             case 'n':
             {
                 stage = STAGE_INIT;
+                break;
+            }
+
+            case 'p':
+            {
+                initpattern = INITPATTERN_MAX;
+                for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
+                {
+                    if(strcmp(optarg, grid_get_initpattern_short_str(i)) == 0)
+                    {
+                        initpattern = i;
+                    }
+                }
+                if(initpattern == INITPATTERN_MAX) // No valid value found?
+                {
+                    printf("Invalid pattern value: %s\n", optarg);
+                    printf("Pattern must be one of:");
+                    for(int i=0; i<INITPATTERN_CYCLEMAX; i++)
+                        printf(" %s", grid_get_initpattern_short_str(i));
+                    printf("\n");
+                    exit(1);
+                }
                 break;
             }
 
