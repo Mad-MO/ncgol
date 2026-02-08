@@ -124,11 +124,14 @@ static uint16_t timer;
 #define COMMAND_KEYS_STR "Command keys:\n"                                      \
                          "  \'q\'                 End program\n"                \
                          "  \'ESC\'               Close dialogs or timeouts\n"  \
+                         "  \n"                                                 \
                          "  \'Up\' and \'Down\'     Adjust speed\n"             \
                          "  \'s\'                 Cycle through speed values\n" \
                          "  \'0\'...\'9\'           Set speed directly\n"       \
+                         "  \n"                                                 \
                          "  \'Left\' and \'Right\'  Change pattern\n"           \
                          "  \'p\'                 Cycle through patterns\n"     \
+                         "  \n"                                                 \
                          "  \'Space\'             Restart current pattern\n"    \
                          "  \'c\'                 Change Charstyle\n"           \
                          "  \'m\'                 Change mode\n"                \

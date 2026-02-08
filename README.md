@@ -27,6 +27,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 ## Usage
 
 - "q" key ends the program
+- "ESC" to close dialogs or timeouts
 - "Up", "Down", "s" and "0" through "9" keys adjust the speed
 - "Left", "Right" and "p" keys initialize the cells to a different pattern
   - Random
@@ -50,7 +51,6 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - LOOP: Restart current pattern
   - STOP: Stop when pattern is finished
 - "h" show help
-- "ESC" to close dialogs or timeouts
 
 ## Roadmap
 
