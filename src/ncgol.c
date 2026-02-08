@@ -10,7 +10,6 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: "p" to inc through patterns
 // TODO: "Highlight" Command keys in bottom line
 // TODO: Make max grid size dynamical (get more memory as needed)
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
@@ -129,6 +128,7 @@ static uint16_t timer;
                          "  \'s\'                 Cycle through speed values\n" \
                          "  \'0\'...\'9\'           Set speed directly\n"       \
                          "  \'Left\' and \'Right\'  Change pattern\n"           \
+                         "  \'p\'                 Cycle through patterns\n"     \
                          "  \'Space\'             Restart current pattern\n"    \
                          "  \'c\'                 Change Charstyle\n"           \
                          "  \'m\'                 Change mode\n"                \
@@ -663,7 +663,7 @@ static void handle_inputs(void)
         else                 initpattern--;
         stage = STAGE_INIT;
     }
-    else if(key == KEY_RIGHT)
+    else if((tolower(key) == 'p' || key == KEY_RIGHT))
     {
         initpattern++;
         initpattern %= INITPATTERN_CYCLEMAX;

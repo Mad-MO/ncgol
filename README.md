@@ -28,7 +28,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
 
 - "q" key ends the program
 - "Up", "Down", "s" and "0" through "9" keys adjust the speed
-- "Left" and "Right" keys initialize the cells to a different pattern
+- "Left", "Right" and "p" keys initialize the cells to a different pattern
   - Random
   - Conway (text string)
   - Still lifes
