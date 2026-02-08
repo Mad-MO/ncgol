@@ -661,7 +661,7 @@ static void handle_inputs(void)
     else if(key == KEY_LEFT)
     {
         if(initpattern == 0) initpattern = INITPATTERN_CYCLEMAX - 1;
-        else             initpattern--;
+        else                 initpattern--;
         stage = STAGE_INIT;
     }
     else if(key == KEY_RIGHT)

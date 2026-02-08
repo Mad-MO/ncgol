@@ -50,6 +50,7 @@ A basic implementation for Conway's "Game of Life" in Ncurses.
   - LOOP: Restart current pattern
   - STOP: Stop when pattern is finished
 - "h" show help
+- "ESC" to close dialogs or timeouts
 
 ## Roadmap
 
