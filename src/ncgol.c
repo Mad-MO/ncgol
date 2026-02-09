@@ -10,7 +10,7 @@
 // Unicode: https://www.compart.com/en/unicode/block/U+2580
 //          https://www.compart.com/en/unicode/block/U+2800
 
-// TODO: Show number of cells and cycles in popup for end detection
+// TODO: Correct cycle counter when end detected
 // TODO: Make speed more stable 0:Stop, 1:0,3 Hz, 2:1Hz, 3:3Hz, 4:10Hz, 5:30Hz, 6:100Hz, 7:300Hz, 8:1kHz, 9:As fast as possible
 // TODO: Make max grid size dynamical (get more memory as needed)
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
