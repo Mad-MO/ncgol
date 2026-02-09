@@ -90,7 +90,9 @@ void grid_init(initpattern_t pattern)
         uint16_t x, y;
         for(x=0; x<grid_width; x++)
             for(y=0; y<grid_height; y++)
-                grid[x][y] = (random() & 1);
+                grid[x][y] = (random() & 0x1);
+        for(x=0; x<10; x++)
+            grid_update();
     }
     else if(pattern == INITPATTERN_CONWAY)
     {
