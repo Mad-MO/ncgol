@@ -453,7 +453,18 @@ uint32_t grid_get_cells_alive(void)
 // Get cycle counter
 uint32_t grid_get_cycle_counter(void)
 {
-    return cycle_counter;
+    if(!end_det_detected())
+    {
+        return cycle_counter;
+    }
+    else if(cycle_counter >= end_det_get_detection_cycles())
+    {
+        return (cycle_counter - end_det_get_detection_cycles());
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 

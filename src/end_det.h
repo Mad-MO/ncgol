@@ -20,6 +20,9 @@ void end_det_reset(void);
 // Return "1" if end of simulation has been detected
 uint8_t end_det_detected(void);
 
+// Return number of cycles since beginning of the end detection
+uint32_t end_det_get_detection_cycles(void);
+
 
 
 #endif // __END_DET_H

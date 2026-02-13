@@ -19,6 +19,7 @@
 #define END_DET_CNT_MIN  50
 static uint16_t end_det[END_DET_CNT_MAX]; // Ring-buffer for storing the alive count for every cycle
 static uint16_t end_det_pos  = 0;
+static uint16_t ring_length = 0;
 static uint8_t  end_detected = 0;
 static uint32_t end_det_cycles = 0;
 
@@ -54,20 +55,21 @@ void end_det_handle(uint32_t alive)
     else if(alive == 0)
     {
         end_detected = 1;
+        ring_length = 0;
     }
-    else if(end_det_cycles >= END_DET_CNT_MIN)                                                 // At least END_DET_CNT_MIN cycles needed for detection
+    else if(end_det_cycles >= END_DET_CNT_MIN)                                              // At least END_DET_CNT_MIN cycles needed for detection
     {
-        #define RING_LEN() (end_det_cycles<END_DET_CNT_MAX ? end_det_cycles : END_DET_CNT_MAX) // Current length of the ring buffer
-        for(uint16_t sequence=1; sequence<=(RING_LEN()/2); sequence++)                         // Test sequence in the length of 1 to half of the buffer
+        ring_length = (end_det_cycles<END_DET_CNT_MAX ? end_det_cycles : END_DET_CNT_MAX);  // Current length of the ring buffer
+        for(uint16_t sequence=1; sequence<=(ring_length/2); sequence++)                     // Test sequence in the length of 1 to half of the buffer
         {
             if(end_detected)
                 break;
-            for(uint16_t testpos=sequence; testpos<RING_LEN(); testpos++)
+            for(uint16_t testpos=sequence; testpos<ring_length; testpos++)
             {
-                #define RING_POS(pos) ((end_det_pos + pos) % RING_LEN())
-                if(end_det[RING_POS(testpos)] != end_det[RING_POS(testpos % sequence)])        // Pattern not found? -> End loop and test next sequence
+                #define RING_POS(pos) ((end_det_pos + pos) % ring_length)
+                if(end_det[RING_POS(testpos)] != end_det[RING_POS(testpos % sequence)])     // Pattern not found? -> End loop and test next sequence
                     break;
-                if(testpos == RING_LEN() - 1)                                                  // End of loop reached? -> Pattern found!
+                if(testpos == ring_length - 1)                                              // End of loop reached? -> Pattern found!
                 {
                     end_detected = 1;
                     #if (WITH_DEBUG_OUTPUT)
@@ -85,4 +87,12 @@ void end_det_handle(uint32_t alive)
 uint8_t end_det_detected(void)
 {
     return end_detected;
+}
+
+
+
+// Return number of cycles since beginning of the end detection
+uint32_t end_det_get_detection_cycles(void)
+{
+    return ring_length;
 }
