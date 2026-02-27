@@ -11,10 +11,9 @@
 //          https://www.compart.com/en/unicode/block/U+2800
 
 // TODO: Make speed more stable 0:Stop, 1:0,3 Hz, 2:1Hz, 3:3Hz, 4:10Hz, 5:30Hz, 6:100Hz, 7:300Hz, 8:1kHz, 9:As fast as possible
-// TODO: Make max grid size dynamical (get more memory as needed)
 // TODO: Decrease speed when end detected
 // TODO: Improve thread performance: Try start smaller threads and start next thread when the last one is finished
-// TODO: Improve key reaction time on lowest speeds or during end detected
+// TODO: Improve keyboard key reaction time on lowest speeds or during end detected
 // TODO: Benchmark (calc without drawing of very large grid) --benchmark / -b
 // TODO: Add assert() from assert.h to check struct size from patterns
 // TODO: Add man page
